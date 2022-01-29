@@ -10,7 +10,6 @@ import frc.robot.Subsystems.Subsystem;
 */
 public class Intake extends Subsystem {
     private static Intake instance = null;
-    //@Override
     public Intake getInstance() {if(instance == null){instance = new Intake();}return instance;}
 
     @Override
