@@ -21,16 +21,16 @@ public class Drivetrain extends Subsystem {
 
     public Drivetrain()
     {
-        leftMaster =    new VictorSPX(0);
-        leftSlave =     new VictorSPX(1);
-        rightMaster =   new VictorSPX(2);
-        rightSlave =    new VictorSPX(3);
+        leftMaster =    new VictorSPX(2);
+        //leftSlave =     new VictorSPX(1);
+        // rightMaster =   new VictorSPX(2);
+        // rightSlave =    new VictorSPX(3);
 
-        leftSlave.follow(leftMaster);
-        rightSlave.follow(rightMaster);
+        // leftSlave.follow(leftMaster);
+        // rightSlave.follow(rightMaster);
 
-        rightMaster.setInverted(true);
-        rightSlave.setInverted(InvertType.FollowMaster);
+        // rightMaster.setInverted(true);
+        // rightSlave.setInverted(InvertType.FollowMaster);
     }
 
     @Override
@@ -45,8 +45,8 @@ public class Drivetrain extends Subsystem {
     public void run()
     {
         double leftpower = -thrustmaster.getY()+thrustmaster.getX();
-        double rightpower = -thrustmaster.getY()-thrustmaster.getX();
+        // double rightpower = -thrustmaster.getY()-thrustmaster.getX();
         leftMaster.set(VictorSPXControlMode.PercentOutput, leftpower);
-        rightMaster.set(VictorSPXControlMode.PercentOutput, rightpower);
+        // rightMaster.set(VictorSPXControlMode.PercentOutput, rightpower);
     }
 }
