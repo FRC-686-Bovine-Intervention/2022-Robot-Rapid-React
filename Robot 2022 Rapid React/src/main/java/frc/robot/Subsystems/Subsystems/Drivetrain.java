@@ -21,7 +21,7 @@ public class Drivetrain extends Subsystem {
 
     public Drivetrain()
     {
-        leftMaster =    new VictorSPX(2);
+        leftMaster =    new VictorSPX(32);
         //leftSlave =     new VictorSPX(1);
         // rightMaster =   new VictorSPX(2);
         // rightSlave =    new VictorSPX(3);
