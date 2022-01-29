@@ -11,7 +11,7 @@ import frc.robot.Subsystems.Subsystem;
 */
 public class Climber extends Subsystem {
     private static Climber instance = null;
-    @Override
+    //@Override
     public Climber getInstance() {if(instance == null){instance = new Climber();}return instance;}
 
     @Override
