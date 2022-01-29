@@ -6,7 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.Auto.AutoManager;
-import frc.robot.Subsystems.Subsystems.Drivetrain;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -17,7 +16,6 @@ import frc.robot.Subsystems.Subsystems.Drivetrain;
 public class Robot extends TimedRobot {
 
   AutoManager autoManager = new AutoManager();
-  Drivetrain drivetrain;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -26,7 +24,6 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     autoManager.InitChoices();
-    drivetrain = Drivetrain.getInstance();
   }
 
   /**
@@ -62,15 +59,11 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {
-    drivetrain.init();
-  } // Testing for asifj
+  public void teleopInit() {}
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {
-    drivetrain.run();
-  }
+  public void teleopPeriodic() {}
 
   /** This function is called once when the robot is disabled. */
   @Override
