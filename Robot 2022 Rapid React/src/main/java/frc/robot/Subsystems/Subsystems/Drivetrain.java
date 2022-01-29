@@ -33,8 +33,8 @@ public class Drivetrain extends Subsystem {
         // rightSlave.setInverted(InvertType.FollowMaster);
     }
 
-    @Override
-    public Drivetrain getInstance() {if(instance == null){instance = new Drivetrain();}return instance;}
+    //@Override
+    public static Drivetrain getInstance() {if(instance == null){instance = new Drivetrain();}return instance;}
 
     @Override
     public void init()
