@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import frc.robot.Subsystems.Subsystem;
 
 /**<h4>Contains all code for the Drivetrain subsystem</h4>
- * Takes inputs from joystick axis and gives power to drive motors accordingly<p>
  * Should only be enabled when the current or most recent state of the climber is Defence
 */
 public class Drivetrain extends Subsystem {
