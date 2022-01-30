@@ -1,5 +1,8 @@
 package frc.robot.Subsystems.Subsystems;
 
+import java.util.ArrayList;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Subsystems.Subsystem;
 
 /**<h4>Contains all code for the Climber subsystem</h4>
@@ -13,20 +16,39 @@ public class Climber extends Subsystem {
     private static Climber instance = null;
     public static Climber getInstance() {if(instance == null){instance = new Climber();}return instance;}
 
-    @Override
-    public void init()
-    {
+    public enum ClimberState {DEFENCE, EXTEND, RETRACT, LOCK}
+    public ArrayList<ClimberState> ClimberStatusHistory = new ArrayList<>();
+    public boolean readyForNextState;
 
+    public Climber()
+    {
+        changeState(ClimberState.DEFENCE);
     }
+
+    @Override
+    public void init() {}
     @Override
     public void run()
     {
 
     }
-
     @Override
     public void updateSmartDashboard()
     {
-        
+        SmartDashboard.putString("Climber/Climber Status", getClimberStatus().name());
+        SmartDashboard.putBoolean("Climber/Ready For Next State", readyForNextState);
     }
+    public ClimberState getClimberStatus() {return ClimberStatusHistory.get(ClimberStatusHistory.size()-1);}
+    public void nextState()
+    {
+        switch(getClimberStatus())
+        {
+            case DEFENCE:       changeState(ClimberState.EXTEND);   break;
+            case EXTEND:        changeState(ClimberState.RETRACT);  break;
+            case RETRACT:       changeState(ClimberState.LOCK);     break;
+            case LOCK:          changeState(ClimberState.EXTEND);   break;
+        }
+    }
+    public void prevState() {ClimberStatusHistory.remove(ClimberStatusHistory.get(ClimberStatusHistory.size()-1));}
+    public void changeState(ClimberState newState) {ClimberStatusHistory.add(newState);}
 }

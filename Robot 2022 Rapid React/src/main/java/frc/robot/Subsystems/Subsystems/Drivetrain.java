@@ -48,8 +48,8 @@ public class Drivetrain extends Subsystem {
     @Override
     public void updateSmartDashboard()
     {
-        SmartDashboard.putNumber("Left Master Current", LeftMaster.getStatorCurrent());
-        SmartDashboard.putNumber("Right Master Current", RightMaster.getStatorCurrent());
+        SmartDashboard.putNumber("Drivetrain/Left Master Current", LeftMaster.getStatorCurrent());
+        SmartDashboard.putNumber("Drivetrain/Right Master Current", RightMaster.getStatorCurrent());
     }
 
     public void setAxis(Vector2d axis) {setPower(axis.y+axis.x, axis.y-axis.x);}

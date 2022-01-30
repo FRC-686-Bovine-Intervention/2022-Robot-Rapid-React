@@ -31,7 +31,8 @@ public class Controls {
         INTAKE,
         OUTTAKE,
         CLIMBERNEXTSTAGE,
-        CLIMBERPREVSTAGE
+        CLIMBERPREVSTAGE,
+        CLIMBERFORCESTATE
     }
     
     public boolean getButton(ButtonControlEnum button)
@@ -42,6 +43,7 @@ public class Controls {
             case OUTTAKE:                   return thrustmaster.getRawButton(Thrustmaster.kBottomThumbButton);
             case CLIMBERNEXTSTAGE:          return thrustmaster.getRawButton(Thrustmaster.kTopButton3);
             case CLIMBERPREVSTAGE:          return thrustmaster.getRawButton(Thrustmaster.kTopButton2);
+            case CLIMBERFORCESTATE:         return thrustmaster.getRawButton(Thrustmaster.kBottomButton1) && thrustmaster.getRawButton(Thrustmaster.kBottomButton2) && thrustmaster.getRawButton(Thrustmaster.kBottomButton3);
             default:                        return false;
         }
     }
