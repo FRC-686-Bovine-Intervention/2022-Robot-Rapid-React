@@ -10,7 +10,7 @@ import frc.robot.Subsystems.Subsystem;
 */
 public class Intake extends Subsystem {
     private static Intake instance = null;
-    public Intake getInstance() {if(instance == null){instance = new Intake();}return instance;}
+    public static Intake getInstance() {if(instance == null){instance = new Intake();}return instance;}
 
     @Override
     public void init()
@@ -21,5 +21,11 @@ public class Intake extends Subsystem {
     public void run()
     {
 
+    }
+
+    @Override
+    public void updateSmartDashboard()
+    {
+        
     }
 }

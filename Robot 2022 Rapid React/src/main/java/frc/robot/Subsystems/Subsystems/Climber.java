@@ -11,7 +11,7 @@ import frc.robot.Subsystems.Subsystem;
 */
 public class Climber extends Subsystem {
     private static Climber instance = null;
-    public Climber getInstance() {if(instance == null){instance = new Climber();}return instance;}
+    public static Climber getInstance() {if(instance == null){instance = new Climber();}return instance;}
 
     @Override
     public void init()
@@ -22,5 +22,11 @@ public class Climber extends Subsystem {
     public void run()
     {
 
+    }
+
+    @Override
+    public void updateSmartDashboard()
+    {
+        
     }
 }
