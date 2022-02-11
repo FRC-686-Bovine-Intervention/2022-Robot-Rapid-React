@@ -32,18 +32,22 @@ public class Drivetrain extends Subsystem {
 
         LeftSlave.follow(LeftMaster);
         RightSlave.follow(RightMaster);
+
+        SmartDashboard.putBoolean("Drivetrain/Enabled", true);
     }
 
-    @Override
-    public void init()
-    {
-
-    }
     @Override
     public void run()
     {
-        
+        if(!SmartDashboard.getBoolean("Drivetrain/Enabled", true))
+        {
+            LeftMaster.set(TalonFXControlMode.Disabled,0);
+            RightMaster.set(TalonFXControlMode.Disabled,0);
+        }
     }
+
+    @Override
+    public void runCalibration(){}
 
     @Override
     public void updateSmartDashboard()
@@ -52,11 +56,14 @@ public class Drivetrain extends Subsystem {
         SmartDashboard.putNumber("Drivetrain/Right Master Current", RightMaster.getStatorCurrent());
     }
 
-    public void setAxis(Vector2d axis) {setPower(axis.y+axis.x, axis.y-axis.x);}
+    public void setAxis(Vector2d axis) {setPower(axis.y-axis.x, axis.y+axis.x);}
 
     public void setPower(double leftPower, double rightPower)
     {
-        LeftMaster.set(TalonFXControlMode.PercentOutput,leftPower);
-        RightMaster.set(TalonFXControlMode.PercentOutput,rightPower);
+        if(SmartDashboard.getBoolean("Drivetrain/Enabled", true))
+        {
+            LeftMaster.set(TalonFXControlMode.PercentOutput,leftPower);
+            RightMaster.set(TalonFXControlMode.PercentOutput,rightPower);
+        }
     }
 }

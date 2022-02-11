@@ -27,6 +27,15 @@ public class Controls {
         }
     }
 
+    public int getPOV(JoystickEnum joystick)
+    {
+        switch(joystick)
+        {
+            case THRUSTMASTER:  default:    return thrustmaster.getPOV();
+            case BUTTONBOARD:               return buttonboard.getPOV();
+        }
+    }
+
     public enum ButtonControlEnum {
         INTAKE,
         OUTTAKE,
@@ -37,6 +46,7 @@ public class Controls {
     
     public boolean getButton(ButtonControlEnum button)
     {
+        System.out.println("asking for button");
         switch(button)
         {
             case INTAKE:                    return thrustmaster.getRawButton(Thrustmaster.kTriggerButton);

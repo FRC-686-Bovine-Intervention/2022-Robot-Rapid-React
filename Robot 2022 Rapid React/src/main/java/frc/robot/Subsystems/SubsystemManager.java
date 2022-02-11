@@ -13,9 +13,18 @@ public class SubsystemManager {
     public void init()
     {
         subsystems.add(Drivetrain.getInstance());
-        subsystems.add(Climber.getInstance());
+        //subsystems.add(Climber.getInstance());
         subsystems.add(Intake.getInstance());
-        for (Subsystem s : subsystems) {s.init();}
+    }
+
+    public void run()
+    {
+        for (Subsystem s : subsystems) {s.run();}
+    }
+
+    public void runCalibration()
+    {
+        for (Subsystem s : subsystems) {s.runCalibration();}
     }
 
     public void updateSmartDashboard() {for (Subsystem s : subsystems) {s.updateSmartDashboard();}}

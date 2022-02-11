@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Subsystems.SubsystemManager;
-import frc.robot.Subsystems.Subsystems.DriverInteraction;
 
 public class Robot extends TimedRobot {
 
@@ -31,6 +30,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
     autoManager.run();
+    subsystemManager.run();
   }
 
   @Override
@@ -38,6 +38,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
+    subsystemManager.run();
     DriverInteraction.getInstance().run();
   }
 
@@ -51,5 +52,7 @@ public class Robot extends TimedRobot {
   public void testInit() {}
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    subsystemManager.run();
+  }
 }

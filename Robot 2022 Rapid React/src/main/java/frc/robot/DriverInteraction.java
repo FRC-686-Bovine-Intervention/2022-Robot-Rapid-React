@@ -1,10 +1,12 @@
-package frc.robot.Subsystems.Subsystems;
+package frc.robot;
 
 import frc.robot.Controls.Controls;
-import frc.robot.Controls.Controls.ButtonControlEnum;
 import frc.robot.Subsystems.Subsystem;
 import frc.robot.Subsystems.SubsystemManager;
-import frc.robot.Subsystems.Subsystems.Climber.ClimberState;
+import frc.robot.Subsystems.Subsystems.Climber;
+import frc.robot.Subsystems.Subsystems.Drivetrain;
+import frc.robot.Subsystems.Subsystems.Intake;
+import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
 
 public class DriverInteraction {
     private static DriverInteraction instance;
@@ -28,15 +30,18 @@ public class DriverInteraction {
 
     public void run()
     {
-        if (climber.getClimberStatus() == ClimberState.DEFENCE || climber.ClimberStatusHistory.get(climber.ClimberStatusHistory.size()-2) == ClimberState.DEFENCE)
+        //drivetrain.setAxis(controls.getAxis(Controls.JoystickEnum.THRUSTMASTER));
+        if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
         {
-            drivetrain.setAxis(controls.getAxis(Controls.JoystickEnum.THRUSTMASTER));
+            intake.changeState(IntakeState.INTAKE);
         }
-        else if (climber.getClimberStatus() == ClimberState.EXTEND && climber.readyForNextState)
+        else if (controls.getButton(Controls.ButtonControlEnum.OUTTAKE))
         {
-            //put driver pivot arm control here
+            intake.changeState(IntakeState.OUTTAKE);
         }
-        if (controls.getButton(ButtonControlEnum.CLIMBERFORCESTATE) || (controls.getButton(ButtonControlEnum.CLIMBERNEXTSTAGE) && climber.readyForNextState)) {climber.nextState();}
-        if (controls.getButton(ButtonControlEnum.CLIMBERPREVSTAGE)) {climber.prevState();}
+        else
+        {
+            intake.changeState(IntakeState.DEFENCE);
+        }
     }
 }

@@ -6,14 +6,16 @@ public class Constants {
 
     // Hardware Port Definitions
     // Drivetrain Hardware
-    public static int kLeftMasterID =       1;
-    public static int kLeftSlaveID =        1;
-    public static int kRightMasterID =      1;
-    public static int kRightSlaveID =       1;
+    public static int kLeftMasterID =       2;
+    public static int kLeftSlaveID =        3;
+    public static int kRightMasterID =      4;
+    public static int kRightSlaveID =       5;
     // Intake Hardware
-
+    public static int kArmMotorID =         6;
+    public static int kRollerMotorID =      7;
     // Climber Hardware
-
+    public static int kLeftClimberID =      0;
+    public static int kRightClimberID =     0;
     // Control Hardware
     public static int kThrustmasterPort =   0;
     public static int kButtonboardPort =    1;
