@@ -7,6 +7,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
+import frc.robot.Subsystems.Subsystems.Intake.ArmPosEnum;
+import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
 
 /**<h4>Contains all code for the Climber subsystem</h4>*/
 public class Climber extends Subsystem {
@@ -16,12 +18,11 @@ public class Climber extends Subsystem {
     private TalonFX LeftMotor;
     private TalonFX RightMotor;
 
-    /**Has 4 states: <b>Defense</b>, <b>Extend</b>, <b>Retract</b>, <b>Lock</b><p><b>Defense</b> is when the robot is not currently climbing, and the climber is in the resting state<p><b>Extend</b> is when the climber extends and gives driver control of the pivot arms after extending when the previous state is not Defence<p><b>Retract</b> is when the climber retracts and the pivot arms move back<p><b>Lock</b> is when the pivot arms move forward to engage the bar, the climber extends a little to transfer support to the pivot arms, and the pivot arms move forward to rotate the robot*/
     public enum ClimberState {
-        /**<b>Defense</b> is when the robot is not currently climbing, and the climber is in the resting state*/DEFENCE,
-        /**<b>Extend</b> is when the climber extends and gives driver control of the pivot arms after extending when the previous state is not Defence*/EXTEND,
-        /**<b>Retract</b> is when the climber retracts and the pivot arms move back*/RETRACT,
-        /**<b>Lock</b> is when the pivot arms move forward to engage the bar, the climber extends a little to transfer support to the pivot arms, and the pivot arms move forward to rotate the robot*/LOCK
+        DEFENSE,
+        EXTEND,
+        RETRACT,
+        CALIBRATING
     }
     public ArrayList<ClimberState> ClimberStatusHistory = new ArrayList<>();
     /**@return <pre>{@code true} - the climber is done moving and is ready to move on
@@ -33,7 +34,7 @@ public class Climber extends Subsystem {
         LeftMotor = new TalonFX(Constants.kLeftClimberID);
         RightMotor = new TalonFX(Constants.kRightClimberID);
 
-        changeState(ClimberState.DEFENCE);
+        changeState(ClimberState.DEFENSE);
 
         SmartDashboard.putBoolean("Climber/Enabled", true);
     }
@@ -41,10 +42,65 @@ public class Climber extends Subsystem {
     @Override
     public void run()
     {
-        if (!SmartDashboard.getBoolean("Climber/Enabled", true))
+        switch (getClimberStatus())
         {
-            forceChangeState(ClimberState.DEFENCE);
+            case DEFENSE:
+                setTargetPos(ClimberPos.RETRACTED);
+            break;
+            case EXTEND:
+                if (ClimberStatusHistory.get(ClimberStatusHistory.size()-2) == ClimberState.DEFENSE)
+                {
+                    if (Intake.getInstance().isAtPos(ArmPosEnum.RAISED))
+                    {
+                        setTargetPos(ClimberPos.EXTENDED);
+                    }
+                    else
+                    {
+                        Intake.getInstance().setTargetPos(ArmPosEnum.RAISED);
+                    }
+                }
+                else
+                {
+                    if (isAtPos(ClimberPos.EXTENDED))
+                    {
+                        Intake.getInstance(); //Driver control
+                    }
+                    else
+                    {
+                        setTargetPos(ClimberPos.EXTENDED);
+                    }
+                }
+            break;
+            case RETRACT:
+                if (isAtPos(ClimberPos.RETRACTED))
+                {
+                    Intake.getInstance().setTargetPos(ArmPosEnum.LOWERED);
+                }
+                else
+                {
+                    setTargetPos(ClimberPos.RETRACTED);
+                }
+            break;
+            case CALIBRATING:
+
+            break;
         }
+    }
+
+    private boolean isAtPos(ClimberPos pos)
+    {
+        return true;
+    }
+
+    private enum ClimberPos
+    {
+        EXTENDED,
+        RETRACTED
+    }
+
+    private void setTargetPos(ClimberPos pos)
+    {
+
     }
 
     @Override
@@ -61,10 +117,10 @@ public class Climber extends Subsystem {
     {
         switch(getClimberStatus())
         {
-            case DEFENCE:       changeState(ClimberState.EXTEND);   break;
+            case DEFENSE:       changeState(ClimberState.EXTEND);   break;
             case EXTEND:        changeState(ClimberState.RETRACT);  break;
-            case RETRACT:       changeState(ClimberState.LOCK);     break;
-            case LOCK:          changeState(ClimberState.EXTEND);   break;
+            case RETRACT:       changeState(ClimberState.EXTEND);   break;
+            case CALIBRATING:   break;
         }
     }
     public void prevState() {ClimberStatusHistory.remove(ClimberStatusHistory.get(ClimberStatusHistory.size()-1));}

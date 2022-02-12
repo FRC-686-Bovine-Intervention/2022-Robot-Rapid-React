@@ -41,7 +41,7 @@ public class DriverInteraction {
         }
         else
         {
-            intake.changeState(IntakeState.DEFENCE);
+            intake.changeState(IntakeState.DEFENSE);
         }
     }
 }
