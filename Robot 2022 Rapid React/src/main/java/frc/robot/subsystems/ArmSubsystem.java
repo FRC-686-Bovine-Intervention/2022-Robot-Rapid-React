@@ -33,7 +33,7 @@ public class ArmSubsystem extends Subsystem
     private static final double kP = 0.05;
     private static final double kI = 0.0;
     private static final double kD = 0.0;
-    private static final double kMaxVelocityDegPerSecond = 120;
+    private static final double kMaxVelocityDegPerSecond = 90;
     private static final double kMaxAccelerationDegPerSecSquared = 200;
 
 
