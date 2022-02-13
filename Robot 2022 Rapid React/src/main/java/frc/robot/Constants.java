@@ -19,4 +19,7 @@ public class Constants {
     // Control Hardware
     public static int kThrustmasterPort =   0;
     public static int kButtonboardPort =    1;
+
+    public static final int kCANTimeoutMs = 10;         // ms, use for on the fly updates
+    public static final int kLongCANTimeoutMs = 100;    // ms, use for constructors
 }
