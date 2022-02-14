@@ -20,7 +20,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void robotPeriodic() {subsystemManager.updateSmartDashboard();}
+  public void robotPeriodic() {subsystemManager.updateShuffleboard();}
 
   @Override
   public void autonomousInit() {

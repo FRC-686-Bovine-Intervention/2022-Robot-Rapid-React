@@ -6,6 +6,8 @@ import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
@@ -85,11 +87,11 @@ public class Intake extends Subsystem {
         setPos(targetPos);
     }
 
-    /**Is true if the robot has calibrated in the past, otherwise false */
-    private boolean calibrated;
-
     @Override
-    public void runCalibration() {calibrated = false;}
+    public void runTestMode()
+    {
+        run();
+    }
 
     /**
      * @param pos is the desired pos
@@ -106,15 +108,15 @@ public class Intake extends Subsystem {
         
     }
 
-    @Override
-    public void updateSmartDashboard()
-    {
-        SmartDashboard.putString("Intake/Status", intakeStatus.name());
-        SmartDashboard.putNumber("Intake/ArmPos", currentPos);
-        SmartDashboard.putString("Intake/TargetPos", targetPos.name());
-    }
     public void changeState(IntakeState newState)
     {
         intakeStatus = newState;
+    }
+
+    private ShuffleboardTab tab = Shuffleboard.getTab("Intake");
+
+    @Override
+    public void updateShuffleboard()
+    {
     }
 }

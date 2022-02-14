@@ -7,9 +7,10 @@ public abstract class Subsystem {
     /**Is called every tick the subsystem is supposed to be active*/
     public abstract void run();
     /**Put all the variables you want to project to SmartDashboard here */
-    public abstract void updateSmartDashboard();
-
-    public boolean calibrated;
+    public boolean Enabled;
+    public abstract void updateShuffleboard();
+    public abstract void runTestMode();
+    public boolean calibrated = true;
     /**Put all calibration code here */
-    public abstract void runCalibration();
+    public void runCalibration() {calibrated = false;}
 }

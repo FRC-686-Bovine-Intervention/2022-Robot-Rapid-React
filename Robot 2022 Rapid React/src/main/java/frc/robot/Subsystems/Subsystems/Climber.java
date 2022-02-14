@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
 import frc.robot.Subsystems.Subsystems.Intake.ArmPosEnum;
-import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
 
 /**<h4>Contains all code for the Climber subsystem</h4>*/
 public class Climber extends Subsystem {
@@ -87,6 +86,12 @@ public class Climber extends Subsystem {
         }
     }
 
+    @Override
+    public void runTestMode()
+    {
+        run();
+    }
+
     private boolean isAtPos(ClimberPos pos)
     {
         return true;
@@ -102,12 +107,9 @@ public class Climber extends Subsystem {
     {
 
     }
-
-    @Override
-    public void runCalibration(){}
     
     @Override
-    public void updateSmartDashboard()
+    public void updateShuffleboard()
     {
         SmartDashboard.putString("Climber/Climber Status", getClimberStatus().name());
         SmartDashboard.putBoolean("Climber/Ready For Next State", readyForNextState);

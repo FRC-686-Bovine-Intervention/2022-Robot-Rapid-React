@@ -17,15 +17,8 @@ public class SubsystemManager {
         subsystems.add(Intake.getInstance());
     }
 
-    public void run()
-    {
-        for (Subsystem s : subsystems) {s.run();}
-    }
-
-    public void runCalibration()
-    {
-        for (Subsystem s : subsystems) {s.runCalibration();}
-    }
-
-    public void updateSmartDashboard() {for (Subsystem s : subsystems) {s.updateSmartDashboard();}}
+    public void run()                   {for (Subsystem s : subsystems) {if (s.Enabled){s.run();}}}
+    public void runTestMode()           {for (Subsystem s : subsystems) {if (s.Enabled){s.runTestMode();}}}
+    public void runCalibration()        {for (Subsystem s : subsystems) {if (s.Enabled){s.runCalibration();}}}
+    public void updateShuffleboard()    {for (Subsystem s : subsystems) {s.updateShuffleboard();}}
 }
