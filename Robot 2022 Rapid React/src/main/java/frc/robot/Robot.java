@@ -11,7 +11,8 @@ import frc.robot.Subsystems.SubsystemManager;
 public class Robot extends TimedRobot {
 
   SubsystemManager subsystemManager = SubsystemManager.getInstance();
-  AutoManager autoManager = new AutoManager();
+  AutoManager autoManager = AutoManager.getInstance();
+  DriverInteraction driverInteraction = DriverInteraction.getInstance();
 
   @Override
   public void robotInit() {
@@ -41,7 +42,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     subsystemManager.run();
-    DriverInteraction.getInstance().run();
+    driverInteraction.run();
   }
 
   @Override
@@ -55,6 +56,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    subsystemManager.run();
+    subsystemManager.runTestMode();
   }
 }

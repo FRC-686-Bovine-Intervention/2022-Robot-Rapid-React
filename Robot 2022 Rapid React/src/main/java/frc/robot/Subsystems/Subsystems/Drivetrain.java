@@ -1,12 +1,8 @@
 package frc.robot.Subsystems.Subsystems;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.drive.Vector2d;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
@@ -22,7 +18,7 @@ public class Drivetrain extends Subsystem {
     public TalonFX LeftMaster, LeftSlave, RightMaster, RightSlave;
     public double LeftPower, RightPower;
 
-    public Drivetrain()
+    private Drivetrain()
     {
         LeftMaster  = new TalonFX(Constants.kLeftMasterID);
         LeftSlave   = new TalonFX(Constants.kLeftSlaveID);
@@ -41,37 +37,18 @@ public class Drivetrain extends Subsystem {
     }
 
     @Override
-    public void run()
-    {
+    public void run(){}
 
-    }
-
-    @Override public void runCalibration(){}
+    @Override
+    public void runCalibration(){}
     
+    @Override
+    public void runTestMode(){}
+
+    @Override
+    public void updateShuffleboard(){}
+
     public void setAxis(Vector2d axis) {setPower(axis.y-axis.x, axis.y+axis.x);}
 
-    public void setPower(double leftPower, double rightPower)
-    {
-        LeftMaster.set(TalonFXControlMode.PercentOutput,leftPower);
-        RightMaster.set(TalonFXControlMode.PercentOutput,rightPower);
-    }
-
-    @Override
-    public void runTestMode()
-    {
-        run();
-    }
-
-    private ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
-    private NetworkTableEntry LeftMasterCurrent =   tab.add("Left Master Current", 0)   .getEntry();
-    private NetworkTableEntry RightMasterCurrent =  tab.add("Right Master Current", 0)  .getEntry();
-    private NetworkTableEntry EnabledEntry =        tab.add("Enabled", true)            .getEntry();
-
-    @Override
-    public void updateShuffleboard()
-    {
-        Enabled = EnabledEntry.getBoolean(true);
-        LeftMasterCurrent.setDouble(LeftMaster.getStatorCurrent());
-        RightMasterCurrent.setDouble(RightMaster.getStatorCurrent());
-    }
+    public void setPower(double leftPower, double rightPower){}
 }

@@ -7,7 +7,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
-import frc.robot.Subsystems.Subsystems.Intake.ArmPosEnum;
 
 /**<h4>Contains all code for the Climber subsystem</h4>*/
 public class Climber extends Subsystem {
@@ -16,6 +15,17 @@ public class Climber extends Subsystem {
 
     private TalonFX LeftMotor;
     private TalonFX RightMotor;
+    
+    private Climber()
+    {
+        LeftMotor = new TalonFX(Constants.kLeftClimberID);
+        RightMotor = new TalonFX(Constants.kRightClimberID);
+
+        changeState(ClimberState.DEFENSE);
+        calibrated = false;
+
+        SmartDashboard.putBoolean("Climber/Enabled", true);
+    }
 
     public enum ClimberState {
         DEFENSE,
@@ -24,96 +34,16 @@ public class Climber extends Subsystem {
         CALIBRATING
     }
     public ArrayList<ClimberState> ClimberStatusHistory = new ArrayList<>();
-    /**@return <pre>{@code true} - the climber is done moving and is ready to move on
-     * <p> <pre>{@code false} - the climber is still moving and should not move to the next state*/
-    public boolean readyForNextState;
-
-    public Climber()
-    {
-        LeftMotor = new TalonFX(Constants.kLeftClimberID);
-        RightMotor = new TalonFX(Constants.kRightClimberID);
-
-        changeState(ClimberState.DEFENSE);
-
-        SmartDashboard.putBoolean("Climber/Enabled", true);
-    }
 
     @Override
-    public void run()
-    {
-        switch (getClimberStatus())
-        {
-            case DEFENSE:
-                setTargetPos(ClimberPos.RETRACTED);
-            break;
-            case EXTEND:
-                if (ClimberStatusHistory.get(ClimberStatusHistory.size()-2) == ClimberState.DEFENSE)
-                {
-                    if (Intake.getInstance().isAtPos(ArmPosEnum.RAISED))
-                    {
-                        setTargetPos(ClimberPos.EXTENDED);
-                    }
-                    else
-                    {
-                        Intake.getInstance().setTargetPos(ArmPosEnum.RAISED);
-                    }
-                }
-                else
-                {
-                    if (isAtPos(ClimberPos.EXTENDED))
-                    {
-                        Intake.getInstance(); //Driver control
-                    }
-                    else
-                    {
-                        setTargetPos(ClimberPos.EXTENDED);
-                    }
-                }
-            break;
-            case RETRACT:
-                if (isAtPos(ClimberPos.RETRACTED))
-                {
-                    Intake.getInstance().setTargetPos(ArmPosEnum.LOWERED);
-                }
-                else
-                {
-                    setTargetPos(ClimberPos.RETRACTED);
-                }
-            break;
-            case CALIBRATING:
-
-            break;
-        }
-    }
+    public void run(){}
 
     @Override
-    public void runTestMode()
-    {
-        run();
-    }
+    public void runTestMode(){}
 
-    private boolean isAtPos(ClimberPos pos)
-    {
-        return true;
-    }
-
-    private enum ClimberPos
-    {
-        EXTENDED,
-        RETRACTED
-    }
-
-    private void setTargetPos(ClimberPos pos)
-    {
-
-    }
+    @Override
+    public void updateShuffleboard(){}
     
-    @Override
-    public void updateShuffleboard()
-    {
-        SmartDashboard.putString("Climber/Climber Status", getClimberStatus().name());
-        SmartDashboard.putBoolean("Climber/Ready For Next State", readyForNextState);
-    }
     public ClimberState getClimberStatus() {return ClimberStatusHistory.get(ClimberStatusHistory.size()-1);}
     public void nextState()
     {

@@ -6,7 +6,6 @@ import frc.robot.Subsystems.SubsystemManager;
 import frc.robot.Subsystems.Subsystems.Climber;
 import frc.robot.Subsystems.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Subsystems.Intake;
-import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
 
 public class DriverInteraction {
     private static DriverInteraction instance;
@@ -17,7 +16,7 @@ public class DriverInteraction {
     Climber climber;
     Intake intake;
 
-    public DriverInteraction()
+    private DriverInteraction()
     {
         controls = Controls.getInstance();
         for (Subsystem s : SubsystemManager.getInstance().subsystems)
@@ -30,18 +29,6 @@ public class DriverInteraction {
 
     public void run()
     {
-        //drivetrain.setAxis(controls.getAxis(Controls.JoystickEnum.THRUSTMASTER));
-        if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
-        {
-            intake.changeState(IntakeState.INTAKE);
-        }
-        else if (controls.getButton(Controls.ButtonControlEnum.OUTTAKE))
-        {
-            intake.changeState(IntakeState.OUTTAKE);
-        }
-        else
-        {
-            intake.changeState(IntakeState.DEFENSE);
-        }
+        
     }
 }

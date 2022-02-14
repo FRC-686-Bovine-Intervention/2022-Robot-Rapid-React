@@ -8,6 +8,8 @@ public class SubsystemManager {
     private static SubsystemManager instance;
     public static SubsystemManager getInstance() {if(instance == null){instance = new SubsystemManager();}return instance;}
 
+    private SubsystemManager(){}
+
     public ArrayList<Subsystem> subsystems = new ArrayList<>();
 
     public void init()
