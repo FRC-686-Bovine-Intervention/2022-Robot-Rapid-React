@@ -59,6 +59,7 @@ public class Intake extends Subsystem {
     public IntakeState intakeStatus;
     public outtakeState outtakeStatus;
 
+
     @Override
     public void run(){
         if (!calibrated){
@@ -66,38 +67,45 @@ public class Intake extends Subsystem {
         }
         switch(intakeStatus){
             case DEFENSE:
-                setPos(ArmPosEnum.LOWERED);
+                setTargetPos(ArmPosEnum.RAISED);
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 break;
             case INTAKE:
-                setPos(ArmPosEnum.LOWERED);
-                RollerMotor.set(VictorSPXControlMode.PercentOutput, 0.75);
+                if (isAtPos(ArmPosEnum.LOWERED)){
+                    RollerMotor.set(VictorSPXControlMode.PercentOutput, 0.75);
+                } else{
+                    setTargetPos(ArmPosEnum.LOWERED);
+                }
                 break;
             case OUTTAKE:
                 switch (outtakeStatus){
                     case SCORING:
-                        setPos(ArmPosEnum.RAISED);
-                        RollerMotor.set(VictorSPXControlMode.PercentOutput, -0.75);
+                        if (isAtPos(ArmPosEnum.RAISED)){
+                            RollerMotor.set(VictorSPXControlMode.PercentOutput, -0.75);
+                        } else{
+                            setTargetPos(ArmPosEnum.RAISED);
+                        }
                         break;
                     case HIDING:
-                        setPos(ArmPosEnum.LOWERED);
-                        RollerMotor.set(VictorSPXControlMode.PercentOutput, -0.3);
+                        if (isAtPos(ArmPosEnum.LOWERED)){
+                            RollerMotor.set(VictorSPXControlMode.PercentOutput, -0.3);
+                        } else{
+                            setTargetPos(ArmPosEnum.LOWERED);
+                        }
                         break;
                 }
                 break;
             case CLIMBING:
                 //Check if robot is in defense state
                 if (Climber.getInstance().ClimberStatusHistory.get(Climber.getInstance().ClimberStatusHistory.size()-1) != ClimberState.DEFENSE) break;
-
                 //Release climber and extend
                 Climber.getInstance().changeState(ClimberState.EXTEND);
-
                 //Set ArmPosEnum.RAISED
-                setPos(ArmPosEnum.RAISED);
-
+                if (!isAtPos(ArmPosEnum.RAISED)){
+                    setTargetPos(ArmPosEnum.RAISED);
+                }
                 //If power level is high, set it back to lower state
-                if (ArmMotor.getStatorCurrent() > 5) {setPos(ArmPosEnum.LOWERED);}
-
+                if (ArmMotor.getStatorCurrent() > 5) {setTargetPos(ArmPosEnum.LOWERED);}
                 //Retract climber
                 Climber.getInstance().changeState(ClimberState.RETRACT);
                 break;
@@ -110,8 +118,8 @@ public class Intake extends Subsystem {
                     calibrated = true;
                 }
                 break;
-
         }
+        setPos(targetPos);
     }
 
     @Override
