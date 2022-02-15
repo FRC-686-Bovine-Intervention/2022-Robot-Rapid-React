@@ -49,13 +49,15 @@ public class Robot extends TimedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    subsystemManager.disable();
+  }
 
   @Override
   public void testInit() {}
 
   @Override
   public void testPeriodic() {
-    subsystemManager.runTestMode();
+    subsystemManager.run();
   }
 }
