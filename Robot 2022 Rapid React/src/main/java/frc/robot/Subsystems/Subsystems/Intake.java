@@ -6,9 +6,9 @@ import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
 
@@ -20,7 +20,7 @@ public class Intake extends Subsystem {
     private TalonFX ArmMotor;
     private VictorSPX RollerMotor;
 
-    public Intake()
+    private Intake()
     {
         ArmMotor = new TalonFX(Constants.kArmMotorID);
         RollerMotor = new VictorSPX(Constants.kRollerMotorID);
@@ -29,8 +29,6 @@ public class Intake extends Subsystem {
     
         intakeStatus = IntakeState.DEFENSE;
         calibrated = false;
-    
-        SmartDashboard.putBoolean("Intake/Enabled", true);
     }
     
     public enum ArmPosEnum {
@@ -57,8 +55,7 @@ public class Intake extends Subsystem {
     @Override
     public void run()
     {
-        if(!calibrated) {changeState(IntakeState.CALIBRATING);}
-        //if(!SmartDashboard.getBoolean("Intake/Enabled", true)){intakeStatus = IntakeState.DEFENSE;}
+        if(!calibrated && !DriverStation.isTest()) {changeState(IntakeState.CALIBRATING);}
         switch (intakeStatus)
         {
             case DEFENSE: default:
@@ -84,7 +81,7 @@ public class Intake extends Subsystem {
                 }
             break;
         }
-        setPos(targetPos);
+        if (intakeStatus == IntakeState.CALIBRATING) setPos(targetPos);
     }
 
     @Override

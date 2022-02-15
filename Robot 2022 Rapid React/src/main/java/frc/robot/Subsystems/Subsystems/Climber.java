@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
 import frc.robot.Subsystems.Subsystems.Intake.ArmPosEnum;
+import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
 
 /**<h4>Contains all code for the Climber subsystem</h4>*/
 public class Climber extends Subsystem {
@@ -28,19 +30,19 @@ public class Climber extends Subsystem {
      * <p> <pre>{@code false} - the climber is still moving and should not move to the next state*/
     public boolean readyForNextState;
 
-    public Climber()
+    private Climber()
     {
         LeftMotor = new TalonFX(Constants.kLeftClimberID);
         RightMotor = new TalonFX(Constants.kRightClimberID);
 
         changeState(ClimberState.DEFENSE);
-
-        SmartDashboard.putBoolean("Climber/Enabled", true);
     }
 
     @Override
     public void run()
     {
+        if(!calibrated && !DriverStation.isTest()) {changeState(ClimberState.CALIBRATING);}
+        if ((getClimberStatus() != ClimberState.DEFENSE) && (getClimberStatus() != ClimberState.CALIBRATING)) Intake.getInstance().changeState(IntakeState.CLIMBING);
         switch (getClimberStatus())
         {
             case DEFENSE:
@@ -126,6 +128,5 @@ public class Climber extends Subsystem {
         }
     }
     public void prevState() {ClimberStatusHistory.remove(ClimberStatusHistory.get(ClimberStatusHistory.size()-1));}
-    public void changeState(ClimberState newState) {if(SmartDashboard.getBoolean("Climber/Enabled", true)){forceChangeState(newState);};}
-    private void forceChangeState(ClimberState newState) {if(getClimberStatus() != newState){ClimberStatusHistory.add(newState);}}
+    public void changeState(ClimberState newState) {if(getClimberStatus() != newState) ClimberStatusHistory.add(newState);}
 }
