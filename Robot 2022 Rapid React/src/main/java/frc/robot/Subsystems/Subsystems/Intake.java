@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
+import frc.robot.Subsystems.Subsystems.Climber.ClimberArmPos;
 import frc.robot.Subsystems.Subsystems.Climber.ClimberState;
 
 
@@ -96,18 +97,15 @@ public class Intake extends Subsystem {
                 }
                 break;
             case CLIMBING:
-                //Check if robot is in defense state
                 if (Climber.getInstance().ClimberStatusHistory.get(Climber.getInstance().ClimberStatusHistory.size()-1) != ClimberState.DEFENSE) break;
-                //Release climber and extend
-                Climber.getInstance().changeState(ClimberState.EXTEND);
-                //Set ArmPosEnum.RAISED
+                Climber.getInstance().changeState(ClimberState.LEAN_FORWARD);
+                Climber.getInstance().changeCurrentArmPos(ClimberArmPos.EXTEND);
                 if (!isAtPos(ArmPosEnum.RAISED)){
                     setTargetPos(ArmPosEnum.RAISED);
                 }
-                //If power level is high, set it back to lower state
                 if (ArmMotor.getStatorCurrent() > 5) {setTargetPos(ArmPosEnum.LOWERED);}
-                //Retract climber
-                Climber.getInstance().changeState(ClimberState.RETRACT);
+                Climber.getInstance().changeState(ClimberState.LEAN_BACKWARD);
+                Climber.getInstance().changeCurrentArmPos(ClimberArmPos.RETRACT);
                 break;
             case CALIBRATING:
                 ArmMotor.set(TalonFXControlMode.PercentOutput, 0.2);
