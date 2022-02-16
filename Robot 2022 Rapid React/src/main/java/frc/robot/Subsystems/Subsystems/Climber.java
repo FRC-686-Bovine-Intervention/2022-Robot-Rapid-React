@@ -2,6 +2,7 @@ package frc.robot.Subsystems.Subsystems;
 
 import java.util.ArrayList;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -36,7 +37,28 @@ public class Climber extends Subsystem {
     public ArrayList<ClimberState> ClimberStatusHistory = new ArrayList<>();
 
     @Override
-    public void run(){}
+    public void run(){
+        switch (getClimberStatus()){
+            case DEFENSE:
+                if (!isAtPos(ClimberPos.RETRACT)){
+                    changeState(ClimberPos.RETRACT);
+                }
+                break;
+            case EXTEND:
+                if (!isAtPos(ClimberPos.EXTEND)){
+                    changeState(ClimberPos.EXTEND);
+                }
+            break;
+            case RETRACT:
+                if (!isAtPos(ClimberPos.RETRACT)){
+                    changeState(ClimberPos.RETRACT);
+                }
+            break;
+            case CALIBRATING:
+                LeftMotor.set(TalonFXControlMode.PercentOutput, -0.1);
+            break;
+        }   
+    }
 
     @Override
     public void runTestMode(){}
