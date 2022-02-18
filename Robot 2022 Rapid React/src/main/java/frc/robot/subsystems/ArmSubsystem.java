@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
@@ -23,8 +24,7 @@ public class ArmSubsystem extends Subsystem
     TrapezoidProfile.State scoringState = new TrapezoidProfile.State(kScoringPositionDegrees, 0);
     TrapezoidProfile.State groundState = new TrapezoidProfile.State(kGroundPositionDegrees, 0);
 
-    private static final double kCalibrationPercentOutput = 0.3;
-    private static final double kMotorStallCurrentThrehold = 20.0;
+    private static final double kCalibrationPercentOutput = 0.05;
 
     private static final double kGearRatio = 16.0 * 48.0/12.0;  // 16 in gearbox, 48t:12t sprockets
     private static final double kEncoderUnitsPerRev = 2048 * kGearRatio;
@@ -33,8 +33,8 @@ public class ArmSubsystem extends Subsystem
     private static final double kP = 0.05;
     private static final double kI = 0.0;
     private static final double kD = 0.0;
-    private static final double kMaxVelocityDegPerSecond = 90;
-    private static final double kMaxAccelerationDegPerSecSquared = 200;
+    private static final double kMaxVelocityDegPerSecond = 30; //90;
+    private static final double kMaxAccelerationDegPerSecSquared = 30;  //200;
 
 
     public WPI_TalonFX motor = new WPI_TalonFX(Constants.kArmMotorID);
@@ -52,7 +52,8 @@ public class ArmSubsystem extends Subsystem
     NetworkTableEntry goalEntry = tab.add("pidGoal", 0.0).getEntry();   
     NetworkTableEntry setPtEntry = tab.add("pidSetPt", 0.0).getEntry();  
     NetworkTableEntry pidOutEntry = tab.add("pidOut", 0.0).getEntry(); 
-    
+    NetworkTableEntry textEntry = tab.add("textBox", "blah\nnewline\nah").withWidget(BuiltInWidgets.kTextView).getEntry(); 
+    NetworkTableEntry limitSwitchEntry = tab.add("fwdLimitSwitch", false).getEntry();
     
     public ArmSubsystem() 
     {
@@ -92,12 +93,17 @@ public class ArmSubsystem extends Subsystem
             motor.set(ControlMode.PercentOutput, pidOutput);
         }
 
+        // always check fwd limit switch
+        // if something went wrong it will rezero the arm angles
+        boolean fwdLimitSwitch = checkFwdLimitSwitch();        
+
         calibratedEntry.setBoolean(calibrated); 
         currentEntry.setNumber(motor.getStatorCurrent());
         degreesEntry.setNumber(currentAngleDegrees); 
         goalEntry.setNumber(pid.getGoal().position);
         setPtEntry.setNumber(pid.getSetpoint().position); 
-        pidOutEntry.setNumber(pidOutput);                 
+        pidOutEntry.setNumber(pidOutput); 
+        limitSwitchEntry.setBoolean(fwdLimitSwitch);                
     }
 
     public void stop()
@@ -107,7 +113,17 @@ public class ArmSubsystem extends Subsystem
 
     public void zeroSensors()
     {
-
+        if (!calibrated)
+        {
+            // give arm a low voltage to slowly move arm upwards
+            motor.set(ControlMode.PercentOutput, kCalibrationPercentOutput);
+        
+            // check if arm has reached the top position (current will grow very large when it stalls)
+            if (checkFwdLimitSwitch())
+            {
+                System.out.printf("Arm Calibration Complete!\n");
+            }
+        }
     }
 
     public static int degreesToEncoderUnits(double _degrees)
@@ -119,50 +135,28 @@ public class ArmSubsystem extends Subsystem
     {
       return (double)(_encoderUnits / kEncoderUnitsPerDeg);
     }   
-    
-    public void calibrate()
-    {
-        disableSoftLimits();
 
-        // give arm a low voltage to slowly move arm upwards
-        motor.set(ControlMode.PercentOutput, kCalibrationPercentOutput);
-    
-        // check if arm has reached the top position (current will grow very large when it stalls)
-        if (motor.getStatorCurrent() > kMotorStallCurrentThrehold)
+
+    public boolean checkFwdLimitSwitch()
+    {
+        boolean fwdLimitSwitchClosed = (motor.isFwdLimitSwitchClosed() == 1);
+        if (fwdLimitSwitchClosed)
         {
-            // stop motor where it is
-            motor.set(ControlMode.PercentOutput, 0.0);
-    
             // set the calibration position here
             motor.setSelectedSensorPosition(degreesToEncoderUnits(kCalibrationPositionDegrees));
             pid.reset(calState);
-            pid.setGoal(scoringState);
-
-            // set soft limits
-            // enableSoftLimits();
+            pid.setGoal(calState);
 
             // stop future calibration
             calibrated = true;
-
-            System.out.printf("Arm Calibration Complete!\n");
         }
+        return fwdLimitSwitchClosed;
     }
-
-    public void enableSoftLimits()
+   
+    public void manualControl(double _ctrl)
     {
-        motor.configReverseSoftLimitThreshold(degreesToEncoderUnits(degreesToEncoderUnits(kGroundPositionDegrees)), Constants.kCANTimeoutMs);
-        motor.configForwardSoftLimitThreshold(degreesToEncoderUnits(degreesToEncoderUnits(kCalibrationPositionDegrees)), Constants.kCANTimeoutMs);
-        motor.configReverseSoftLimitEnable(true, Constants.kCANTimeoutMs);
-        motor.configForwardSoftLimitEnable(true, Constants.kCANTimeoutMs);
-        motor.overrideLimitSwitchesEnable(true);
+        motor.set(ControlMode.PercentOutput, _ctrl);
     }
-
-    public void disableSoftLimits()
-    {
-        motor.configReverseSoftLimitEnable(false, Constants.kCANTimeoutMs);
-        motor.configForwardSoftLimitEnable(false, Constants.kCANTimeoutMs);
-        motor.overrideLimitSwitchesEnable(false); // disable soft limit switches
-    }      
   
 }
   

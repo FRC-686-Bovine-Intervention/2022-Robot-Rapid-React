@@ -16,19 +16,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+
   }
 
   @Override
   public void robotPeriodic() {
-    if (!arm.calibrated)
-    {
-      arm.calibrate();
-    }
+
   }
 
   @Override
   public void autonomousInit() {
-    
+    arm.zeroSensors();    
   }
 
   @Override
@@ -38,11 +36,18 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-
+    arm.zeroSensors();
   }
 
   @Override
   public void teleopPeriodic() {
+    double armCtrl = joystick.getRawAxis(1);
+    if (Math.abs(armCtrl)>0.1)
+    {
+      armCtrl *= 0.3;
+      arm.manualControl(armCtrl);
+    }
+
     if (joystick.getRawButtonPressed(1)) {
       arm.setTarget(ArmSubsystem.kGroundPositionDegrees);
     }
