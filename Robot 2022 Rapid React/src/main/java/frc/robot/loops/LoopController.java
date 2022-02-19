@@ -1,6 +1,5 @@
 package frc.robot.loops;
 
-
 import java.util.ArrayList;
 import java.util.List;
 

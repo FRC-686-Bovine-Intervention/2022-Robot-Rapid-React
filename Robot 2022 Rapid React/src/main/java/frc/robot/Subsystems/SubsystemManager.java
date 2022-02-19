@@ -3,6 +3,7 @@ package frc.robot.Subsystems;
 import java.util.ArrayList;
 
 import frc.robot.Subsystems.Subsystems.Drive;
+import frc.robot.Subsystems.Subsystems.Intake;
 
 public class SubsystemManager {
     private static SubsystemManager instance;
@@ -14,6 +15,7 @@ public class SubsystemManager {
 
     public void init()
     {
+        subsystems.add(Intake.getInstance());
         subsystems.add(Drive.getInstance());
     }
 

@@ -1,7 +1,6 @@
 package frc.robot.Subsystems.Subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -35,8 +34,7 @@ public class Intake extends Subsystem {
     
     public enum ArmPosEnum {
         LOWERED(0),
-        RAISED(35236),
-        CLIMBERRAISE(1000);
+        RAISED(35236);
 
         public final double angleDeg;
         ArmPosEnum(double angleDeg) {this.angleDeg = angleDeg;}
@@ -65,15 +63,15 @@ public class Intake extends Subsystem {
                 setTargetPos(ArmPosEnum.RAISED);
             break;
             case INTAKE:
-                if (isAtPos(ArmPosEnum.LOWERED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, 0.3);}
+                if (isAtPos(ArmPosEnum.LOWERED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, 0.7);}
                 else {setTargetPos(ArmPosEnum.LOWERED);}
             break;
             case OUTTAKE:
-                if (isAtPos(ArmPosEnum.RAISED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, -0.3);}
+                if (isAtPos(ArmPosEnum.RAISED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, -0.9);}
                 else {setTargetPos(ArmPosEnum.RAISED);}
             break;
             case CLIMBING: break;
-            case CALIBRATING:
+            case CALIBRATING: calibrated = true; changeState(IntakeState.DEFENSE);/*
                 if (ArmMotor.getStatorCurrent() > 5)
                 {
                     ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
@@ -81,7 +79,7 @@ public class Intake extends Subsystem {
                     calibrated = true;
                     break;
                 }
-                ArmMotor.set(TalonFXControlMode.PercentOutput, 0.2);
+                ArmMotor.set(TalonFXControlMode.PercentOutput, 0.2);*/
             break;
         }
         if (intakeStatus != IntakeState.CALIBRATING) setPos(targetPos);
@@ -113,7 +111,7 @@ public class Intake extends Subsystem {
      * @return if the arm is within the radius of error from the desired pos
      */
     public boolean isAtPos(ArmPosEnum pos, double error) {return ((currentPos >= pos.angleDeg - error)&&(currentPos <= pos.angleDeg + error));}
-    public boolean isAtPos(ArmPosEnum pos) {return isAtPos(pos, 4);}
+    public boolean isAtPos(ArmPosEnum pos) {return true;/*return isAtPos(pos, 4);*/}
 
     public void setTargetPos(ArmPosEnum pos) {targetPos = pos;}
 
@@ -129,11 +127,14 @@ public class Intake extends Subsystem {
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Intake");
     private NetworkTableEntry calibrateEntry = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+    private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+    private NetworkTableEntry statusEntry = tab.add("Status", "not updating what").withWidget(BuiltInWidgets.kTextView).getEntry();
     private SendableChooser<IntakeState> stateChooser = new SendableChooser<>();
 
     @Override
     public void updateShuffleboard()
     {
-        
+        Enabled = enableEntry.getBoolean(true);
+        statusEntry.setString(intakeStatus.name());
     }
 }
