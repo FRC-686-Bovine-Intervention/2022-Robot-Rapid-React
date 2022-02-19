@@ -5,6 +5,7 @@ import frc.robot.Subsystems.Subsystems.Climber;
 import frc.robot.Subsystems.Subsystems.Drive;
 import frc.robot.Subsystems.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Subsystems.Intake;
+import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
 
 public class DriverInteraction {
     private static DriverInteraction instance;
@@ -18,6 +19,7 @@ public class DriverInteraction {
     private DriverInteraction()
     {
         controls = Controls.getInstance();
+        intake = Intake.getInstance();
         /*for (Subsystem s : SubsystemManager.getInstance().subsystems)
         {
             if (s instanceof Drivetrain)    {drivetrain =   (Drivetrain)s;}
@@ -29,17 +31,17 @@ public class DriverInteraction {
     public void run()
     {
         Drive.getInstance().setOpenLoop(controls.getDriveCommand());
-        /*if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
+        if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
         {
-            Intake.getInstance().changeState(IntakeState.INTAKE);
+            intake.changeState(IntakeState.INTAKE);
         }
         else if (controls.getButton(Controls.ButtonControlEnum.OUTTAKE))
         {
-            Intake.getInstance().changeState(IntakeState.OUTTAKE);
+            intake.changeState(IntakeState.OUTTAKE);
         }
         else
         {
-            Intake.getInstance().changeState(IntakeState.DEFENSE);
-        }*/
+            intake.changeState(IntakeState.DEFENSE);
+        }
     }
 }
