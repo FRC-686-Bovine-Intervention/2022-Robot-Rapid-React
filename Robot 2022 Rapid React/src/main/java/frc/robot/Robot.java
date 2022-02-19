@@ -4,7 +4,7 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.Util;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
@@ -106,6 +106,8 @@ public class Robot extends TimedRobot {
     x = 0.8*x*x*x - 0.8*x + x;
 
     x*= 0.8;
+
+    x = Math.max(-0.7, Math.min(x, 0.7));
     
     double driveLeftPower = y - x;
     double driveRightPower = y + x;
