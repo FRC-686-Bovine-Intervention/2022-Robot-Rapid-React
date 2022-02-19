@@ -7,6 +7,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Subsystems.SubsystemManager;
+import frc.robot.Subsystems.Subsystems.Drive;
+import frc.robot.loops.DriveLoop;
+import frc.robot.loops.LoopController;
 
 public class Robot extends TimedRobot {
 
@@ -18,10 +21,12 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     subsystemManager.init();
     autoManager.InitChoices();
+    LoopController.getInstance().register(Drive.getInstance().getVelocityPIDLoop());
+    LoopController.getInstance().register(DriveLoop.getInstance());
   }
 
   @Override
-  public void robotPeriodic() {subsystemManager.updateShuffleboard();}
+  public void robotPeriodic() {subsystemManager.updateShuffleboard(); LoopController.getInstance().run();}
 
   @Override
   public void autonomousInit() {
@@ -36,7 +41,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    
+    LoopController.getInstance().start();
   }
 
   @Override
@@ -46,7 +51,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {LoopController.getInstance().start();}
 
   @Override
   public void disabledPeriodic() {
@@ -54,7 +59,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void testInit() {}
+  public void testInit() {LoopController.getInstance().start();}
 
   @Override
   public void testPeriodic() {

@@ -2,7 +2,7 @@ package frc.robot.Subsystems;
 
 import java.util.ArrayList;
 
-import frc.robot.Subsystems.Subsystems.*;
+import frc.robot.Subsystems.Subsystems.Drive;
 
 public class SubsystemManager {
     private static SubsystemManager instance;
@@ -14,9 +14,7 @@ public class SubsystemManager {
 
     public void init()
     {
-        subsystems.add(Drivetrain.getInstance());
-        //subsystems.add(Climber.getInstance());
-        subsystems.add(Intake.getInstance());
+        subsystems.add(Drive.getInstance());
     }
 
     public void run()                   {for (Subsystem s : subsystems) {if (s.Enabled) s.run();            else s.disable();}}

@@ -4,11 +4,9 @@ package frc.robot.loops;
 import java.util.ArrayList;
 import java.util.List;
 
-import frc.robot.lib.util.CrashTrackingRunnable;
-import frc.robot.Constants;
-
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.lib.util.CrashTrackingRunnable;
 
 /**
  * This code runs all of the robot's loops. Loop objects are stored in a List
@@ -17,6 +15,8 @@ import edu.wpi.first.wpilibj.Timer;
  */
 public class LoopController 
 {
+    private static LoopController instance;
+    public static LoopController getInstance() {if(instance == null){instance = new LoopController();}return instance;} 
     public final double kPeriod = 0.01;
 
     private boolean running_;

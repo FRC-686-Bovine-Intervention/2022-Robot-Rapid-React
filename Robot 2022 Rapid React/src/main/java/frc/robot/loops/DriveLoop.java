@@ -7,7 +7,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.ctre.phoenix.motorcontrol.TalonFXSensorCollection;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -85,7 +84,7 @@ public class DriveLoop implements Loop
 	public static double kQuadEncoderStatusFramePeriod = 0.100;	// 100 ms
 
 	// CONTROL LOOP GAINS   
-	public static double kDriveSecondsFromNeutralToFull = 0.375;		// decrease acceleration (reduces current, robot tipping)
+	public static double kDriveSecondsFromNeutralToFull = 0.7;		// decrease acceleration (reduces current, robot tipping)
 	public static double kCalEncoderPulsePer100ms = 1400;		// velocity at a nominal throttle (measured using NI web interface)
 	public static double kCalPercentOutput 		 = 0.49;	// percent output of motor at above throttle (using NI web interface)
    
@@ -444,16 +443,10 @@ public class DriveLoop implements Loop
 	{
 		if (newCmd.getResetEncoders())
 		{
-			TalonFXSensorCollection collection = lMotorMaster.getSensorCollection();
-			collection.setQuadraturePosition(0, kTalonTimeoutMs);
-			
-			collection = rMotorMaster.getSensorCollection();
-			collection.setQuadraturePosition(0, kTalonTimeoutMs);
-			
+			lMotorMaster.setSelectedSensorPosition(0.0);
+			rMotorMaster.setSelectedSensorPosition(0.0);
 			gyro.zeroSensor();  
 			// calibration to desired initial pose is done in RobotState.reset() called from Robot.autonomousInit()  
 		}
 	}	
-
-
 };

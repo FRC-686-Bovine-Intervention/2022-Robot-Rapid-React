@@ -2,8 +2,8 @@ package frc.robot.Subsystems;
 
 public abstract class Subsystem {
     /* 
-        private SUBNAME instance; 
-        public SUBNAME getInstance() {if(instance == null){instance = new SUBNAME();}return instance;} 
+        private static SUBNAME instance; 
+        public static SUBNAME getInstance() {if(instance == null){instance = new SUBNAME();}return instance;} 
  
         private SUBNAME() 
         { 
