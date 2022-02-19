@@ -60,6 +60,9 @@ public class Robot extends TimedRobot {
     driveLeftB.follow(driveLeftA);
     driveRightB.follow(driveRightA);
 
+    driveLeftA.configOpenloopRamp(0.7);
+    driveRightA.configOpenloopRamp(0.7);
+
     driveLeftA.setNeutralMode(NeutralMode.Coast);
     driveLeftB.setNeutralMode(NeutralMode.Coast);
     driveRightA.setNeutralMode(NeutralMode.Coast);
@@ -95,22 +98,27 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //Set up arcade steer
-    double forward = -driverController.getRawAxis(1);
-    double turn = -driverController.getRawAxis(2);
+    double y = -driverController.getRawAxis(1);
+    double x = -driverController.getRawAxis(0);
+
+    double s = 0.7;
+    y = s*y*y*y - s*y + y;
+    x = 0.8*x*x*x - 0.8*x + x;
+
+    x*= 0.8;
     
-    double driveLeftPower = forward - turn;
-    double driveRightPower = forward + turn;
+    double driveLeftPower = y - x;
+    double driveRightPower = y + x;
+
 
     driveLeftA.set(driveLeftPower);
-    driveLeftB.set(driveLeftPower);
     driveRightA.set(driveRightPower);
-    driveRightB.set(driveRightPower);
 
     //Intake controls
-    if(driverController.getRawButton(0)){
+    if(driverController.getRawButton(1) || !armUp){
       intake.set(VictorSPXControlMode.PercentOutput, 0.7);;
     }
-    else if(driverController.getRawButton(2)){
+    else if(driverController.getRawButton(3)){
       intake.set(VictorSPXControlMode.PercentOutput, -0.9);
     }
     else{
@@ -136,12 +144,12 @@ public class Robot extends TimedRobot {
     }
 
     // if(driverController.getRawButtonPressed(6) && !armUp){
-    if(driverController.getRawAxis(5) > 0.5 && !armUp){
+    if(driverController.getRawAxis(5) < -0.5 && !armUp){
       lastBurstTime = Timer.getFPGATimestamp();
       armUp = true;
     }
     // else if(driverController.getRawButtonPressed(8) && armUp){
-    else if(driverController.getRawAxis(5) < -0.5 && armUp){
+    else if(driverController.getRawAxis(5) > 0.5 && armUp){
       lastBurstTime = Timer.getFPGATimestamp();
       armUp = false;
     }  
