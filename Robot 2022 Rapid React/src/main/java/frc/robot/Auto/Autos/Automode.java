@@ -1,5 +1,5 @@
 package frc.robot.Auto.Autos;
 
-public interface Autonomous {
+public interface Automode {
     
 }

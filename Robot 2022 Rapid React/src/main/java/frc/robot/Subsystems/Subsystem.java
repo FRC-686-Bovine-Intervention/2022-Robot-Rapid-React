@@ -23,6 +23,7 @@ public abstract class Subsystem {
 
     /**Returns true if the subsytsem has been calibrated in the past*/
     public boolean calibrated = true;
+    public boolean autoCalibrate = true;
     /**Put all calibration code here */
     public void runCalibration() {calibrated = false;}
 

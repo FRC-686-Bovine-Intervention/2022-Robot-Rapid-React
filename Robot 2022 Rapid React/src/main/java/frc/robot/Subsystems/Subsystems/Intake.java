@@ -6,9 +6,11 @@ import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
 
@@ -55,7 +57,7 @@ public class Intake extends Subsystem {
     @Override
     public void run()
     {
-        if(!calibrated && !DriverStation.isTest()) {changeState(IntakeState.CALIBRATING);}
+        if(autoCalibrate && !calibrated) {changeState(IntakeState.CALIBRATING);}
         switch (intakeStatus)
         {
             case DEFENSE: default:
@@ -72,22 +74,37 @@ public class Intake extends Subsystem {
             break;
             case CLIMBING: break;
             case CALIBRATING:
-                ArmMotor.set(TalonFXControlMode.PercentOutput, 0.2);
                 if (ArmMotor.getStatorCurrent() > 5)
                 {
                     ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
                     changeState(IntakeState.DEFENSE);
                     calibrated = true;
+                    break;
                 }
+                ArmMotor.set(TalonFXControlMode.PercentOutput, 0.2);
             break;
         }
-        if (intakeStatus == IntakeState.CALIBRATING) setPos(targetPos);
+        if (intakeStatus != IntakeState.CALIBRATING) setPos(targetPos);
     }
 
     @Override
     public void runTestMode()
     {
+        intakeStatus = stateChooser.getSelected();
+        if (stateChooser.getSelected() == IntakeState.CALIBRATING || calibrateEntry.getBoolean(false))
+        {
+            runCalibration();
+            calibrateEntry.setBoolean(false);
+        }
+        autoCalibrate = false;
         run();
+        autoCalibrate = true;
+    }
+    @Override
+    public void runCalibration()
+    {
+        calibrated = false;
+        changeState(IntakeState.CALIBRATING);
     }
 
     /**
@@ -111,9 +128,12 @@ public class Intake extends Subsystem {
     }
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Intake");
+    private NetworkTableEntry calibrateEntry = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+    private SendableChooser<IntakeState> stateChooser = new SendableChooser<>();
 
     @Override
     public void updateShuffleboard()
     {
+        
     }
 }

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
 import frc.robot.Subsystems.Subsystems.Intake.ArmPosEnum;
@@ -110,9 +109,9 @@ public class Climber extends Subsystem {
     @Override
     public void updateShuffleboard()
     {
-        SmartDashboard.putString("Climber/Climber Status", getClimberStatus().name());
-        SmartDashboard.putBoolean("Climber/Ready For Next State", readyForNextState);
+        
     }
+
     public ClimberState getClimberStatus() {return ClimberStatusHistory.get(ClimberStatusHistory.size()-1);}
     public void nextState()
     {
