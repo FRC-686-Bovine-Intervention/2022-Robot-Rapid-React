@@ -1,11 +1,14 @@
 package frc.robot.Subsystems.Subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -21,11 +24,27 @@ public class Intake extends Subsystem {
     private TalonFX ArmMotor;
     private VictorSPX RollerMotor;
 
+
+    //Constants for controlling the arm. consider tuning these for your particular robot
+    final double armHoldUp = 0.08;
+    final double armHoldDown = 0.13;
+    final double armTravel = 0.5;
+
+    final double armTimeUp = 0.5;
+    final double armTimeDown = 0.35;
+
+    //Varibles needed for the code
+    boolean burstMode = false;
+    double lastBurstTime = 0;
+
+
     private Intake()
     {
         ArmMotor = new TalonFX(Constants.kArmMotorID);
         RollerMotor = new VictorSPX(Constants.kRollerMotorID);
     
+        ArmMotor.configFactoryDefault();
+        ArmMotor.setInverted(TalonFXInvertType.CounterClockwise);
         ArmMotor.setNeutralMode(NeutralMode.Brake);
     
         intakeStatus = IntakeState.DEFENSE;
@@ -40,7 +59,7 @@ public class Intake extends Subsystem {
         ArmPosEnum(double angleDeg) {this.angleDeg = angleDeg;}
     }
 
-    public ArmPosEnum targetPos;
+    public ArmPosEnum targetPos = ArmPosEnum.RAISED;
     public double currentPos;
 
     public enum IntakeState {
@@ -60,15 +79,27 @@ public class Intake extends Subsystem {
         {
             case DEFENSE: default:
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
-                setTargetPos(ArmPosEnum.RAISED);
+                if(targetPos != ArmPosEnum.RAISED)
+                {
+                    lastBurstTime = Timer.getFPGATimestamp();
+                    setTargetPos(ArmPosEnum.RAISED);
+                }
             break;
             case INTAKE:
                 if (isAtPos(ArmPosEnum.LOWERED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, 0.7);}
-                else {setTargetPos(ArmPosEnum.LOWERED);}
+                    if(targetPos != ArmPosEnum.LOWERED)
+                    {
+                        lastBurstTime = Timer.getFPGATimestamp();
+                        setTargetPos(ArmPosEnum.LOWERED);
+                    }
             break;
             case OUTTAKE:
                 if (isAtPos(ArmPosEnum.RAISED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, -0.9);}
-                else {setTargetPos(ArmPosEnum.RAISED);}
+                    if(targetPos != ArmPosEnum.RAISED)
+                    {
+                        lastBurstTime = Timer.getFPGATimestamp();
+                        setTargetPos(ArmPosEnum.RAISED);
+                    }
             break;
             case CLIMBING: break;
             case CALIBRATING: calibrated = true; changeState(IntakeState.DEFENSE);/*
@@ -117,7 +148,22 @@ public class Intake extends Subsystem {
 
     private void setPos(ArmPosEnum pos)
     {
-        
+        if(pos == ArmPosEnum.RAISED){
+            if(Timer.getFPGATimestamp() - lastBurstTime < armTimeUp){
+                ArmMotor.set(TalonFXControlMode.PercentOutput, armTravel);
+            }
+            else{
+                ArmMotor.set(TalonFXControlMode.PercentOutput, armHoldUp);
+            }
+        }
+        else{
+            if(Timer.getFPGATimestamp() - lastBurstTime < armTimeDown){
+                ArmMotor.set(TalonFXControlMode.PercentOutput, -armTravel);
+            }
+            else{
+                ArmMotor.set(TalonFXControlMode.PercentOutput, -armHoldDown);
+            }
+        }
     }
 
     public void changeState(IntakeState newState)
@@ -129,6 +175,7 @@ public class Intake extends Subsystem {
     private NetworkTableEntry calibrateEntry = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry statusEntry = tab.add("Status", "not updating what").withWidget(BuiltInWidgets.kTextView).getEntry();
+    private NetworkTableEntry armposEntry = tab.add("Arm position", "not updating what").withWidget(BuiltInWidgets.kTextView).getEntry();
     private SendableChooser<IntakeState> stateChooser = new SendableChooser<>();
 
     @Override
@@ -137,5 +184,6 @@ public class Intake extends Subsystem {
         Enabled = enableEntry.getBoolean(true);
         enableEntry.setBoolean(Enabled);
         statusEntry.setString(intakeStatus.name());
+        armposEntry.setString(targetPos.name());
     }
 }
