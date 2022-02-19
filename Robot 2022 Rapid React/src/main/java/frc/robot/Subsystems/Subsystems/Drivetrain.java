@@ -7,7 +7,6 @@ import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.drive.Vector2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
 
@@ -22,7 +21,7 @@ public class Drivetrain extends Subsystem {
     public TalonFX LeftMaster, LeftSlave, RightMaster, RightSlave;
     public double LeftPower, RightPower;
 
-    public Drivetrain()
+    private Drivetrain()
     {
         LeftMaster  = new TalonFX(Constants.kLeftMasterID);
         LeftSlave   = new TalonFX(Constants.kLeftSlaveID);
@@ -36,14 +35,23 @@ public class Drivetrain extends Subsystem {
 
         LeftSlave.follow(LeftMaster);
         RightSlave.follow(RightMaster);
-
-        SmartDashboard.putBoolean("Drivetrain/Enabled", true);
     }
 
     @Override
     public void run()
     {
+        LeftMaster.set(TalonFXControlMode.PercentOutput, LeftPower);
+        RightMaster.set(TalonFXControlMode.PercentOutput, RightPower);
+    }
 
+    @Override
+    public void runTestMode() {run();}
+
+    @Override
+    public void disable()
+    {
+        LeftMaster.set(TalonFXControlMode.PercentOutput, 0);
+        RightMaster.set(TalonFXControlMode.PercentOutput, 0);
     }
 
     @Override public void runCalibration(){}
@@ -52,14 +60,8 @@ public class Drivetrain extends Subsystem {
 
     public void setPower(double leftPower, double rightPower)
     {
-        LeftMaster.set(TalonFXControlMode.PercentOutput,leftPower);
-        RightMaster.set(TalonFXControlMode.PercentOutput,rightPower);
-    }
-
-    @Override
-    public void runTestMode()
-    {
-        run();
+        LeftPower = leftPower;
+        RightPower = rightPower;
     }
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");

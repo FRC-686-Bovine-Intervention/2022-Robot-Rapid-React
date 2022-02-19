@@ -3,6 +3,8 @@ package frc.robot.Controls;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.Vector2d;
 import frc.robot.Constants;
+import frc.robot.command_status.DriveCommand;
+import frc.robot.lib.util.Util;
 
 public class Controls {
     private static Controls instance;
@@ -56,5 +58,16 @@ public class Controls {
             case CLIMBERFORCESTATE:         return thrustmaster.getRawButton(Thrustmaster.kBottomButton1) && thrustmaster.getRawButton(Thrustmaster.kBottomButton2) && thrustmaster.getRawButton(Thrustmaster.kBottomButton3);
             default:                        return false;
         }
+    }
+
+    public DriveCommand getDriveCommand()
+    {
+        Vector2d a = getAxis(JoystickEnum.THRUSTMASTER);
+        a.x = 0.8*a.x*a.x*a.x - 0.8*a.x + a.x;
+        a.y = 0.7*a.y*a.y*a.y - 0.7*a.y + a.y;
+        a.x = Util.limit(a.x, 0.7);
+        double leftPower = a.y-a.x;
+        double rightPower = a.y+a.x;
+        return new DriveCommand(leftPower, rightPower);
     }
 }

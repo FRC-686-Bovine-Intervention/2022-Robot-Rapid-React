@@ -4,10 +4,11 @@ import java.util.ArrayList;
 
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
 import frc.robot.Subsystems.Subsystems.Intake.ArmPosEnum;
+import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
 
 /**<h4>Contains all code for the Climber subsystem</h4>*/
 public class Climber extends Subsystem {
@@ -19,8 +20,9 @@ public class Climber extends Subsystem {
 
     public enum ClimberState {
         DEFENSE,
-        EXTEND,
+        EXTEND_FLOOR,
         RETRACT,
+        EXTEND_BAR,
         CALIBRATING
     }
     public ArrayList<ClimberState> ClimberStatusHistory = new ArrayList<>();
@@ -28,46 +30,32 @@ public class Climber extends Subsystem {
      * <p> <pre>{@code false} - the climber is still moving and should not move to the next state*/
     public boolean readyForNextState;
 
-    public Climber()
+    private Climber()
     {
         LeftMotor = new TalonFX(Constants.kLeftClimberID);
         RightMotor = new TalonFX(Constants.kRightClimberID);
 
         changeState(ClimberState.DEFENSE);
-
-        SmartDashboard.putBoolean("Climber/Enabled", true);
     }
 
     @Override
     public void run()
     {
+        if(!calibrated && !DriverStation.isTest()) {changeState(ClimberState.CALIBRATING);}
+        if ((getClimberStatus() != ClimberState.DEFENSE) && (getClimberStatus() != ClimberState.CALIBRATING)) Intake.getInstance().changeState(IntakeState.CLIMBING);
         switch (getClimberStatus())
         {
             case DEFENSE:
                 setTargetPos(ClimberPos.RETRACTED);
             break;
-            case EXTEND:
-                if (ClimberStatusHistory.get(ClimberStatusHistory.size()-2) == ClimberState.DEFENSE)
+            case EXTEND_FLOOR:
+                if (Intake.getInstance().isAtPos(ArmPosEnum.RAISED))
                 {
-                    if (Intake.getInstance().isAtPos(ArmPosEnum.RAISED))
-                    {
-                        setTargetPos(ClimberPos.EXTENDED);
-                    }
-                    else
-                    {
-                        Intake.getInstance().setTargetPos(ArmPosEnum.RAISED);
-                    }
+                    setTargetPos(ClimberPos.EXTENDED);
                 }
                 else
                 {
-                    if (isAtPos(ClimberPos.EXTENDED))
-                    {
-                        Intake.getInstance(); //Driver control
-                    }
-                    else
-                    {
-                        setTargetPos(ClimberPos.EXTENDED);
-                    }
+                    Intake.getInstance().setTargetPos(ArmPosEnum.RAISED);
                 }
             break;
             case RETRACT:
@@ -78,6 +66,16 @@ public class Climber extends Subsystem {
                 else
                 {
                     setTargetPos(ClimberPos.RETRACTED);
+                }
+            break;
+            case EXTEND_BAR:
+                if (isAtPos(ClimberPos.EXTENDED))
+                {
+                    Intake.getInstance(); //Driver control
+                }
+                else
+                {
+                    setTargetPos(ClimberPos.EXTENDED);
                 }
             break;
             case CALIBRATING:
@@ -111,21 +109,21 @@ public class Climber extends Subsystem {
     @Override
     public void updateShuffleboard()
     {
-        SmartDashboard.putString("Climber/Climber Status", getClimberStatus().name());
-        SmartDashboard.putBoolean("Climber/Ready For Next State", readyForNextState);
+        
     }
+
     public ClimberState getClimberStatus() {return ClimberStatusHistory.get(ClimberStatusHistory.size()-1);}
     public void nextState()
     {
         switch(getClimberStatus())
         {
-            case DEFENSE:       changeState(ClimberState.EXTEND);   break;
-            case EXTEND:        changeState(ClimberState.RETRACT);  break;
-            case RETRACT:       changeState(ClimberState.EXTEND);   break;
+            case DEFENSE:       changeState(ClimberState.EXTEND_FLOOR); break;
+            case EXTEND_FLOOR:  changeState(ClimberState.RETRACT);      break;
+            case RETRACT:       changeState(ClimberState.EXTEND_BAR);   break;
+            case EXTEND_BAR:    changeState(ClimberState.RETRACT);      break;
             case CALIBRATING:   break;
         }
     }
-    public void prevState() {ClimberStatusHistory.remove(ClimberStatusHistory.get(ClimberStatusHistory.size()-1));}
-    public void changeState(ClimberState newState) {if(SmartDashboard.getBoolean("Climber/Enabled", true)){forceChangeState(newState);};}
-    private void forceChangeState(ClimberState newState) {if(getClimberStatus() != newState){ClimberStatusHistory.add(newState);}}
+    public void prevState() {ClimberStatusHistory.remove(ClimberStatusHistory.size()-1);}
+    public void changeState(ClimberState newState) {if(getClimberStatus() != newState) ClimberStatusHistory.add(newState);}
 }

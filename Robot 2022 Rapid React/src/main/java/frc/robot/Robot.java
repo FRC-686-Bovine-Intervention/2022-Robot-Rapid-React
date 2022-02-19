@@ -7,20 +7,26 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Subsystems.SubsystemManager;
+import frc.robot.Subsystems.Subsystems.Drive;
+import frc.robot.loops.DriveLoop;
+import frc.robot.loops.LoopController;
 
 public class Robot extends TimedRobot {
 
   SubsystemManager subsystemManager = SubsystemManager.getInstance();
-  AutoManager autoManager = new AutoManager();
+  AutoManager autoManager = AutoManager.getInstance();
+  DriverInteraction driverInteraction = DriverInteraction.getInstance();
 
   @Override
   public void robotInit() {
     subsystemManager.init();
     autoManager.InitChoices();
+    LoopController.getInstance().register(Drive.getInstance().getVelocityPIDLoop());
+    LoopController.getInstance().register(DriveLoop.getInstance());
   }
 
   @Override
-  public void robotPeriodic() {subsystemManager.updateShuffleboard();}
+  public void robotPeriodic() {subsystemManager.updateShuffleboard(); LoopController.getInstance().run();}
 
   @Override
   public void autonomousInit() {
@@ -35,23 +41,25 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    
+    LoopController.getInstance().start();
   }
 
   @Override
   public void teleopPeriodic() {
     subsystemManager.run();
-    DriverInteraction.getInstance().run();
+    driverInteraction.run();
   }
 
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {LoopController.getInstance().start();}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    subsystemManager.disable();
+  }
 
   @Override
-  public void testInit() {}
+  public void testInit() {LoopController.getInstance().start();}
 
   @Override
   public void testPeriodic() {

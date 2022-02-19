@@ -6,9 +6,11 @@ import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.Constants;
 import frc.robot.Subsystems.Subsystem;
 
@@ -20,7 +22,7 @@ public class Intake extends Subsystem {
     private TalonFX ArmMotor;
     private VictorSPX RollerMotor;
 
-    public Intake()
+    private Intake()
     {
         ArmMotor = new TalonFX(Constants.kArmMotorID);
         RollerMotor = new VictorSPX(Constants.kRollerMotorID);
@@ -29,8 +31,6 @@ public class Intake extends Subsystem {
     
         intakeStatus = IntakeState.DEFENSE;
         calibrated = false;
-    
-        SmartDashboard.putBoolean("Intake/Enabled", true);
     }
     
     public enum ArmPosEnum {
@@ -57,8 +57,7 @@ public class Intake extends Subsystem {
     @Override
     public void run()
     {
-        if(!calibrated) {changeState(IntakeState.CALIBRATING);}
-        //if(!SmartDashboard.getBoolean("Intake/Enabled", true)){intakeStatus = IntakeState.DEFENSE;}
+        if(autoCalibrate && !calibrated) {changeState(IntakeState.CALIBRATING);}
         switch (intakeStatus)
         {
             case DEFENSE: default:
@@ -75,22 +74,37 @@ public class Intake extends Subsystem {
             break;
             case CLIMBING: break;
             case CALIBRATING:
-                ArmMotor.set(TalonFXControlMode.PercentOutput, 0.2);
                 if (ArmMotor.getStatorCurrent() > 5)
                 {
                     ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
                     changeState(IntakeState.DEFENSE);
                     calibrated = true;
+                    break;
                 }
+                ArmMotor.set(TalonFXControlMode.PercentOutput, 0.2);
             break;
         }
-        setPos(targetPos);
+        if (intakeStatus != IntakeState.CALIBRATING) setPos(targetPos);
     }
 
     @Override
     public void runTestMode()
     {
+        intakeStatus = stateChooser.getSelected();
+        if (stateChooser.getSelected() == IntakeState.CALIBRATING || calibrateEntry.getBoolean(false))
+        {
+            runCalibration();
+            calibrateEntry.setBoolean(false);
+        }
+        autoCalibrate = false;
         run();
+        autoCalibrate = true;
+    }
+    @Override
+    public void runCalibration()
+    {
+        calibrated = false;
+        changeState(IntakeState.CALIBRATING);
     }
 
     /**
@@ -114,9 +128,12 @@ public class Intake extends Subsystem {
     }
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Intake");
+    private NetworkTableEntry calibrateEntry = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+    private SendableChooser<IntakeState> stateChooser = new SendableChooser<>();
 
     @Override
     public void updateShuffleboard()
     {
+        
     }
 }

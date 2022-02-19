@@ -1,12 +1,10 @@
 package frc.robot;
 
 import frc.robot.Controls.Controls;
-import frc.robot.Subsystems.Subsystem;
-import frc.robot.Subsystems.SubsystemManager;
 import frc.robot.Subsystems.Subsystems.Climber;
+import frc.robot.Subsystems.Subsystems.Drive;
 import frc.robot.Subsystems.Subsystems.Drivetrain;
 import frc.robot.Subsystems.Subsystems.Intake;
-import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
 
 public class DriverInteraction {
     private static DriverInteraction instance;
@@ -17,31 +15,31 @@ public class DriverInteraction {
     Climber climber;
     Intake intake;
 
-    public DriverInteraction()
+    private DriverInteraction()
     {
         controls = Controls.getInstance();
-        for (Subsystem s : SubsystemManager.getInstance().subsystems)
+        /*for (Subsystem s : SubsystemManager.getInstance().subsystems)
         {
             if (s instanceof Drivetrain)    {drivetrain =   (Drivetrain)s;}
             if (s instanceof Climber)       {climber =      (Climber)s;}
             if (s instanceof Intake)        {intake =       (Intake)s;}
-        }
+        }*/
     }
 
     public void run()
     {
-        //drivetrain.setAxis(controls.getAxis(Controls.JoystickEnum.THRUSTMASTER));
-        if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
+        Drive.getInstance().setOpenLoop(controls.getDriveCommand());
+        /*if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
         {
-            intake.changeState(IntakeState.INTAKE);
+            Intake.getInstance().changeState(IntakeState.INTAKE);
         }
         else if (controls.getButton(Controls.ButtonControlEnum.OUTTAKE))
         {
-            intake.changeState(IntakeState.OUTTAKE);
+            Intake.getInstance().changeState(IntakeState.OUTTAKE);
         }
         else
         {
-            intake.changeState(IntakeState.DEFENSE);
-        }
+            Intake.getInstance().changeState(IntakeState.DEFENSE);
+        }*/
     }
 }

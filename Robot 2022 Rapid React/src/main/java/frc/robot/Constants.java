@@ -19,4 +19,7 @@ public class Constants {
     // Control Hardware
     public static int kThrustmasterPort =   0;
     public static int kButtonboardPort =    1;
+
+    public static double kLoopDt = 0.01;
+    public static int kTalonTimeoutMs = 5;
 }
