@@ -135,6 +135,7 @@ public class Intake extends Subsystem {
     public void updateShuffleboard()
     {
         Enabled = enableEntry.getBoolean(true);
+        enableEntry.setBoolean(Enabled);
         statusEntry.setString(intakeStatus.name());
     }
 }
