@@ -2,13 +2,14 @@ package frc.robot.Subsystems.Subsystems;
 
 import java.util.ArrayList;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
+import frc.robot.Controls.Controls;
+import frc.robot.Controls.Controls.JoystickEnum;
 import frc.robot.Subsystems.Subsystem;
-import frc.robot.Subsystems.Subsystems.Intake.ArmPosEnum;
-import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
 
 /**<h4>Contains all code for the Climber subsystem</h4>*/
 public class Climber extends Subsystem {
@@ -18,6 +19,22 @@ public class Climber extends Subsystem {
     private TalonFX LeftMotor;
     private TalonFX RightMotor;
 
+    private Intake intake;
+
+    private Climber()
+    {
+        LeftMotor = new TalonFX(Constants.kLeftClimberID);
+        RightMotor = new TalonFX(Constants.kRightClimberID);
+
+        LeftMotor.setInverted(TalonFXInvertType.CounterClockwise);
+        RightMotor.setInverted(TalonFXInvertType.Clockwise);
+
+        RightMotor.follow(LeftMotor);
+
+        changeState(ClimberState.DEFENSE);
+        intake = Intake.getInstance();
+    }
+
     public enum ClimberState {
         DEFENSE,
         EXTEND_FLOOR,
@@ -26,62 +43,55 @@ public class Climber extends Subsystem {
         CALIBRATING
     }
     public ArrayList<ClimberState> ClimberStatusHistory = new ArrayList<>();
-    /**@return <pre>{@code true} - the climber is done moving and is ready to move on
-     * <p> <pre>{@code false} - the climber is still moving and should not move to the next state*/
     public boolean readyForNextState;
-
-    private Climber()
-    {
-        LeftMotor = new TalonFX(Constants.kLeftClimberID);
-        RightMotor = new TalonFX(Constants.kRightClimberID);
-
-        changeState(ClimberState.DEFENSE);
-    }
 
     @Override
     public void run()
     {
-        if(!calibrated && !DriverStation.isTest()) {changeState(ClimberState.CALIBRATING);}
-        if ((getClimberStatus() != ClimberState.DEFENSE) && (getClimberStatus() != ClimberState.CALIBRATING)) Intake.getInstance().changeState(IntakeState.CLIMBING);
-        switch (getClimberStatus())
-        {
-            case DEFENSE:
-                setTargetPos(ClimberPos.RETRACTED);
-            break;
-            case EXTEND_FLOOR:
-                if (Intake.getInstance().isAtPos(ArmPosEnum.RAISED))
-                {
-                    setTargetPos(ClimberPos.EXTENDED);
-                }
-                else
-                {
-                    Intake.getInstance().setTargetPos(ArmPosEnum.RAISED);
-                }
-            break;
-            case RETRACT:
-                if (isAtPos(ClimberPos.RETRACTED))
-                {
-                    Intake.getInstance().setTargetPos(ArmPosEnum.LOWERED);
-                }
-                else
-                {
-                    setTargetPos(ClimberPos.RETRACTED);
-                }
-            break;
-            case EXTEND_BAR:
-                if (isAtPos(ClimberPos.EXTENDED))
-                {
-                    Intake.getInstance(); //Driver control
-                }
-                else
-                {
-                    setTargetPos(ClimberPos.EXTENDED);
-                }
-            break;
-            case CALIBRATING:
+        LeftMotor.set(TalonFXControlMode.PercentOutput, Controls.getInstance().getAxis(JoystickEnum.THRUSTMASTER).y);
+        // if(autoCalibrate && !calibrated) {changeState(ClimberState.CALIBRATING);}
+        // switch (getClimberStatus())
+        // {
+        //     case DEFENSE:
+        //         setTargetPos(ClimberPos.RETRACTED);
+        //     break;
+        //     case EXTEND_FLOOR:
+        //         intake.changeState(IntakeState.CLIMBING);
+        //         if (intake.isAtPos(ArmPosEnum.RAISED))
+        //         {
+        //             setTargetPos(ClimberPos.EXTENDED);
+        //         }
+        //         else
+        //         {
+        //             intake.setTargetPos(ArmPosEnum.RAISED);
+        //         }
+        //     break;
+        //     case RETRACT:
+        //         intake.changeState(IntakeState.CLIMBING);
+        //         if (isAtPos(ClimberPos.RETRACTED))
+        //         {
+        //             intake.setTargetPos(ArmPosEnum.LOWERED);
+        //         }
+        //         else
+        //         {
+        //             setTargetPos(ClimberPos.RETRACTED);
+        //         }
+        //     break;
+        //     case EXTEND_BAR:
+        //         intake.changeState(IntakeState.CLIMBING);
+        //         if (isAtPos(ClimberPos.EXTENDED))
+        //         {
+        //             //Driver control
+        //         }
+        //         else
+        //         {
+        //             setTargetPos(ClimberPos.EXTENDED);
+        //         }
+        //     break;
+        //     case CALIBRATING:
 
-            break;
-        }
+        //     break;
+        // }
     }
 
     @Override

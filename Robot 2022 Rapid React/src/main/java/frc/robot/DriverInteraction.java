@@ -30,7 +30,7 @@ public class DriverInteraction {
 
     public void run()
     {
-        Drive.getInstance().setOpenLoop(controls.getDriveCommand());
+        //Drive.getInstance().setOpenLoop(controls.getDriveCommand());
         if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
         {
             intake.changeState(IntakeState.INTAKE);
