@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
@@ -31,7 +30,7 @@ public class Robot extends TimedRobot {
   //Constants for controlling the arm. consider tuning these for your particular robot
   final double armHoldUp = 0.08;
   final double armHoldDown = 0.13;
-  final double armTravel = 0.5;
+  final double armTravel = 0.4;
 
   final double armTimeUp = 0.5;
   final double armTimeDown = 0.35;
@@ -96,10 +95,13 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     //Set up arcade steer
     double forward = -driverController.getRawAxis(1);
-    double turn = -driverController.getRawAxis(2);
+    double turn = -driverController.getRawAxis(0);
     
     double driveLeftPower = forward - turn;
     double driveRightPower = forward + turn;
+
+    driveLeftPower *= 0.3;
+    driveRightPower *= 0.3;
 
     driveLeftA.set(driveLeftPower);
     driveLeftB.set(driveLeftPower);
@@ -107,10 +109,10 @@ public class Robot extends TimedRobot {
     driveRightB.set(driveRightPower);
 
     //Intake controls
-    if(driverController.getRawButton(0)){
-      intake.set(VictorSPXControlMode.PercentOutput, 0.7);;
+    if(driverController.getRawButton(1)){
+      intake.set(VictorSPXControlMode.PercentOutput, 0.7);
     }
-    else if(driverController.getRawButton(2)){
+    else if(driverController.getRawButton(3)){
       intake.set(VictorSPXControlMode.PercentOutput, -0.9);
     }
     else{
@@ -136,12 +138,12 @@ public class Robot extends TimedRobot {
     }
 
     // if(driverController.getRawButtonPressed(6) && !armUp){
-    if(driverController.getRawAxis(5) > 0.5 && !armUp){
+    if(driverController.getRawAxis(5) < -0.5 && !armUp){
       lastBurstTime = Timer.getFPGATimestamp();
       armUp = true;
     }
     // else if(driverController.getRawButtonPressed(8) && armUp){
-    else if(driverController.getRawAxis(5) < -0.5 && armUp){
+    else if(driverController.getRawAxis(5) > 0.5 && armUp){
       lastBurstTime = Timer.getFPGATimestamp();
       armUp = false;
     }  
