@@ -48,7 +48,7 @@ public class Climber extends Subsystem {
     @Override
     public void run()
     {
-        LeftMotor.set(TalonFXControlMode.PercentOutput, Controls.getInstance().getAxis(JoystickEnum.THRUSTMASTER).y);
+        LeftMotor.set(TalonFXControlMode.PercentOutput, Controls.getInstance().getAxis(JoystickEnum.THRUSTMASTER).y*0.3);
         // if(autoCalibrate && !calibrated) {changeState(ClimberState.CALIBRATING);}
         // switch (getClimberStatus())
         // {
