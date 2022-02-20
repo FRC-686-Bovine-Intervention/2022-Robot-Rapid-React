@@ -35,7 +35,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousPeriodic() {
-    autoManager.run();
     subsystemManager.run();
   }
 

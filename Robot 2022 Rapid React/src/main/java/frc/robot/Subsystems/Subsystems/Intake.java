@@ -80,11 +80,14 @@ public class Intake extends Subsystem {
     public double currentPos;
 
     public enum IntakeState {
-        DEFENSE,
-        INTAKE,
-        OUTTAKE,
-        CLIMBING,
-        CALIBRATING
+        DEFENSE(ArmPosEnum.RAISED),
+        INTAKE(ArmPosEnum.LOWERED),
+        OUTTAKE(ArmPosEnum.RAISED),
+        CLIMBING(null),
+        CALIBRATING(null);
+
+        public final ArmPosEnum armPos;
+        IntakeState(ArmPosEnum armPos) {this.armPos = armPos;}
     }
     public IntakeState intakeStatus = IntakeState.DEFENSE;
 
