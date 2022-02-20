@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.Util;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.VictorSPXControlMode;
@@ -59,6 +60,9 @@ public class Robot extends TimedRobot {
     driveLeftB.follow(driveLeftA);
     driveRightB.follow(driveRightA);
 
+    driveLeftA.configOpenloopRamp(0.7);
+    driveRightA.configOpenloopRamp(0.7);
+
     driveLeftA.setNeutralMode(NeutralMode.Coast);
     driveLeftB.setNeutralMode(NeutralMode.Coast);
     driveRightA.setNeutralMode(NeutralMode.Coast);
@@ -94,23 +98,27 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     //Set up arcade steer
-    double forward = -driverController.getRawAxis(1);
-    double turn = -driverController.getRawAxis(0);
-    
-    double driveLeftPower = forward - turn;
-    double driveRightPower = forward + turn;
+    double y = -driverController.getRawAxis(1);
+    double x = -driverController.getRawAxis(0);
 
-    driveLeftPower *= 0.3;
-    driveRightPower *= 0.3;
+    double s = 0.7;
+    y = s*y*y*y - s*y + y;
+    x = 0.8*x*x*x - 0.8*x + x;
+
+    x*= 0.8;
+
+    x = Math.max(-0.7, Math.min(x, 0.7));
+    
+    double driveLeftPower = y - x;
+    double driveRightPower = y + x;
+
 
     driveLeftA.set(driveLeftPower);
-    driveLeftB.set(driveLeftPower);
     driveRightA.set(driveRightPower);
-    driveRightB.set(driveRightPower);
 
     //Intake controls
-    if(driverController.getRawButton(1)){
-      intake.set(VictorSPXControlMode.PercentOutput, 0.7);
+    if(driverController.getRawButton(1) || !armUp){
+      intake.set(VictorSPXControlMode.PercentOutput, 0.7);;
     }
     else if(driverController.getRawButton(3)){
       intake.set(VictorSPXControlMode.PercentOutput, -0.9);
