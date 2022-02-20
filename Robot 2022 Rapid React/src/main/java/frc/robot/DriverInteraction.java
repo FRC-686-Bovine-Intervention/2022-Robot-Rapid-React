@@ -1,6 +1,8 @@
 package frc.robot;
 
 import frc.robot.Controls.Controls;
+import frc.robot.Controls.Controls.ButtonControlEnum;
+import frc.robot.Controls.Controls.JoystickEnum;
 import frc.robot.Subsystems.Subsystems.Climber;
 import frc.robot.Subsystems.Subsystems.Drive;
 import frc.robot.Subsystems.Subsystems.Drivetrain;
@@ -28,9 +30,13 @@ public class DriverInteraction {
         }*/
     }
 
+    private boolean driving = true;
+
     public void run()
     {
-        //Drive.getInstance().setOpenLoop(controls.getDriveCommand());
+        driving = !controls.getButton(Controls.ButtonControlEnum.CLIMBERNEXTSTAGE);
+        if (driving) Drive.getInstance().setOpenLoop(controls.getDriveCommand());
+        else Climber.getInstance().setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*-0.6);
         if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
         {
             intake.changeState(IntakeState.INTAKE);

@@ -12,7 +12,7 @@ public abstract class Subsystem {
     */ 
 
     /**Returns true if the subsystem is supposed to be active, otherwise false*/
-    public boolean Enabled;
+    public boolean Enabled = true;
 
     /**Is called every tick the subsystem is supposed to be active*/
     public abstract void run();
