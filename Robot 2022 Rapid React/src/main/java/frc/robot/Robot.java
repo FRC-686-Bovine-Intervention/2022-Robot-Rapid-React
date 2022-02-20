@@ -41,22 +41,25 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    double armCtrl = joystick.getRawAxis(1);
-    if (Math.abs(armCtrl)>0.1)
-    {
-      armCtrl *= 0.3;
-      arm.manualControl(armCtrl);
-    }
+    // double armCtrl = joystick.getRawAxis(1);
+    // if (Math.abs(armCtrl)>0.1)
+    // {
+    //   armCtrl *= 0.1;
+    //   arm.manualControl(armCtrl);
+    // }
 
     if (joystick.getRawButtonPressed(1)) {
+      System.out.println("go to Ground");
       arm.setTarget(ArmSubsystem.kGroundPositionDegrees);
     }
     
     if (joystick.getRawButtonPressed(2)) {
+      System.out.println("go to Scoring");
       arm.setTarget(ArmSubsystem.kScoringPositionDegrees);
     }
     
     if (joystick.getRawButtonPressed(4)) {
+      System.out.println("go to Calibration");
       arm.setTarget(ArmSubsystem.kCalibrationPositionDegrees);
     }
     
