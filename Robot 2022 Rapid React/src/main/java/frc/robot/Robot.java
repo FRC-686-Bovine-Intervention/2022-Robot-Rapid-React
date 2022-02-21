@@ -50,7 +50,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {LoopController.getInstance().start();}
+  public void disabledInit() {LoopController.getInstance().start(); autoManager.stop();}
 
   @Override
   public void disabledPeriodic() {
