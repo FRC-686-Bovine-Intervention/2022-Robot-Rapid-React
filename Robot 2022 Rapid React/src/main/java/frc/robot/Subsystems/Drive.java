@@ -1,6 +1,5 @@
-package frc.robot.Subsystems.Subsystems;
+package frc.robot.subsystems;
 
-import frc.robot.Subsystems.Subsystem;
 import frc.robot.command_status.DriveCommand;
 import frc.robot.command_status.DriveCommand.DriveControlMode;
 import frc.robot.command_status.DriveState;

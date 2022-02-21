@@ -1,5 +1,7 @@
 package frc.robot.lib.util;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.loops.DriveLoop;
 
 /**
@@ -88,32 +90,35 @@ public class Kinematics
     }
 
     
-    /** Append the result of forward kinematics to a previous pose. */
+    /** Append the result of forward kinematics to a previous Pose2d. */
 
-    public static Pose integrateForwardKinematics(Pose _currentPose, double _lSpeed, double _rSpeed, double _gyroAngle)
+    public static Pose2d integrateForwardKinematics(Pose2d _currentPose2d, double _lSpeed, double _rSpeed, double _gyroAngle)
     {
-    	LinearAngularSpeed speed = forwardKinematics(_lSpeed, _rSpeed, _gyroAngle - _currentPose.getHeading());
-        return travelArc(_currentPose, speed);
+    	LinearAngularSpeed speed = forwardKinematics(_lSpeed, _rSpeed, _gyroAngle - _currentPose2d.getRotation().getRadians());
+        return travelArc(_currentPose2d, speed);
     }
     
-    // Obtain a new Pose from travel along a constant curvature path.
-    public static Pose travelArc(Pose _initialPose, LinearAngularSpeed _speed)
+    // Obtain a new Pose2d from travel along a constant curvature path.
+    public static Pose2d travelArc(Pose2d _initialPose2d, LinearAngularSpeed _speed)
     {
 		double D = _speed.linearSpeed;				// distance traveled = arc-length of circle
-		double L = D;							// chord-length
+		double L = D;							    // chord-length
 		
 		double dTheta = _speed.angularSpeed;
 		if (Math.abs(dTheta) > 1e-9)
 			L = 2*D*Math.sin(dTheta/2)/dTheta;			// chord-length given change in heading
 				
-		double avgHeading = _initialPose.getHeading() + dTheta/2;	// mean of current and final headings
+		double avgHeading = _initialPose2d.getRotation().getRadians() + dTheta/2;	// mean of current and final headings
 
 		Vector2d translation = Vector2d.magnitudeAngle(L, avgHeading);	// calculate change in position
 		
-		// update pose
-		Pose finalPose = _initialPose.add(translation).turn(_speed.angularSpeed);
+		// update Pose2d
+		// Pose2d finalPose2d = _initialPose2d.add(translation).turn(_speed.angularSpeed);
+		Pose2d finalPose2d = new Pose2d(_initialPose2d.getX() + translation.getX(),
+                                        _initialPose2d.getY() + translation.getY(),
+                                        _initialPose2d.getRotation().plus(new Rotation2d(_speed.angularSpeed)));
 		
-		return finalPose;
+		return finalPose2d;
     }
 
     

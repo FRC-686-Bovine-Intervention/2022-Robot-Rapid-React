@@ -5,11 +5,13 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.Auto.AutoManager;
-import frc.robot.Subsystems.SubsystemManager;
-import frc.robot.Subsystems.Subsystems.Drive;
+import frc.robot.auto.AutoManager;
+import frc.robot.auto.AutoModeExecuter;
+import frc.robot.auto.modes.SimplePathFollowerAuto;
 import frc.robot.loops.DriveLoop;
 import frc.robot.loops.LoopController;
+import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.SubsystemManager;
 
 public class Robot extends TimedRobot {
 
@@ -17,6 +19,8 @@ public class Robot extends TimedRobot {
   AutoManager autoManager = AutoManager.getInstance();
   DriverInteraction driverInteraction = DriverInteraction.getInstance();
 
+	AutoModeExecuter autoModeExecuter = null;
+    
   @Override
   public void robotInit() {
     subsystemManager.init();
@@ -30,7 +34,17 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    autoManager.init();
+    // autoManager.init();
+    if (autoModeExecuter != null)
+    {
+        autoModeExecuter.stop();
+      }
+      autoModeExecuter = null;
+      
+    autoModeExecuter = new AutoModeExecuter();
+    autoModeExecuter.setAutoMode( new SimplePathFollowerAuto() );
+
+    autoModeExecuter.start();    
   }
 
   @Override

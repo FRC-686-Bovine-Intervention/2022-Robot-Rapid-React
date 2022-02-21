@@ -1,5 +1,7 @@
 package frc.robot.command_status;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.lib.util.InterpolatingDouble;
 import frc.robot.lib.util.InterpolatingTreeMap;
@@ -116,7 +118,10 @@ public class RobotState
     {
         Kinematics.LinearAngularSpeed speed = new Kinematics.LinearAngularSpeed(robotSpeed.linearSpeed * _lookaheadTime,
                 robotSpeed.angularSpeed * _lookaheadTime);
-        return Kinematics.travelArc(getLatestFieldToVehicle(), speed);
+        Pose2d getLatestFieldToVehicle2d = new Pose2d(getLatestFieldToVehicle().getX(), getLatestFieldToVehicle().getY(), new Rotation2d(getLatestFieldToVehicle().getHeading()));
+        Pose2d predictedFieldToVehicle2d = Kinematics.travelArc(getLatestFieldToVehicle2d, speed);
+        Pose predictedFieldToVehicle = new Pose(predictedFieldToVehicle2d.getX(), predictedFieldToVehicle2d.getY(), predictedFieldToVehicle2d.getRotation().getRadians());
+        return predictedFieldToVehicle;
     }
 
     public synchronized void addFieldToVehicleObservation(double _timestamp, Pose _observation)
@@ -135,9 +140,11 @@ public class RobotState
 
         setPrevEncoderDistance(_lEncoderDistance, _rEncoderDistance);
 
-        Pose odometry = Kinematics.integrateForwardKinematics(lastPose, lDeltaDistance, rDeltaDistance,
+        Pose2d lastPose2d = new Pose2d(lastPose.getX(), lastPose.getY(), new Rotation2d(lastPose.getHeading()));
+        Pose2d odometry2d = Kinematics.integrateForwardKinematics(lastPose2d, lDeltaDistance, rDeltaDistance,
                 _gyroAngle - gyroCorrection);
         Kinematics.LinearAngularSpeed speed = Kinematics.forwardKinematics(_lEncoderSpeed, _rEncoderSpeed);
+        Pose odometry = new Pose(odometry2d.getX(), odometry2d.getY(), odometry2d.getRotation().getRadians());
 
         addFieldToVehicleObservation(_time, odometry); // store odometry
         robotSpeed = speed; // used in getPredictedFieldToVehicle()

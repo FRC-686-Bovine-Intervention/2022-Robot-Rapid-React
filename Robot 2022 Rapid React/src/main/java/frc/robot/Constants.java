@@ -22,4 +22,6 @@ public class Constants {
 
     public static double kLoopDt = 0.01;
     public static int kTalonTimeoutMs = 5;
+
+    public static double kTrackWidthInches = 22.0;    // distance between left and right wheels
 }
