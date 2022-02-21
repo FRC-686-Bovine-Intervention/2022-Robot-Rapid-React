@@ -1,12 +1,13 @@
 package frc.robot.Auto;
 
-import frc.robot.command_status.RobotState;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.Auto.AutoModes.AutoMode;
+import frc.robot.Auto.AutoModes.BasicAuto;
+import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.Pose;
 
 public class AutoManager {
@@ -18,12 +19,15 @@ public class AutoManager {
     private ShuffleboardTab tab = Shuffleboard.getTab("Autonomous");
     private SendableChooser<AutoMode> AutoModeChooser = new SendableChooser<>();
     private SendableChooser<Pose> InitialPoseChooser = new SendableChooser<>();
-    private ComplexWidget wig = tab.add("test", AutoModeChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
+    private ComplexWidget wig = tab.add("mode", AutoModeChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
+    private ComplexWidget a = tab.add("pose", InitialPoseChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
 
     private AutoManager(){}
 
     public void InitChoices()
     {
+        AutoModeChooser.addOption("BasicAuto", new BasicAuto());
+        InitialPoseChooser.addOption("null", new Pose());
     }
 
     public void init()
@@ -34,6 +38,7 @@ public class AutoManager {
         }
         autoModeExecuter = null;
 
+        autoModeExecuter = new AutoModeExecuter();
         autoModeExecuter.setAutoMode(AutoModeChooser.getSelected());
         RobotState.getInstance().reset(InitialPoseChooser.getSelected());
 

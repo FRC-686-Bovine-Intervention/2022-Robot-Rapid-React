@@ -23,7 +23,7 @@ public class SetIntake implements Action{
 
     @Override
     public boolean isFinished() {
-        return Intake.getInstance().isAtPos(set.armPos);
+        return Intake.getInstance().calibrated && Intake.getInstance().isAtPos(set.armPos);
     }
 
     @Override
