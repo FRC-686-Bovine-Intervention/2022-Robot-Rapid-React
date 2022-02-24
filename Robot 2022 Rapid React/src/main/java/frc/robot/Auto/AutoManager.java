@@ -26,8 +26,8 @@ public class AutoManager {
 
     public void InitChoices()
     {
-        AutoModeChooser.addOption("BasicAuto", new BasicAuto());
-        InitialPoseChooser.addOption("null", new Pose());
+        AutoModeChooser.setDefaultOption("BasicAuto", new BasicAuto());
+        InitialPoseChooser.setDefaultOption("0", new Pose());
     }
 
     public void init()

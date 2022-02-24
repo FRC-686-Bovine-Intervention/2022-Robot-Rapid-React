@@ -19,7 +19,7 @@ public class SubsystemManager {
         subsystems.add(Drive.getInstance());
     }
 
-    public void run()                   {for (Subsystem s : subsystems) {if (s.Enabled) s.run();            else s.disable();}}
+    public void run()                   {for (Subsystem s : subsystems) {if(s.Enabled) s.run();            else s.disable();}}
     public void runTestMode()           {for (Subsystem s : subsystems) {if (s.Enabled) s.runTestMode();    else s.disable();}}
     public void runCalibration()        {for (Subsystem s : subsystems) {if (s.Enabled) s.runCalibration();}}
     public void disable()               {for (Subsystem s : subsystems) {s.disable();}}

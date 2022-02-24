@@ -27,6 +27,7 @@ public class AutoModeExecuter {
                 @Override
                 public void runCrashTracked() 
                 {
+                    System.out.println("AutoExecuter.automode.run()");
                     if (autoMode != null) 
                     {
                         autoMode.run();

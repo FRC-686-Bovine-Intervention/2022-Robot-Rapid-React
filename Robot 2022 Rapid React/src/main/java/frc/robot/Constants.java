@@ -6,6 +6,7 @@ public class Constants {
 
     // Hardware Port Definitions
     // Drivetrain Hardware
+    public static int kPigeonID =           1;
     public static int kLeftMasterID =       2;
     public static int kLeftSlaveID =        3;
     public static int kRightMasterID =      4;
@@ -14,8 +15,8 @@ public class Constants {
     public static int kArmMotorID =         6;
     public static int kRollerMotorID =      7;
     // Climber Hardware
-    public static int kLeftClimberID =      0;
-    public static int kRightClimberID =     0;
+    public static int kLeftClimberID =      8;
+    public static int kRightClimberID =     9;
     // Control Hardware
     public static int kThrustmasterPort =   0;
     public static int kButtonboardPort =    1;

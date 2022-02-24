@@ -48,7 +48,6 @@ public class Controls {
     
     public boolean getButton(ButtonControlEnum button)
     {
-        System.out.println("asking for button");
         switch(button)
         {
             case INTAKE:                    return thrustmaster.getRawButton(Thrustmaster.kTriggerButton);

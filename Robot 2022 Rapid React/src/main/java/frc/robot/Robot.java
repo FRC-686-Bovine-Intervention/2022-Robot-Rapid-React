@@ -4,12 +4,18 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Subsystems.SubsystemManager;
 import frc.robot.Subsystems.Subsystems.Drive;
+import frc.robot.command_status.DriveState;
+import frc.robot.command_status.RobotState;
 import frc.robot.loops.DriveLoop;
 import frc.robot.loops.LoopController;
+import frc.robot.loops.RobotStateLoop;
 
 public class Robot extends TimedRobot {
 
@@ -23,10 +29,12 @@ public class Robot extends TimedRobot {
     autoManager.InitChoices();
     LoopController.getInstance().register(Drive.getInstance().getVelocityPIDLoop());
     LoopController.getInstance().register(DriveLoop.getInstance());
+    LoopController.getInstance().register(RobotStateLoop.getInstance());
   }
 
   @Override
-  public void robotPeriodic() {subsystemManager.updateShuffleboard(); LoopController.getInstance().run();}
+  public void robotPeriodic() {subsystemManager.updateShuffleboard(); LoopController.getInstance().run();
+  }
 
   @Override
   public void autonomousInit() {

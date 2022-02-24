@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
@@ -53,10 +53,8 @@ public class DriveLoop implements Loop
 
 	// Motor Controller Inversions
 	
-    public static boolean kLeftMotorInverted = false;
-    public static boolean kRightMotorInverted = true;
-    public static boolean kLeftMotorSensorPhase = true;
-    public static boolean kRightMotorSensorPhase = true;
+    public static TalonFXInvertType kLeftMotorInverted = TalonFXInvertType.CounterClockwise;
+    public static TalonFXInvertType kRightMotorInverted = TalonFXInvertType.Clockwise;
 
     public static int kDriveTrainCurrentLimit = 25;
 
@@ -70,21 +68,18 @@ public class DriveLoop implements Loop
 	public static double kDriveWatchdogTimerThreshold = 0.500;
 
 	// Wheels
-	public static double kDriveWheelCircumInches    = 18.800;
+	public static double kDriveWheelCircumInches    = 6*Math.PI;
 	public static double kTrackLengthInches         = 17.500;
 	public static double kTrackWidthInches          = 26.000;
 	public static double kTrackEffectiveDiameter    = (kTrackWidthInches * kTrackWidthInches + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;;
 	public static double kTrackScrubFactor          = 0.5;
 
 	// Wheel Encoder
-	public static double kQuadEncoderGain  = 1.0;	// number of drive shaft rotations per encoder shaft rotation
-													// 1.0 if encoder is directly coupled to the drive shaft
-	public static int    kQuadEncoderCodesPerRev    = 1024;
-	public static int    kQuadEncoderUnitsPerRev    = (int)(4*kQuadEncoderCodesPerRev / kQuadEncoderGain);  ;
-	public static double kQuadEncoderStatusFramePeriod = 0.100;	// 100 ms
+	public static int    kFalconEncoderUnitsPerRev    = 2048;
+	public static double kDriveGearRatio				= 50/14*50/14;
+	public static double kFalconEncoderStatusFramePeriod = 0.100;	// 100 ms
 
 	// CONTROL LOOP GAINS   
-	public static double kDriveSecondsFromNeutralToFull = 0.7;		// decrease acceleration (reduces current, robot tipping)
 	public static double kCalEncoderPulsePer100ms = 1400;		// velocity at a nominal throttle (measured using NI web interface)
 	public static double kCalPercentOutput 		 = 0.49;	// percent output of motor at above throttle (using NI web interface)
    
@@ -99,7 +94,7 @@ public class DriveLoop implements Loop
     public static double kDriveVelocityKd = 5.0;
     public static double kDriveVelocityKf = kCalPercentOutput * 1023.0 / kCalEncoderPulsePer100ms;
     public static int    kDriveVelocityIZone = 0;
-    public static double kDriveVelocityRampRate = 0.375;
+    public static double kDriveVelocityRampRate = 0.375;	// seconds from zero to full speed
     public static int    kDriveVelocityAllowableError = 0;
 
     // PID gains for drive base lock loop
@@ -147,6 +142,9 @@ public class DriveLoop implements Loop
 		lMotorMaster = new TalonFX(Constants.kLeftMasterID);
 		rMotorMaster = new TalonFX(Constants.kRightMasterID);
         
+		lMotorMaster.configFactoryDefault();
+		rMotorMaster.configFactoryDefault();
+
 		// Get status at 100Hz (faster than default 50 Hz)
 		lMotorMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, kTalonTimeoutMs);
 		rMotorMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, kTalonTimeoutMs);
@@ -156,14 +154,7 @@ public class DriveLoop implements Loop
 		lMotorMaster.setNeutralMode(NeutralMode.Coast);
 		rMotorMaster.setNeutralMode(NeutralMode.Coast);
 
-		lMotorMaster.configOpenloopRamp(kDriveSecondsFromNeutralToFull, kTalonTimeoutMs);		
-		rMotorMaster.configOpenloopRamp(kDriveSecondsFromNeutralToFull, kTalonTimeoutMs);		
-		
 		// Set up the encoders
-		lMotorMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kTalonPidIdx, kTalonTimeoutMs);	// configure for closed-loop PID
-		rMotorMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kTalonPidIdx, kTalonTimeoutMs);
-		lMotorMaster.setSensorPhase(kLeftMotorSensorPhase);
-		rMotorMaster.setSensorPhase(kRightMotorSensorPhase);
 		lMotorMaster.setInverted(kLeftMotorInverted);
 		rMotorMaster.setInverted(kRightMotorInverted);
 		
@@ -208,20 +199,20 @@ public class DriveLoop implements Loop
 		 *****************************************************************/
 		lMotorSlaves = new ArrayList<BaseMotorController>();	
 		rMotorSlaves = new ArrayList<BaseMotorController>();	
-		lMotorSlaves.add(new VictorSPX(Constants.kLeftSlaveID));
-		rMotorSlaves.add(new VictorSPX(Constants.kRightSlaveID));			
+		lMotorSlaves.add(new TalonFX(Constants.kLeftSlaveID));
+		rMotorSlaves.add(new TalonFX(Constants.kRightSlaveID));			
 		
         for (BaseMotorController lMotorSlave : lMotorSlaves) 
         {
     		lMotorSlave.follow(lMotorMaster);	// give slave the TalonID of it's master
     		lMotorSlave.setNeutralMode(NeutralMode.Coast);
-    		lMotorSlave.setInverted(kLeftMotorInverted);
+			lMotorSlave.setInverted(InvertType.FollowMaster);
         }
         for (BaseMotorController rMotorSlave : rMotorSlaves) 
         {
     		rMotorSlave.follow(rMotorMaster);	// give slave the TalonID of it's master
     		rMotorSlave.setNeutralMode(NeutralMode.Coast);
-    		rMotorSlave.setInverted(kRightMotorInverted);
+			rMotorSlave.setInverted(InvertType.FollowMaster);
         }
         
 		/*****************************************************************
@@ -238,8 +229,8 @@ public class DriveLoop implements Loop
 		 * Select which Gyro is installed
 		 *****************************************************************/
 		// select which gyro is installed
-			System.out.println("Selected gyro = Pigeon");
-			gyro = Pigeon.getInstance();
+		System.out.println("Selected gyro = Pigeon");
+		gyro = Pigeon.getInstance();
 
 	}
 	
@@ -429,12 +420,12 @@ public class DriveLoop implements Loop
 	}
 
 	// Talon SRX reports position in rotations while in closed-loop Position mode
-	public static double encoderUnitsToInches(double _encoderPosition) {	return (double)_encoderPosition / (double)kQuadEncoderUnitsPerRev  * kDriveWheelCircumInches; }
-	public static int inchesToEncoderUnits(double _inches) { return (int)(_inches / kDriveWheelCircumInches * kQuadEncoderUnitsPerRev); }
+	public static double encoderUnitsToInches(double _encoderPosition) { return _encoderPosition / kFalconEncoderUnitsPerRev / kDriveGearRatio * kDriveWheelCircumInches; }
+	public static double inchesToEncoderUnits(double _inches) { return _inches / kDriveWheelCircumInches * kFalconEncoderUnitsPerRev * kDriveGearRatio; }
 
 	// Talon SRX reports speed in RPM while in closed-loop Speed mode
-	public static double encoderUnitsPerFrameToInchesPerSecond(double _encoderEdgesPerFrame) { return encoderUnitsToInches(_encoderEdgesPerFrame) / kQuadEncoderStatusFramePeriod; }
-	public static int inchesPerSecondToEncoderUnitsPerFrame(double _inchesPerSecond) { return (int)(inchesToEncoderUnits(_inchesPerSecond) * kQuadEncoderStatusFramePeriod); }
+	public static double encoderUnitsPerFrameToInchesPerSecond(double _encoderEdgesPerFrame) { return encoderUnitsToInches(_encoderEdgesPerFrame) / kFalconEncoderStatusFramePeriod; }
+	public static int inchesPerSecondToEncoderUnitsPerFrame(double _inchesPerSecond) { return (int)(inchesToEncoderUnits(_inchesPerSecond) * kFalconEncoderStatusFramePeriod); }
 
 	
 	
