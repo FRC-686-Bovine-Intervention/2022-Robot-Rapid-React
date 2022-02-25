@@ -1,6 +1,6 @@
-package frc.robot.Auto;
+package frc.robot.auto;
 
-import frc.robot.Auto.AutoModes.AutoMode;
+import frc.robot.auto.modes.AutoMode;
 import frc.robot.lib.util.CrashTrackingRunnable;
 
 public class AutoModeExecuter {

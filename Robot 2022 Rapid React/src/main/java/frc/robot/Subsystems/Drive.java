@@ -1,10 +1,11 @@
-package frc.robot.Subsystems.Subsystems;
+package frc.robot.subsystems;
 
-import frc.robot.Subsystems.Subsystem;
+import edu.wpi.first.math.util.Units;
 import frc.robot.command_status.DriveCommand;
 import frc.robot.command_status.DriveCommand.DriveControlMode;
 import frc.robot.command_status.DriveState;
 import frc.robot.lib.util.DataLogger;
+import frc.robot.lib.util.Kinematics;
 import frc.robot.lib.util.Kinematics.WheelSpeed;
 import frc.robot.lib.util.PIDController;
 import frc.robot.loops.DriveLoop;
@@ -39,6 +40,8 @@ public class Drive extends Subsystem
 	// velocity heading
 	private VelocityHeadingSetpoint velocityHeadingSetpoint = new VelocityHeadingSetpoint();
 
+	// turn to heading target
+	private double targetHeadingDeg = 0.0;
 
 
 
@@ -73,7 +76,8 @@ public class Drive extends Subsystem
     		{
     			case OPEN_LOOP:
     			case BASE_LOCKED:
-    				// states where Talon SRXs are not controlling velocity
+				case TURN_TO_HEADING:
+				// states where Talon SRXs are not controlling velocity
     				return;
 
     			case VELOCITY_SETPOINT:
@@ -136,6 +140,20 @@ public class Drive extends Subsystem
 		updateVelocityHeading();
 	}
     
+	public void setTurnToHeadingSetpoint(double _targetHeadingDeg)
+	{
+		// get remaining angular error
+		double robotToTargetDeg = _targetHeadingDeg - driveState.getHeadingDeg();
+
+		// use this error to calculate how much more the left and right wheels should turn
+		WheelSpeed deltaDistanceInches = Kinematics.inverseKinematics(0.0, Units.degreesToRadians(robotToTargetDeg));
+
+		// update Position Motion Magic Setpoint
+		driveCmd.setDriveMode(DriveControlMode.TURN_TO_HEADING);
+		driveCmd.setMotors(driveState.getLeftDistanceInches()  + deltaDistanceInches.left, 
+						   driveState.getRightDistanceInches() + deltaDistanceInches.right);		
+	}
+
 
 	/*
 	 * Set/get functions
@@ -225,9 +243,7 @@ public class Drive extends Subsystem
 	}
 
 
-	
-	
-	
+
 	
 	/*
 	 * Subsystem overrides(non-Javadoc)

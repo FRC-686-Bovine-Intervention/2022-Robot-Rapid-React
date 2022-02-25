@@ -1,4 +1,4 @@
-package frc.robot.Controls;
+package frc.robot.controls;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.Vector2d;

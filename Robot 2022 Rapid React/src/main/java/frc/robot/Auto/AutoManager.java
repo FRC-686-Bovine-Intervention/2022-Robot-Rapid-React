@@ -1,12 +1,12 @@
-package frc.robot.Auto;
+package frc.robot.auto;
 
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.Auto.AutoModes.AutoMode;
-import frc.robot.Auto.AutoModes.BasicAuto;
+import frc.robot.auto.modes.AutoMode;
+import frc.robot.auto.modes.BasicAuto;
 import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.Pose;
 

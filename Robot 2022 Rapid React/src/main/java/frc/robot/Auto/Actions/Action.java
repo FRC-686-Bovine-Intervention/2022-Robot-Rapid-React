@@ -1,4 +1,4 @@
-package frc.robot.Auto.Actions;
+package frc.robot.auto.actions;
 
 public interface Action {
     /**

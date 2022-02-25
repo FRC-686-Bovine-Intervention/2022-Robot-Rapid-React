@@ -1,11 +1,11 @@
 package frc.robot;
 
-import frc.robot.Controls.Controls;
-import frc.robot.Subsystems.Subsystems.Climber;
-import frc.robot.Subsystems.Subsystems.Drive;
-import frc.robot.Subsystems.Subsystems.Drivetrain;
-import frc.robot.Subsystems.Subsystems.Intake;
-import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
+import frc.robot.controls.Controls;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake.IntakeState;
 
 public class DriverInteraction {
     private static DriverInteraction instance;

@@ -1,7 +1,7 @@
-package frc.robot.Auto.Actions;
+package frc.robot.auto.actions;
 
-import frc.robot.Subsystems.Subsystems.Intake;
-import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake.IntakeState;
 
 public class SetIntake implements Action{
     private IntakeState set;
