@@ -6,7 +6,7 @@ import frc.robot.subsystems.Intake.IntakeState;
 public class SetIntake implements Action{
     private IntakeState set;
 
-    public SetIntake(IntakeState set)
+    public SetIntake(IntakeState set) //
     {
         this.set = set;
     }
