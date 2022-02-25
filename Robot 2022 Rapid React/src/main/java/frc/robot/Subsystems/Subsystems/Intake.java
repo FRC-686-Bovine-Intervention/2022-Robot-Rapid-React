@@ -128,10 +128,9 @@ public class Intake extends Subsystem {
     public void runTestMode()
     {
         //intakeStatus = stateChooser.getSelected();
-        if (stateChooser.getSelected() == IntakeState.CALIBRATING || calibrateEntry.getBoolean(false))
+        if (stateChooser.getSelected() == IntakeState.CALIBRATING)
         {
             runCalibration();
-            calibrateEntry.setBoolean(false);
         }
         autoCalibrate = false;
         run();
@@ -165,10 +164,11 @@ public class Intake extends Subsystem {
 
     public void setTargetPos(ArmPosEnum pos) {targetPos = pos;}
 
+    double pidOutput = 0.0;
     private void setPos(ArmPosEnum pos)
     {
         pid.setGoal(pos.angleDeg);
-        double pidOutput = 0.0;
+        pidOutput = 0.0;
         double currentAngleDegrees = encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition());
 
         pidOutput = pid.calculate(currentAngleDegrees);
@@ -205,18 +205,27 @@ public class Intake extends Subsystem {
     }
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Intake");
-    private NetworkTableEntry calibrateEntry = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
+    private NetworkTableEntry calibrateEntry = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kBooleanBox).getEntry();
     private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry statusEntry = tab.add("Status", "not updating what").withWidget(BuiltInWidgets.kTextView).getEntry();
     private NetworkTableEntry armposEntry = tab.add("Arm position", "not updating what").withWidget(BuiltInWidgets.kTextView).getEntry();
+    private NetworkTableEntry armCurrentEntry = tab.add("Arm Current", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
+    private NetworkTableEntry armPIDOutputEntry = tab.add("Arm PID Output", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
+    private NetworkTableEntry armCurrentPosEntry = tab.add("Arm Current Pos", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
+    private NetworkTableEntry armGoalEntry = tab.add("Arm PID Goal", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
     private SendableChooser<IntakeState> stateChooser = new SendableChooser<>();
 
     @Override
     public void updateShuffleboard()
     {
+        armCurrentEntry.setDouble(ArmMotor.getStatorCurrent());
+        armPIDOutputEntry.setDouble(pidOutput);
+        armCurrentPosEntry.setDouble(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
+        armGoalEntry.setDouble(pid.getGoal().position);
         Enabled = enableEntry.getBoolean(true);
         enableEntry.setBoolean(Enabled);
         statusEntry.setString(intakeStatus.name());
         armposEntry.setString(targetPos.name());
+        calibrateEntry.setBoolean(calibrated);
     }
 }

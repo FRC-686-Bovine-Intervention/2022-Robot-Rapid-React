@@ -11,7 +11,7 @@ public class BasicAuto extends AutoMode{
     @Override
     protected void routine() throws AutoModeEndedException {
         System.out.println("BasicAuto.routine()");
-        runAction(new DriveStraight(36));
+        runAction(new DriveStraight(8*12));
 
         //runAction(new SetIntake(Intake.IntakeState.INTAKE));
         //runAction(new SetIntake(Intake.IntakeState.OUTTAKE));

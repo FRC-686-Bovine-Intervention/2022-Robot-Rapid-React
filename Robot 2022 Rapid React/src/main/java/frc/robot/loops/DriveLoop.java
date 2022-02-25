@@ -89,9 +89,9 @@ public class DriveLoop implements Loop
 
     // PID gains for drive velocity loop (sent to Talon)
     // Units: error is 4*256 counts/rev. Max output is +/- 1023 units.
-    public static double kDriveVelocityKp = 1.0;
+    public static double kDriveVelocityKp = 0.3;//1.0;
     public static double kDriveVelocityKi = 0.00;
-    public static double kDriveVelocityKd = 5.0;
+    public static double kDriveVelocityKd = 5.0;//5.0;
     public static double kDriveVelocityKf = kCalPercentOutput * 1023.0 / kCalEncoderPulsePer100ms;
     public static int    kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0.375;	// seconds from zero to full speed
@@ -110,9 +110,9 @@ public class DriveLoop implements Loop
     // PID gains for constant heading velocity control
     // Units: Error is degrees. Output is inches/second difference to
     // left/right.
-    public static double kDriveHeadingVelocityKp = 4.0;
+    public static double kDriveHeadingVelocityKp = 4.0;//4.0;
     public static double kDriveHeadingVelocityKi = 0.0;
-    public static double kDriveHeadingVelocityKd = 50.0;
+    public static double kDriveHeadingVelocityKd = 0.0;//50.0;
     
     // Point Turn constants
     public static double kPointTurnKp = 0.05;

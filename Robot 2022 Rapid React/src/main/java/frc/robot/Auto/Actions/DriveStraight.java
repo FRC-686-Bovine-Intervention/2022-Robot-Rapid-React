@@ -11,6 +11,7 @@ import frc.robot.command_status.RobotState;
 public class DriveStraight implements Action{
 
     private double startingDistance;
+    private double startingHeading;
     private double distance;
 
     public DriveStraight(double distance)
@@ -21,11 +22,12 @@ public class DriveStraight implements Action{
     @Override
     public void start() {
         startingDistance = getDistance();
+        startingHeading = RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg();
     }
 
     @Override
     public void run() {
-        Drive.getInstance().setVelocityHeadingSetpoint(12, DriveState.getInstance().getHeadingDeg());
+        Drive.getInstance().setVelocityHeadingSetpoint(18, startingHeading);
     }
 
     @Override

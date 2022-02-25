@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Auto.AutoManager;
 import frc.robot.Subsystems.SubsystemManager;
 import frc.robot.Subsystems.Subsystems.Drive;
@@ -23,6 +22,15 @@ public class Robot extends TimedRobot {
   AutoManager autoManager = AutoManager.getInstance();
   DriverInteraction driverInteraction = DriverInteraction.getInstance();
 
+  private NetworkTableEntry headingEntry = Shuffleboard.getTab("Robot Status").add("Heading Degrees", -999999).getEntry();
+  private NetworkTableEntry distanceEntry = Shuffleboard.getTab("Robot Status").add("Distance", -999999).getEntry();
+  private double startingDistance;
+
+  private double getDistance()
+    {
+        return (DriveState.getInstance().getLeftDistanceInches() + DriveState.getInstance().getRightDistanceInches())/2;
+    }
+
   @Override
   public void robotInit() {
     subsystemManager.init();
@@ -34,10 +42,13 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {subsystemManager.updateShuffleboard(); LoopController.getInstance().run();
+    distanceEntry.setDouble(getDistance() - startingDistance);
+    headingEntry.setDouble(RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg());
   }
 
   @Override
   public void autonomousInit() {
+    startingDistance = getDistance();
     autoManager.init();
   }
 
