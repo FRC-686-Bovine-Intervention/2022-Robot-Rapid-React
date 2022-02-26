@@ -1,33 +1,58 @@
-package frc.robot.Auto;
+package frc.robot.auto;
 
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.auto.modes.AutoMode;
+import frc.robot.auto.modes.BasicAuto;
+import frc.robot.auto.modes.OneBallAuto;
+import frc.robot.command_status.RobotState;
+import frc.robot.lib.util.Pose;
 
 public class AutoManager {
     private static AutoManager instance;
     public static AutoManager getInstance() {if(instance == null){instance = new AutoManager();}return instance;}
 
-    private AutoManager(){}
+    AutoModeExecuter autoModeExecuter = null;
 
-    private static final String kDefaultAuto = "Default";
-    private static final String kCustomAuto = "My Auto";
-    private String m_autoSelected;
-    private final SendableChooser<String> m_chooser = new SendableChooser<>();
+    private ShuffleboardTab tab = Shuffleboard.getTab("Autonomous");
+    private SendableChooser<AutoMode> AutoModeChooser = new SendableChooser<>();
+    private SendableChooser<Pose> InitialPoseChooser = new SendableChooser<>();
+    private ComplexWidget wig = tab.add("mode", AutoModeChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
+    private ComplexWidget a = tab.add("pose", InitialPoseChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
+
+    private AutoManager(){}
 
     public void InitChoices()
     {
-        m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-        m_chooser.addOption("My Auto", kCustomAuto);
-        SmartDashboard.putData("Auto/Auto choices", m_chooser);
+        AutoModeChooser.addOption("BasicAuto", new BasicAuto());
+        AutoModeChooser.setDefaultOption("One Ball Auto", new OneBallAuto());
+        InitialPoseChooser.setDefaultOption("new Pose()", new Pose());
     }
 
     public void init()
     {
-        m_autoSelected = m_chooser.getSelected();
+        if (autoModeExecuter != null)
+        {
+            autoModeExecuter.stop();
+        }
+        autoModeExecuter = null;
+
+        autoModeExecuter = new AutoModeExecuter();
+        autoModeExecuter.setAutoMode(AutoModeChooser.getSelected());
+        RobotState.getInstance().reset(InitialPoseChooser.getSelected());
+
+        autoModeExecuter.start();
     }
 
-    public void run()
+    public void stop()
     {
-        
+        if (autoModeExecuter != null)
+        {
+            autoModeExecuter.stop();
+        }
+        autoModeExecuter = null;
     }
 }

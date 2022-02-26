@@ -4,12 +4,21 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
-import frc.robot.Auto.AutoManager;
-import frc.robot.Subsystems.SubsystemManager;
-import frc.robot.Subsystems.Subsystems.Drive;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import frc.robot.auto.AutoManager;
+import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.SubsystemManager;
+import frc.robot.command_status.DriveState;
+import frc.robot.command_status.RobotState;
 import frc.robot.loops.DriveLoop;
 import frc.robot.loops.LoopController;
+import frc.robot.loops.RobotStateLoop;
 
 public class Robot extends TimedRobot {
 
@@ -17,25 +26,45 @@ public class Robot extends TimedRobot {
   AutoManager autoManager = AutoManager.getInstance();
   DriverInteraction driverInteraction = DriverInteraction.getInstance();
 
+  private NetworkTableEntry headingEntry = Shuffleboard.getTab("Robot Status").add("Heading Degrees", -999999).getEntry();
+  private NetworkTableEntry distanceEntry = Shuffleboard.getTab("Robot Status").add("Distance", -999999).getEntry();
+  private NetworkTableEntry poseEntry = Shuffleboard.getTab("Robot Status").add("Pose Entry", "not updating").getEntry();
+  private double startingDistance;
+
+  private double getDistance()
+    {
+        return (DriveState.getInstance().getLeftDistanceInches() + DriveState.getInstance().getRightDistanceInches())/2;
+    }
+
   @Override
   public void robotInit() {
+    HttpCamera httpCamera = new HttpCamera("Limelight", "10.6.86.11:1182",HttpCameraKind.kMJPGStreamer); //http://gloworm.local:5800/stream.mjpeg
+    httpCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    CameraServer.addCamera(httpCamera);
+    Shuffleboard.getTab("Camera").add(httpCamera);
+
     subsystemManager.init();
     autoManager.InitChoices();
     LoopController.getInstance().register(Drive.getInstance().getVelocityPIDLoop());
     LoopController.getInstance().register(DriveLoop.getInstance());
+    LoopController.getInstance().register(RobotStateLoop.getInstance());
   }
 
   @Override
-  public void robotPeriodic() {subsystemManager.updateShuffleboard(); LoopController.getInstance().run();}
+  public void robotPeriodic() {subsystemManager.updateShuffleboard(); LoopController.getInstance().run();
+    distanceEntry.setDouble(getDistance() - startingDistance);
+    headingEntry.setDouble(RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg());
+    poseEntry.setString(RobotState.getInstance().getLatestFieldToVehicle().toString());
+  }
 
   @Override
   public void autonomousInit() {
+    startingDistance = getDistance();
     autoManager.init();
   }
 
   @Override
   public void autonomousPeriodic() {
-    autoManager.run();
     subsystemManager.run();
   }
 
@@ -51,7 +80,7 @@ public class Robot extends TimedRobot {
   }
 
   @Override
-  public void disabledInit() {LoopController.getInstance().start();}
+  public void disabledInit() {LoopController.getInstance().start(); autoManager.stop();}
 
   @Override
   public void disabledPeriodic() {

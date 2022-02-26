@@ -1,4 +1,4 @@
-package frc.robot.Controls;
+package frc.robot.controls;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.Vector2d;
@@ -48,7 +48,6 @@ public class Controls {
     
     public boolean getButton(ButtonControlEnum button)
     {
-        System.out.println("asking for button");
         switch(button)
         {
             case INTAKE:                    return thrustmaster.getRawButton(Thrustmaster.kTriggerButton);

@@ -1,9 +1,6 @@
-package frc.robot.Subsystems;
+package frc.robot.subsystems;
 
 import java.util.ArrayList;
-
-import frc.robot.Subsystems.Subsystems.Drive;
-import frc.robot.Subsystems.Subsystems.Intake;
 
 public class SubsystemManager {
     private static SubsystemManager instance;

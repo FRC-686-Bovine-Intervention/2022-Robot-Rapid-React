@@ -32,12 +32,14 @@ import edu.wpi.first.wpilibj.Timer;
  *                      Motor controllers use velocity PID to maintain velocity setpoints, RoboRIO uses heading PID
  *                      to adjust velocity setpoints to maintain heading. 
  *                                
+ * TURN_TO_HEADING:     The robot attempts to turn to an absolute heading angle.  The remaining angle is used to update
+ *                      the setpoint of a position PID loop
  */
 
 public class DriveCommand
 {    
 	// The robot drivetrain's various states
-	public enum DriveControlMode { OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING }
+	public enum DriveControlMode { OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING, TURN_TO_HEADING }
 
 	// all member variables should be private to force other object to use the set/get access methods
 	// which are synchronized to allow multi-thread synchronization	
@@ -90,6 +92,7 @@ public class DriveCommand
     		break;
     		
     	case BASE_LOCKED:
+        case TURN_TO_HEADING:
     		talonMode = ControlMode.Position;
     		
     	case VELOCITY_SETPOINT:
