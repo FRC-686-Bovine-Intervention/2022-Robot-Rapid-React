@@ -4,26 +4,26 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 
 public class SetIntake implements Action{
-    private IntakeState set;
+    private IntakeState state;
 
-    public SetIntake(IntakeState set) //
+    public SetIntake(IntakeState state)
     {
-        this.set = set;
+        this.state = state;
     }
     
     @Override
     public void start() {
-        
+        Intake.getInstance().changeState(state);
     }
 
     @Override
     public void run() {
-        Intake.getInstance().changeState(set);
+        
     }
 
     @Override
     public boolean isFinished() {
-        return Intake.getInstance().calibrated && Intake.getInstance().isAtPos(set.armPos);
+        return Intake.getInstance().calibrated && Intake.getInstance().isAtPos(state.armPos);
     }
 
     @Override

@@ -24,6 +24,7 @@ public class Robot extends TimedRobot {
 
   private NetworkTableEntry headingEntry = Shuffleboard.getTab("Robot Status").add("Heading Degrees", -999999).getEntry();
   private NetworkTableEntry distanceEntry = Shuffleboard.getTab("Robot Status").add("Distance", -999999).getEntry();
+  private NetworkTableEntry poseEntry = Shuffleboard.getTab("Robot Status").add("Pose Entry", "not updating").getEntry();
   private double startingDistance;
 
   private double getDistance()
@@ -44,6 +45,7 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {subsystemManager.updateShuffleboard(); LoopController.getInstance().run();
     distanceEntry.setDouble(getDistance() - startingDistance);
     headingEntry.setDouble(RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg());
+    poseEntry.setString(RobotState.getInstance().getLatestFieldToVehicle().toString());
   }
 
   @Override

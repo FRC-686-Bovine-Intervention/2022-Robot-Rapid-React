@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.auto.modes.AutoMode;
 import frc.robot.auto.modes.BasicAuto;
+import frc.robot.auto.modes.OneBallAuto;
 import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.Pose;
 
@@ -26,8 +27,9 @@ public class AutoManager {
 
     public void InitChoices()
     {
-        AutoModeChooser.setDefaultOption("BasicAuto", new BasicAuto());
-        InitialPoseChooser.setDefaultOption("0", new Pose());
+        AutoModeChooser.addOption("BasicAuto", new BasicAuto());
+        AutoModeChooser.setDefaultOption("One Ball Auto", new OneBallAuto());
+        InitialPoseChooser.setDefaultOption("new Pose()", new Pose());
     }
 
     public void init()
