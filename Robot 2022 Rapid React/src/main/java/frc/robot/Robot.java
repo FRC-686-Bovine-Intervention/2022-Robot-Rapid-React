@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.HttpCamera;
+import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -34,6 +38,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+    HttpCamera httpCamera = new HttpCamera("Limelight", "10.6.86.11:1182",HttpCameraKind.kMJPGStreamer); //http://gloworm.local:5800/stream.mjpeg
+    httpCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    CameraServer.addCamera(httpCamera);
+    Shuffleboard.getTab("Camera").add(httpCamera);
+
     subsystemManager.init();
     autoManager.InitChoices();
     LoopController.getInstance().register(Drive.getInstance().getVelocityPIDLoop());
