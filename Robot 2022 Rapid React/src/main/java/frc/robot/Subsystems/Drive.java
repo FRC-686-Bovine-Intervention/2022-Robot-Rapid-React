@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.command_status.DriveCommand;
 import frc.robot.command_status.DriveCommand.DriveControlMode;
 import frc.robot.command_status.DriveState;
@@ -30,6 +32,8 @@ public class Drive extends Subsystem
 		}
 		return instance;
 	}
+
+	private NetworkTableEntry enableEntry = Shuffleboard.getTab("Drivetrain").add("Enabled", true).getEntry();
 
 	// drive commands
 	private DriveCommand driveCmd;
@@ -259,7 +263,10 @@ public class Drive extends Subsystem
 	//@Override
 	public void zeroSensors() { driveCmd.setResetEncoders(); }
 
-	@Override public void run(){} @Override public void updateShuffleboard(){}
+	@Override public void run(){} @Override public void updateShuffleboard(){
+		Enabled = enableEntry.getBoolean(true);
+		enableEntry.setBoolean(Enabled);
+	}
 
 
 	

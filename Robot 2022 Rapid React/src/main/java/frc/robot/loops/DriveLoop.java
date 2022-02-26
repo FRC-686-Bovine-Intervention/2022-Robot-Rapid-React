@@ -42,7 +42,7 @@ public class DriveLoop implements Loop
     private static Drive drive;
 	private static GyroBase gyro;
     private DriveState driveState;
-    
+
 	public final TalonFX lMotorMaster;
 	public final TalonFX rMotorMaster;
 	public final List<BaseMotorController> lMotorSlaves;
@@ -321,13 +321,16 @@ public class DriveLoop implements Loop
 		
 		// Watchdog timer  
 		double currentTime = Timer.getFPGATimestamp();
+
+		if (!drive.Enabled) newCmd = DriveCommand.COAST();
+
 		if (currentTime - newCmd.getCommandTime() > kDriveWatchdogTimerThreshold)
 		{
 			// Halt robot if new command hasn't been sent in a while
 			stopMotors();
 			return;
 		}
-				
+		
 		synchronized(newCmd)	// lock DriveCommand so no one changes it under us while we are sending the commands
 		{
 			setControlMode(newCmd);

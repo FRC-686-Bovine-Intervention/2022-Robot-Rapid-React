@@ -82,6 +82,7 @@ public class Intake extends Subsystem {
         DEFENSE(ArmPosEnum.RAISED),
         INTAKE(ArmPosEnum.LOWERED),
         OUTTAKE(ArmPosEnum.RAISED),
+        OUTTAKE_GROUND(ArmPosEnum.LOWERED),
         CLIMBING(null),
         CALIBRATING(null);
 
@@ -107,6 +108,10 @@ public class Intake extends Subsystem {
             case OUTTAKE:
                 if(isAtPos(ArmPosEnum.RAISED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kOuttakePercentOutput);}
                 else {setTargetPos(ArmPosEnum.RAISED);}
+            break;
+            case OUTTAKE_GROUND:
+                if(isAtPos(ArmPosEnum.LOWERED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kOuttakePercentOutput);}
+                else {setTargetPos(ArmPosEnum.LOWERED);}
             break;
             case CLIMBING: break;
             case CALIBRATING:
