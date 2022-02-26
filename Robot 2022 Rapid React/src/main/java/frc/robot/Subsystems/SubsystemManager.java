@@ -2,10 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.ArrayList;
 
-import frc.robot.Subsystems.Subsystems.Climber;
-import frc.robot.Subsystems.Subsystems.Drive;
-import frc.robot.Subsystems.Subsystems.Intake;
-
 public class SubsystemManager {
     private static SubsystemManager instance;
     public static SubsystemManager getInstance() {if(instance == null){instance = new SubsystemManager();}return instance;}

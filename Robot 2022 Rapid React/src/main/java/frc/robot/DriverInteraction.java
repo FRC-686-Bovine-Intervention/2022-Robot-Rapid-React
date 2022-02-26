@@ -1,13 +1,12 @@
 package frc.robot;
 
-import frc.robot.Controls.Controls;
-import frc.robot.Controls.Controls.ButtonControlEnum;
-import frc.robot.Controls.Controls.JoystickEnum;
-import frc.robot.Subsystems.Subsystems.Climber;
-import frc.robot.Subsystems.Subsystems.Drive;
-import frc.robot.Subsystems.Subsystems.Drivetrain;
-import frc.robot.Subsystems.Subsystems.Intake;
-import frc.robot.Subsystems.Subsystems.Intake.IntakeState;
+import frc.robot.controls.Controls;
+import frc.robot.controls.Controls.JoystickEnum;
+import frc.robot.subsystems.Climber;
+import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Intake.IntakeState;
 
 public class DriverInteraction {
     private static DriverInteraction instance;
@@ -36,7 +35,7 @@ public class DriverInteraction {
     {
         driving = !controls.getButton(Controls.ButtonControlEnum.CLIMBERNEXTSTAGE);
         if (driving) Drive.getInstance().setOpenLoop(controls.getDriveCommand());
-        else Climber.getInstance().setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*-0.6);
+        else Climber.getInstance().setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*-1);
         if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
         {
             intake.changeState(IntakeState.INTAKE);

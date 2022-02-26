@@ -6,9 +6,10 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc.robot.Constants;
-import frc.robot.controls.Controls;
-import frc.robot.controls.Controls.JoystickEnum;
 
 /**<h4>Contains all code for the Climber subsystem</h4>*/
 public class Climber extends Subsystem {
@@ -47,7 +48,6 @@ public class Climber extends Subsystem {
     @Override
     public void run()
     {
-        LeftMotor.set(TalonFXControlMode.PercentOutput, Controls.getInstance().getAxis(JoystickEnum.THRUSTMASTER).y);
         // if(autoCalibrate && !calibrated) {changeState(ClimberState.CALIBRATING);}
         // switch (getClimberStatus())
         // {
@@ -110,18 +110,30 @@ public class Climber extends Subsystem {
         RETRACTED
     }
 
-    private void setTargetPos(ClimberPos pos)
+    public void setTargetPos(double power)
     {
-
+        LeftMotor.set(TalonFXControlMode.PercentOutput, power);
     }
+
+    private ShuffleboardTab tab = Shuffleboard.getTab("Climber");
+    private NetworkTableEntry currentEntry = tab.add("Current", -9999).getEntry();
     
     @Override
     public void updateShuffleboard()
     {
-        
+        currentEntry.setDouble(LeftMotor.getStatorCurrent());
     }
 
-    public ClimberState getClimberStatus() {return ClimberStatusHistory.get(ClimberStatusHistory.size()-1);}
+    public ClimberState getClimberStatus() {
+        try
+        {
+            return ClimberStatusHistory.get(ClimberStatusHistory.size()-1);
+        }
+        catch (IndexOutOfBoundsException o)
+        {
+            return null;
+        }
+    }
     public void nextState()
     {
         switch(getClimberStatus())
