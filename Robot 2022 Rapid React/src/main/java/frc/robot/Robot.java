@@ -38,10 +38,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    HttpCamera httpCamera = new HttpCamera("Limelight", "10.6.86.11:1182",HttpCameraKind.kMJPGStreamer); //http://gloworm.local:5800/stream.mjpeg
+    HttpCamera httpCamera = new HttpCamera("Limelight", "http://gloworm.local:1182/stream.mjpg"); //10.6.86.11:1182/stream.mjpg
     httpCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
     CameraServer.addCamera(httpCamera);
-    Shuffleboard.getTab("Camera").add(httpCamera);
 
     subsystemManager.init();
     autoManager.InitChoices();

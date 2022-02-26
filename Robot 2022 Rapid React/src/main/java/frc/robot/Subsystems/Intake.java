@@ -40,7 +40,7 @@ public class Intake extends Subsystem {
     private static final double kEncoderUnitsPerRev = 2048 * kGearRatio;
     private static final double kEncoderUnitsPerDeg = kEncoderUnitsPerRev/360.0;
 
-    private static final double kP = 0.08;
+    private static final double kP = 0.06;
     private static final double kI = 0.0;
     private static final double kD = 0.0;
     private static final double kMaxVelocityDegPerSecond = 120;
