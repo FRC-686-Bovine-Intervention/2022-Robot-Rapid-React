@@ -23,7 +23,6 @@ public class OneBallAuto extends AutoMode{
         reversePath.add(new Waypoint(initialPose, driveOptions));
         reversePath.add(new Waypoint(outsideTarmac, driveOptions));
         reversePath.setReverseDirection();
-
         runAction(new SetIntake(IntakeState.OUTTAKE));
         runAction(new WaitAction(0.5));
         runAction(new SetIntake(IntakeState.DEFENSE));

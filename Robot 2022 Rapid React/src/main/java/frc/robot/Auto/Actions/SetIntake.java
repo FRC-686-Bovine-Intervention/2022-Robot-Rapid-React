@@ -15,10 +15,10 @@ public class SetIntake implements Action{
     public void start() {
         Intake.getInstance().changeState(state);
     }
-
+    
     @Override
     public void run() {
-        
+        Intake.getInstance().changeState(state);
     }
 
     @Override
