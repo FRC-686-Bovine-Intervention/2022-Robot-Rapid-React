@@ -24,4 +24,9 @@ public class Constants {
     public static double kLoopDt = 0.01;
     public static int kTalonTimeoutMs = 5;
 
+
+    // Robot Dimensions
+    public static double kCenterToFrontBumper = 20.0;       // TODO: measure and update!
+    public static double kCenterToIntake = 30.0;            // TODO: measure and update!
 }
+
