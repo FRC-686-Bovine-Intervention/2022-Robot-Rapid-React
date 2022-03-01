@@ -2,7 +2,7 @@ package frc.robot.auto.modes;
 
 import frc.robot.auto.AutoModeEndedException;
 import frc.robot.auto.actions.PathFollowerAction;
-import frc.robot.auto.actions.SetIntake;
+import frc.robot.auto.actions.SetIntakeAction;
 import frc.robot.auto.actions.WaitAction;
 import frc.robot.lib.util.Path;
 import frc.robot.lib.util.Path.Waypoint;
@@ -23,9 +23,9 @@ public class OneBallAuto extends AutoMode{
         reversePath.add(new Waypoint(initialPose, driveOptions));
         reversePath.add(new Waypoint(outsideTarmac, driveOptions));
         reversePath.setReverseDirection();
-        runAction(new SetIntake(IntakeState.OUTTAKE));
+        runAction(new SetIntakeAction(IntakeState.OUTTAKE));
         runAction(new WaitAction(0.5));
-        runAction(new SetIntake(IntakeState.DEFENSE));
+        runAction(new SetIntakeAction(IntakeState.DEFENSE));
         runAction(new PathFollowerAction(reversePath));
     }
 }
