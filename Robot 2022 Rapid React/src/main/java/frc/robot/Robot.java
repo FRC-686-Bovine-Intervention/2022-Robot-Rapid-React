@@ -27,9 +27,13 @@ public class Robot extends TimedRobot {
   DriverInteraction driverInteraction = DriverInteraction.getInstance();
 
   private NetworkTableEntry headingEntry = Shuffleboard.getTab("Robot Status").add("Heading Degrees", -999999).getEntry();
-  private NetworkTableEntry distanceEntry = Shuffleboard.getTab("Robot Status").add("Distance", -999999).getEntry();
-  private NetworkTableEntry poseEntry = Shuffleboard.getTab("Robot Status").add("Pose Entry", "not updating").getEntry();
+  private NetworkTableEntry averageDistanceEntry = Shuffleboard.getTab("Robot Status").add("Average Distance", -999999).getEntry();
+  private NetworkTableEntry leftDistanceEntry = Shuffleboard.getTab("Robot Status").add("Left Distance", -999999).getEntry();
+  private NetworkTableEntry rightDistanceEntry = Shuffleboard.getTab("Robot Status").add("Right Distance", -999999).getEntry();
+  private NetworkTableEntry poseEntry = Shuffleboard.getTab("Robot Status").add("Pose", "not updating").getEntry();
   private double startingDistance;
+  private double startingLeftDistance;
+  private double startingRightDistance;
 
   private double getDistance()
     {
@@ -38,9 +42,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    HttpCamera httpCamera = new HttpCamera("Limelight", "http://gloworm.local:1182/stream.mjpg"); //10.6.86.11:1182/stream.mjpg
-    httpCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-    CameraServer.addCamera(httpCamera);
+    // HttpCamera httpCamera = new HttpCamera("Limelight", "http://gloworm.local:1182/stream.mjpg"); //10.6.86.11:1182/stream.mjpg
+    // httpCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
+    // CameraServer.addCamera(httpCamera);
 
     subsystemManager.init();
     autoManager.InitChoices();
@@ -51,7 +55,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {subsystemManager.updateShuffleboard(); LoopController.getInstance().run();
-    distanceEntry.setDouble(getDistance() - startingDistance);
+    averageDistanceEntry.setDouble(getDistance() - startingDistance);
+    leftDistanceEntry.setDouble(DriveState.getInstance().getLeftDistanceInches() - startingLeftDistance);
+    rightDistanceEntry.setDouble(DriveState.getInstance().getRightDistanceInches() - startingRightDistance);
     headingEntry.setDouble(RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg());
     poseEntry.setString(RobotState.getInstance().getLatestFieldToVehicle().toString());
   }
@@ -59,6 +65,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     startingDistance = getDistance();
+    startingLeftDistance = DriveState.getInstance().getLeftDistanceInches();
+    startingRightDistance = DriveState.getInstance().getRightDistanceInches();
     autoManager.init();
   }
 
@@ -69,6 +77,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    startingDistance = getDistance();
+    startingLeftDistance = DriveState.getInstance().getLeftDistanceInches();
+    startingRightDistance = DriveState.getInstance().getRightDistanceInches();
     LoopController.getInstance().start();
   }
 

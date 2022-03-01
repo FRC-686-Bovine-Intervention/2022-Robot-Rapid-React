@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.command_status.DriveCommand;
 import frc.robot.command_status.DriveCommand.DriveControlMode;
@@ -12,6 +13,7 @@ import frc.robot.lib.util.Kinematics.WheelSpeed;
 import frc.robot.lib.util.PIDController;
 import frc.robot.loops.DriveLoop;
 import frc.robot.loops.Loop;
+import frc.robot.command_status.RobotState;
 
 /**
  * The robot's drivetrain, which implements the Superstructure abstract class.
@@ -33,7 +35,8 @@ public class Drive extends Subsystem
 		return instance;
 	}
 
-	private NetworkTableEntry enableEntry = Shuffleboard.getTab("Drivetrain").add("Enabled", true).getEntry();
+	private NetworkTableEntry enableEntry = Shuffleboard.getTab("Drivetrain").add("Enabled", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
+	private NetworkTableEntry deltaDistanceInchesEntry = Shuffleboard.getTab("Drivetrain").add("deltaDistanceInchesEntry", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();
 
 	// drive commands
 	private DriveCommand driveCmd;
@@ -147,15 +150,19 @@ public class Drive extends Subsystem
 	public void setTurnToHeadingSetpoint(double _targetHeadingDeg)
 	{
 		// get remaining angular error
-		double robotToTargetDeg = _targetHeadingDeg - driveState.getHeadingDeg();
+		double robotToTargetDeg = _targetHeadingDeg - RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg();
 
 		// use this error to calculate how much more the left and right wheels should turn
 		WheelSpeed deltaDistanceInches = Kinematics.inverseKinematics(0.0, Units.degreesToRadians(robotToTargetDeg));
 
+		System.out.println("robotToTargetDeg: " + robotToTargetDeg + "\ntargetHeadingDeg: " + _targetHeadingDeg + "\nheadingDeg: " + RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg() + "\nLeft: " + deltaDistanceInches.left + "\nRight: " + deltaDistanceInches.right + "\n");
+
+		deltaDistanceInchesEntry.setString("Left: " + deltaDistanceInches.left + " Right: " + deltaDistanceInches.right);
+
 		// update Position Motion Magic Setpoint
 		driveCmd.setDriveMode(DriveControlMode.TURN_TO_HEADING);
-		driveCmd.setMotors(driveState.getLeftDistanceInches()  + deltaDistanceInches.left, 
-						   driveState.getRightDistanceInches() + deltaDistanceInches.right);		
+		//driveCmd.setMotors(driveState.getLeftDistanceInches()  + deltaDistanceInches.left, 
+		//				   driveState.getRightDistanceInches() + deltaDistanceInches.right);		
 	}
 
 

@@ -21,7 +21,6 @@ public class PathFollowerAction implements Action{
     @Override
     public void start() 
     {
-      System.out.println("PathFollowerAction.start(), pose = " + RobotState.getInstance().getLatestFieldToVehicle().toString());
       driveCtrl.start();
     }
 
@@ -47,7 +46,6 @@ public class PathFollowerAction implements Action{
     @Override
     public void done() 
     {
-		System.out.println("PathFollowerAction.done(),  pose = " + RobotState.getInstance().getLatestFieldToVehicle().toString());
 		// cleanup code, if any
 		driveCtrl.done();
     }
