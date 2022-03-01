@@ -74,7 +74,7 @@ public class DriveLoop implements Loop
 	public static double kTrackScrubFactor          = 0.5;
 
 	// Wheel Encoder
-	public static int    kFalconEncoderUnitsPerRev    = 2048;
+	public static int    kTalonFXEncoderUnitsPerRev    = 2048;
 	public static double kDriveGearRatio				= (50.0/14.0)*(50.0/14.0);
 	public static double kFalconEncoderStatusFramePeriod = 0.100;	// 100 ms
 
@@ -194,8 +194,8 @@ public class DriveLoop implements Loop
 		lMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxVel), kTalonTimeoutMs);
 		lMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxAccel), kTalonTimeoutMs);	
 		
-		lMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxVel), kTalonTimeoutMs);
-		lMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxAccel), kTalonTimeoutMs);
+		rMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxVel), kTalonTimeoutMs);
+		rMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxAccel), kTalonTimeoutMs);
 
 		lMotorMaster.configOpenloopRamp(kDriveOpenLoopRampRate, 0);
 		rMotorMaster.configOpenloopRamp(kDriveOpenLoopRampRate, 0);
@@ -433,8 +433,8 @@ public class DriveLoop implements Loop
 	}
 
 	// Talon SRX reports position in rotations while in closed-loop Position mode
-	public static double encoderUnitsToInches(double _encoderPosition) { return _encoderPosition / kFalconEncoderUnitsPerRev / kDriveGearRatio * kDriveWheelCircumInches; }
-	public static double inchesToEncoderUnits(double _inches) { return _inches / kDriveWheelCircumInches * kFalconEncoderUnitsPerRev * kDriveGearRatio; }
+	public static double encoderUnitsToInches(double _encoderPosition) { return _encoderPosition / kTalonFXEncoderUnitsPerRev / kDriveGearRatio * kDriveWheelCircumInches; }
+	public static double inchesToEncoderUnits(double _inches) { return _inches / kDriveWheelCircumInches * kTalonFXEncoderUnitsPerRev * kDriveGearRatio; }
 
 	// Talon SRX reports speed in RPM while in closed-loop Speed mode
 	public static double encoderUnitsPerFrameToInchesPerSecond(double _encoderEdgesPerFrame) { return encoderUnitsToInches(_encoderEdgesPerFrame) / kFalconEncoderStatusFramePeriod; }
