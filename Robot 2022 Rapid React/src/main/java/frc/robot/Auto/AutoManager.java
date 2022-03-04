@@ -5,7 +5,10 @@ import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.auto.modes.*;
+import frc.robot.auto.modes.ActionTestingAuto;
+import frc.robot.auto.modes.AutoMode;
+import frc.robot.auto.modes.EpicAwesomeAuto;
+import frc.robot.auto.modes.OneBallAuto;
 import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.Pose;
 
