@@ -11,6 +11,7 @@ import frc.robot.lib.util.DataLogger;
 import frc.robot.lib.util.Kinematics;
 import frc.robot.lib.util.Kinematics.WheelSpeed;
 import frc.robot.lib.util.PIDController;
+import frc.robot.lib.util.Vector2d;
 import frc.robot.loops.DriveLoop;
 import frc.robot.loops.Loop;
 import frc.robot.command_status.RobotState;
@@ -147,15 +148,23 @@ public class Drive extends Subsystem
 		updateVelocityHeading();
 	}
     
+// DEBUG printout	
+int printCnt = 0;	
 	public void setTurnToHeadingSetpoint(double _targetHeadingDeg)
 	{
 		// get remaining angular error
-		double robotToTargetDeg = _targetHeadingDeg - RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg();
+		double robotToTargetDeg = Vector2d.normalizeAngleDeg(_targetHeadingDeg - RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg());
 
 		// use this error to calculate how much more the left and right wheels should turn
 		WheelSpeed deltaDistanceInches = Kinematics.inverseKinematics(0.0, Units.degreesToRadians(robotToTargetDeg));
 
-		System.out.println("robotToTargetDeg: " + robotToTargetDeg + "\ntargetHeadingDeg: " + _targetHeadingDeg + "\nheadingDeg: " + RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg() + "\nLeft: " + deltaDistanceInches.left + "\nRight: " + deltaDistanceInches.right + "\n");
+// DEBUG printout
+printCnt = (printCnt+1) % 10;
+if (printCnt==0) {
+	System.out.println("targetHeadingDeg: " + _targetHeadingDeg + ", robotHeadingDeg: " + RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg() + ", robotToTargetDeg: " + robotToTargetDeg + );
+	System.out.println("Left: " + deltaDistanceInches.left + ", Right: " + deltaDistanceInches.right);
+	System.out.println();
+}
 
 		deltaDistanceInchesEntry.setString("Left: " + deltaDistanceInches.left + " Right: " + deltaDistanceInches.right);
 

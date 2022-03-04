@@ -5,7 +5,6 @@ import frc.robot.controls.Controls.ButtonControlEnum;
 import frc.robot.controls.Controls.JoystickEnum;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drive;
-import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 
@@ -14,7 +13,6 @@ public class DriverInteraction {
     public static DriverInteraction getInstance() {if(instance == null){instance = new DriverInteraction();}return instance;}
 
     Controls controls;
-    Drivetrain drivetrain;
     Climber climber;
     Intake intake;
 

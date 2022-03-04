@@ -5,9 +5,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.auto.modes.AutoMode;
-import frc.robot.auto.modes.BasicAuto;
-import frc.robot.auto.modes.OneBallAuto;
+import frc.robot.auto.modes.*;
 import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.Pose;
 
@@ -27,8 +25,9 @@ public class AutoManager {
 
     public void InitChoices()
     {
+        AutoModeChooser.addOption("OneBallAuto", new OneBallAuto());
         AutoModeChooser.addOption("BasicAuto", new BasicAuto());
-        AutoModeChooser.setDefaultOption("One Ball Auto", new OneBallAuto());
+        AutoModeChooser.setDefaultOption("TurnToAngle", new TurnToAngleAuto());
         InitialPoseChooser.setDefaultOption("new Pose()", new Pose());
     }
 

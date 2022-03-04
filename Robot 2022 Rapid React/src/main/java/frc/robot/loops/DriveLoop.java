@@ -74,7 +74,7 @@ public class DriveLoop implements Loop
 	public static double kTrackScrubFactor          = 0.5;
 
 	// Wheel Encoder
-	public static int    kFalconEncoderUnitsPerRev    = 2048;
+	public static int    kTalonFXEncoderUnitsPerRev    = 2048;
 	public static double kDriveGearRatio				= (50.0/14.0)*(50.0/14.0);
 	public static double kFalconEncoderStatusFramePeriod = 0.100;	// 100 ms
 
@@ -88,20 +88,20 @@ public class DriveLoop implements Loop
 
     // PID gains for drive velocity loop (sent to Talon)
     // Units: error is 2048 counts/rev.  Max output is +/- 1023 units
+    public static double kDriveVelocityKf = kCalPercentOutput * 1023.0 / kCalEncoderUnitsPer100ms;
     public static double kDriveVelocityKp = 0.3;
     public static double kDriveVelocityKi = 0.0;
     public static double kDriveVelocityKd = 5.0;
-    public static double kDriveVelocityKf = kCalPercentOutput * 1023.0 / kCalEncoderUnitsPer100ms;
     public static int    kDriveVelocityIZone = 0;
     public static double kDriveVelocityRampRate = 0;	// seconds from zero to full speed
     public static int    kDriveVelocityAllowableError = 0;
 
     // PID gains for drive position loop
     // Units: error is 2048 counts/rev. Max output is +/- 1023 units.
-    public static double kDrivePositionKp = 0.5;
+    public static double kDrivePositionKf = 0;
+    public static double kDrivePositionKp = 0.001;
     public static double kDrivePositionKi = 0;
     public static double kDrivePositionKd = 0;
-    public static double kDrivePositionKf = 0;
     public static int    kDrivePositionIZone = 0;
     public static double kDrivePositionRampRate = 0;
     public static int    kDrivePositionAllowableError = 10;
@@ -109,7 +109,7 @@ public class DriveLoop implements Loop
     // PID gains for constant heading velocity control
     // Units: Error is degrees. Output is inches/second difference to
     // left/right.
-    public static double kDriveHeadingVelocityKp = 4.0;//4.0;
+    public static double kDriveHeadingVelocityKp = 4.0;
     public static double kDriveHeadingVelocityKi = 0.0;
     public static double kDriveHeadingVelocityKd = 0.0;//50.0;
     
@@ -194,8 +194,8 @@ public class DriveLoop implements Loop
 		lMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxVel), kTalonTimeoutMs);
 		lMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxAccel), kTalonTimeoutMs);	
 		
-		lMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxVel), kTalonTimeoutMs);
-		lMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxAccel), kTalonTimeoutMs);
+		rMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxVel), kTalonTimeoutMs);
+		rMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxAccel), kTalonTimeoutMs);
 
 		lMotorMaster.configOpenloopRamp(kDriveOpenLoopRampRate, 0);
 		rMotorMaster.configOpenloopRamp(kDriveOpenLoopRampRate, 0);
@@ -433,8 +433,8 @@ public class DriveLoop implements Loop
 	}
 
 	// Talon SRX reports position in rotations while in closed-loop Position mode
-	public static double encoderUnitsToInches(double _encoderPosition) { return _encoderPosition / kFalconEncoderUnitsPerRev / kDriveGearRatio * kDriveWheelCircumInches; }
-	public static double inchesToEncoderUnits(double _inches) { return _inches / kDriveWheelCircumInches * kFalconEncoderUnitsPerRev * kDriveGearRatio; }
+	public static double encoderUnitsToInches(double _encoderPosition) { return _encoderPosition / kTalonFXEncoderUnitsPerRev / kDriveGearRatio * kDriveWheelCircumInches; }
+	public static double inchesToEncoderUnits(double _inches) { return _inches / kDriveWheelCircumInches * kTalonFXEncoderUnitsPerRev * kDriveGearRatio; }
 
 	// Talon SRX reports speed in RPM while in closed-loop Speed mode
 	public static double encoderUnitsPerFrameToInchesPerSecond(double _encoderEdgesPerFrame) { return encoderUnitsToInches(_encoderEdgesPerFrame) / kFalconEncoderStatusFramePeriod; }
