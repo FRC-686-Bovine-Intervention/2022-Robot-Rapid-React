@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.command_status.DriveCommand;
 import frc.robot.command_status.DriveCommand.DriveControlMode;
 import frc.robot.command_status.DriveState;
+import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.DataLogger;
 import frc.robot.lib.util.Kinematics;
 import frc.robot.lib.util.Kinematics.WheelSpeed;
@@ -14,7 +15,6 @@ import frc.robot.lib.util.PIDController;
 import frc.robot.lib.util.Vector2d;
 import frc.robot.loops.DriveLoop;
 import frc.robot.loops.Loop;
-import frc.robot.command_status.RobotState;
 
 /**
  * The robot's drivetrain, which implements the Superstructure abstract class.
@@ -48,11 +48,6 @@ public class Drive extends Subsystem
 	// velocity heading
 	private VelocityHeadingSetpoint velocityHeadingSetpoint = new VelocityHeadingSetpoint();
 
-	// turn to heading target
-	private double targetHeadingDeg = 0.0;
-
-
-
 
 
 	// The constructor instantiates all of the drivetrain components when the
@@ -84,6 +79,7 @@ public class Drive extends Subsystem
     		{
     			case OPEN_LOOP:
     			case BASE_LOCKED:
+				case POSITION_SETPOINT:
 				case TURN_TO_HEADING:
 				// states where Talon SRXs are not controlling velocity
     				return;
@@ -128,10 +124,16 @@ public class Drive extends Subsystem
 		driveCmd.setDriveMode(DriveControlMode.BASE_LOCKED);
 	}
 
-	public void setVelocitySetpoint(WheelSpeed _wheelSpeed) 
+	public void setPositionSetpoint(double _lDistanceInches, double _rDistanceInches) 
+	{
+		driveCmd.setDriveMode(DriveControlMode.POSITION_SETPOINT);
+		driveCmd.setMotors(_lDistanceInches, _rDistanceInches);
+	}
+
+	public void setVelocitySetpoint(WheelSpeed _wheelSpeedInchesPerSecond) 
 	{
 		driveCmd.setDriveMode(DriveControlMode.VELOCITY_SETPOINT);
-		driveCmd.setMotors(_wheelSpeed);
+		driveCmd.setMotors(_wheelSpeedInchesPerSecond);
 	}
 
 	public void setVelocitySetpoint(double left_inches_per_sec, double right_inches_per_sec) 
@@ -147,9 +149,9 @@ public class Drive extends Subsystem
 		velocityHeadingSetpoint.velocityHeadingPID.reset();
 		updateVelocityHeading();
 	}
-    
-// DEBUG printout	
-int printCnt = 0;	
+
+	public double lTargetDistanceInches, rTargetDistanceInches; 
+
 	public void setTurnToHeadingSetpoint(double _targetHeadingDeg)
 	{
 		// get remaining angular error
@@ -158,21 +160,22 @@ int printCnt = 0;
 		// use this error to calculate how much more the left and right wheels should turn
 		WheelSpeed deltaDistanceInches = Kinematics.inverseKinematics(0.0, Units.degreesToRadians(robotToTargetDeg));
 
-// DEBUG printout
-printCnt = (printCnt+1) % 10;
-if (printCnt==0) {
-	System.out.println("targetHeadingDeg: " + _targetHeadingDeg + ", robotHeadingDeg: " + RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg() + ", robotToTargetDeg: " + robotToTargetDeg + );
-	System.out.println("Left: " + deltaDistanceInches.left + ", Right: " + deltaDistanceInches.right);
-	System.out.println();
-}
-
-		deltaDistanceInchesEntry.setString("Left: " + deltaDistanceInches.left + " Right: " + deltaDistanceInches.right);
+		lTargetDistanceInches = DriveState.getInstance().getLeftDistanceInches()  + deltaDistanceInches.left;
+		rTargetDistanceInches = DriveState.getInstance().getRightDistanceInches()  + deltaDistanceInches.right;
 
 		// update Position Motion Magic Setpoint
+		// DriveLoop.getInstance().configMotionMagicSpeed(kTurnToAngleCruiseVelocity, kTurnToAngleAccel);
 		driveCmd.setDriveMode(DriveControlMode.TURN_TO_HEADING);
-		//driveCmd.setMotors(driveState.getLeftDistanceInches()  + deltaDistanceInches.left, 
-		//				   driveState.getRightDistanceInches() + deltaDistanceInches.right);		
+		driveCmd.setMotors(lTargetDistanceInches, rTargetDistanceInches);
+	}	
+
+	public boolean isTurnToHeadingFinished(double _distanceThresholdInches)
+	{
+		return (Math.abs(lTargetDistanceInches - driveState.getLeftDistanceInches())  < _distanceThresholdInches) &&
+		       (Math.abs(rTargetDistanceInches - driveState.getRightDistanceInches()) < _distanceThresholdInches);
 	}
+		
+
 
 
 	/*

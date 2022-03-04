@@ -27,7 +27,8 @@ public class AutoManager {
     {
         AutoModeChooser.addOption("OneBallAuto", new OneBallAuto());
         AutoModeChooser.addOption("BasicAuto", new BasicAuto());
-        AutoModeChooser.setDefaultOption("TurnToAngle", new TurnToAngleAuto());
+        AutoModeChooser.setDefaultOption("TurnAround", new TurnAroundAuto());
+        AutoModeChooser.setDefaultOption("WheelPosition", new WheelPositionAuto());
         InitialPoseChooser.setDefaultOption("new Pose()", new Pose());
     }
 

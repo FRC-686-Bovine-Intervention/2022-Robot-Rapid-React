@@ -50,6 +50,7 @@ public class DriveLoop implements Loop
 
 	private static final int kVelocityControlSlot = 0;
 	private static final int kPositionControlSlot = 1;
+	private static final int kMotionMagicControlSlot = 2;
 
 	// Motor Controller Inversions
 	
@@ -71,7 +72,7 @@ public class DriveLoop implements Loop
 	public static double kDriveWheelCircumInches    = 6*Math.PI;
 	public static double kTrackWidthInches          = 22.000;
 	public static double kTrackEffectiveDiameter    = 22.5; //Went 707in in 10 rotations       (kTrackWidthInches * kTrackWidthInches + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
-	public static double kTrackScrubFactor          = 0.5;
+	public static double kTrackScrubFactor          = 1.0;
 
 	// Wheel Encoder
 	public static int    kTalonFXEncoderUnitsPerRev    = 2048;
@@ -99,12 +100,22 @@ public class DriveLoop implements Loop
     // PID gains for drive position loop
     // Units: error is 2048 counts/rev. Max output is +/- 1023 units.
     public static double kDrivePositionKf = 0;
-    public static double kDrivePositionKp = 0.001;
+    public static double kDrivePositionKp = 0;//0.001;
     public static double kDrivePositionKi = 0;
     public static double kDrivePositionKd = 0;
     public static int    kDrivePositionIZone = 0;
     public static double kDrivePositionRampRate = 0;
-    public static int    kDrivePositionAllowableError = 10;
+    public static int    kDrivePositionAllowableError = 0;
+
+    // PID gains for motion magic (motion profiled position)
+    // Units: error is 2048 counts/rev. Max output is +/- 1023 units.
+    public static double kDriveMotionMagicKf = 0;
+    public static double kDriveMotionMagicKp = 0.20;
+    public static double kDriveMotionMagicKi = 0;
+    public static double kDriveMotionMagicKd = 0;
+    public static int    kDriveMotionMagicIZone = 0;
+    public static double kDriveMotionMagicRampRate = 0;
+    public static int    kDriveMotionMagicAllowableError = 0;
 
     // PID gains for constant heading velocity control
     // Units: Error is degrees. Output is inches/second difference to
@@ -191,11 +202,24 @@ public class DriveLoop implements Loop
 		lMotorMaster.configAllowableClosedloopError(kPositionControlSlot, kDrivePositionAllowableError, kTalonTimeoutMs);
 		rMotorMaster.configAllowableClosedloopError(kPositionControlSlot, kDrivePositionAllowableError, kTalonTimeoutMs);
 
-		lMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxVel), kTalonTimeoutMs);
-		lMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxAccel), kTalonTimeoutMs);	
-		
-		rMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxVel), kTalonTimeoutMs);
-		rMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(kPathFollowingMaxAccel), kTalonTimeoutMs);
+
+		// Load MotionMagic control gains
+		lMotorMaster.config_kF(kMotionMagicControlSlot, kDriveMotionMagicKf, kTalonTimeoutMs);
+		lMotorMaster.config_kP(kMotionMagicControlSlot, kDriveMotionMagicKp, kTalonTimeoutMs);
+		lMotorMaster.config_kI(kMotionMagicControlSlot, kDriveMotionMagicKi, kTalonTimeoutMs);
+		lMotorMaster.config_kD(kMotionMagicControlSlot, kDriveMotionMagicKd, kTalonTimeoutMs);
+		lMotorMaster.config_IntegralZone(kMotionMagicControlSlot, kDriveMotionMagicIZone, kTalonTimeoutMs);
+
+		rMotorMaster.config_kF(kMotionMagicControlSlot, kDriveMotionMagicKf, kTalonTimeoutMs);
+		rMotorMaster.config_kP(kMotionMagicControlSlot, kDriveMotionMagicKp, kTalonTimeoutMs);
+		rMotorMaster.config_kI(kMotionMagicControlSlot, kDriveMotionMagicKi, kTalonTimeoutMs);
+		rMotorMaster.config_kD(kMotionMagicControlSlot, kDriveMotionMagicKd, kTalonTimeoutMs);
+		rMotorMaster.config_IntegralZone(kMotionMagicControlSlot, kDriveMotionMagicIZone, kTalonTimeoutMs);
+
+		lMotorMaster.configAllowableClosedloopError(kMotionMagicControlSlot, kDriveMotionMagicAllowableError, kTalonTimeoutMs);
+		rMotorMaster.configAllowableClosedloopError(kMotionMagicControlSlot, kDriveMotionMagicAllowableError, kTalonTimeoutMs);
+
+		configMotionMagicSpeed(kPathFollowingMaxVel, kPathFollowingMaxAccel);
 
 		lMotorMaster.configOpenloopRamp(kDriveOpenLoopRampRate, 0);
 		rMotorMaster.configOpenloopRamp(kDriveOpenLoopRampRate, 0);
@@ -239,6 +263,15 @@ public class DriveLoop implements Loop
 		gyro = Pigeon.getInstance();
 
 	}
+
+	public void configMotionMagicSpeed(double _cruiseVelocityInchesPerSec, double _accelerationInchesPerSecSqr)
+	{
+		lMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(_cruiseVelocityInchesPerSec), kTalonTimeoutMs);
+		rMotorMaster.configMotionCruiseVelocity(inchesPerSecondToEncoderUnitsPerFrame(_cruiseVelocityInchesPerSec), kTalonTimeoutMs);
+		lMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(_accelerationInchesPerSecSqr), kTalonTimeoutMs);	
+		rMotorMaster.configMotionAcceleration(inchesPerSecondToEncoderUnitsPerFrame(_accelerationInchesPerSecSqr), kTalonTimeoutMs);		
+	}
+
 	
 	
 	@Override public void onStart()
@@ -302,8 +335,12 @@ public class DriveLoop implements Loop
 	        		driveState.setMotorStatus(lMotorMaster.getSelectedSensorPosition( kTalonPidIdx ), rMotorMaster.getSelectedSensorPosition( kTalonPidIdx ) );
 	        		break;
 	        		
-	        	case Velocity:
+				case Velocity:
 	        		driveState.setMotorStatus(lMotorMaster.getSelectedSensorVelocity( kTalonPidIdx ), rMotorMaster.getSelectedSensorVelocity( kTalonPidIdx ) );
+	        		break;
+	        		
+				case MotionMagic:
+	        		driveState.setMotorStatus(lMotorMaster.getSelectedSensorPosition( kTalonPidIdx ), rMotorMaster.getSelectedSensorPosition( kTalonPidIdx ) );
 	        		break;
 	        		
 	        	case Disabled:
@@ -364,7 +401,12 @@ public class DriveLoop implements Loop
 	        		rMotorMaster.selectProfileSlot(kVelocityControlSlot, kTalonPidIdx);
 	        		break;
 	        		
-	        	case Disabled:
+				case MotionMagic:
+	    			lMotorMaster.selectProfileSlot(kMotionMagicControlSlot, kTalonPidIdx);
+	    			rMotorMaster.selectProfileSlot(kMotionMagicControlSlot, kTalonPidIdx);
+	        		break;
+	        		
+				case Disabled:
 	        	default:
 	        		break;
 	        }
@@ -423,7 +465,13 @@ public class DriveLoop implements Loop
            		lMotorMaster.set(ControlMode.Velocity, inchesPerSecondToEncoderUnitsPerFrame(lMotorCtrl)); 
         		rMotorMaster.set(ControlMode.Velocity, inchesPerSecondToEncoderUnitsPerFrame(rMotorCtrl));
         		break;
-        		
+        	
+			case MotionMagic:
+        		// DriveCommand given in inches
+           		lMotorMaster.set(ControlMode.MotionMagic, inchesToEncoderUnits(lMotorCtrl)); 
+        		rMotorMaster.set(ControlMode.MotionMagic, inchesToEncoderUnits(rMotorCtrl));
+        		break;
+        						
         	case Disabled:
         	default:
         		lMotorMaster.set(ControlMode.Disabled, 0);

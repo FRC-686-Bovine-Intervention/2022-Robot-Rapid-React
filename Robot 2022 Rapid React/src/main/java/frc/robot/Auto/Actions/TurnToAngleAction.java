@@ -1,7 +1,6 @@
 package frc.robot.auto.actions;
 
 import frc.robot.command_status.DriveCommand;
-import frc.robot.command_status.DriveState;
 import frc.robot.subsystems.Drive;
 
 public class TurnToAngleAction implements Action{
@@ -9,7 +8,8 @@ public class TurnToAngleAction implements Action{
     private double targetAngleDeg;
 
     private static final double angleErrorThresholdDeg = 1.0;
-    private static final double wheelVelocityThresholdInchesPerSec = 5;
+    private static final double distanceThresholdInches = 1.0;
+    private static final double wheelVelocityThresholdInchesPerSec = 5.0;
 
     public TurnToAngleAction(double _targetAngleDeg)
     {
@@ -18,18 +18,19 @@ public class TurnToAngleAction implements Action{
 
     @Override
     public void start() {
-    }
-
-    @Override
-    public void run() {
         Drive.getInstance().setTurnToHeadingSetpoint(targetAngleDeg);
     }
 
     @Override
+    public void run() {
+        // keep sending same drive commands
+        DriveCommand driveCmd = Drive.getInstance().getCommand();
+        driveCmd.setMotors(driveCmd.getLeftMotor(), driveCmd.getRightMotor());
+    }
+
+    @Override
     public boolean isFinished() {
-        return (Math.abs(targetAngleDeg - DriveState.getInstance().getHeadingDeg()) < angleErrorThresholdDeg) &&
-               (Math.abs(DriveState.getInstance().getLeftSpeedInchesPerSec()) < wheelVelocityThresholdInchesPerSec) &&
-               (Math.abs(DriveState.getInstance().getRightSpeedInchesPerSec()) < wheelVelocityThresholdInchesPerSec);
+        return Drive.getInstance().isTurnToHeadingFinished(distanceThresholdInches);
     }
 
     @Override
