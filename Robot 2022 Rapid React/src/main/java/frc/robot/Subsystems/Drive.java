@@ -161,7 +161,7 @@ int printCnt = 0;
 // DEBUG printout
 printCnt = (printCnt+1) % 10;
 if (printCnt==0) {
-	System.out.println("targetHeadingDeg: " + _targetHeadingDeg + ", robotHeadingDeg: " + RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg() + ", robotToTargetDeg: " + robotToTargetDeg + );
+	System.out.println("targetHeadingDeg: " + _targetHeadingDeg + ", robotHeadingDeg: " + RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg() + ", robotToTargetDeg: " + robotToTargetDeg);
 	System.out.println("Left: " + deltaDistanceInches.left + ", Right: " + deltaDistanceInches.right);
 	System.out.println();
 }
