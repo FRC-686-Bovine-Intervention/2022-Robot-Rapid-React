@@ -158,20 +158,20 @@ int printCnt = 0;
 		// use this error to calculate how much more the left and right wheels should turn
 		WheelSpeed deltaDistanceInches = Kinematics.inverseKinematics(0.0, Units.degreesToRadians(robotToTargetDeg));
 
-// DEBUG printout
-printCnt = (printCnt+1) % 10;
-if (printCnt==0) {
-	System.out.println("targetHeadingDeg: " + _targetHeadingDeg + ", robotHeadingDeg: " + RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg() + ", robotToTargetDeg: " + robotToTargetDeg);
-	System.out.println("Left: " + deltaDistanceInches.left + ", Right: " + deltaDistanceInches.right);
-	System.out.println();
-}
+		// DEBUG printout
+		printCnt = (printCnt+1) % 10;
+		if (printCnt==0) {
+			System.out.println("targetHeadingDeg: " + _targetHeadingDeg + ", robotHeadingDeg: " + RobotState.getInstance().getLatestFieldToVehicle().getHeadingDeg() + ", robotToTargetDeg: " + robotToTargetDeg);
+			System.out.println("Left: " + deltaDistanceInches.left + ", Right: " + deltaDistanceInches.right);
+			System.out.println();
+		}
 
 		deltaDistanceInchesEntry.setString("Left: " + deltaDistanceInches.left + " Right: " + deltaDistanceInches.right);
 
 		// update Position Motion Magic Setpoint
 		driveCmd.setDriveMode(DriveControlMode.TURN_TO_HEADING);
-		//driveCmd.setMotors(driveState.getLeftDistanceInches()  + deltaDistanceInches.left, 
-		//				   driveState.getRightDistanceInches() + deltaDistanceInches.right);		
+		driveCmd.setMotors(driveState.getLeftDistanceInches()  + deltaDistanceInches.left, 
+						   driveState.getRightDistanceInches() + deltaDistanceInches.right);		
 	}
 
 
