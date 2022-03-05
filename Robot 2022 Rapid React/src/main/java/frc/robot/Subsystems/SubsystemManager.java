@@ -12,7 +12,7 @@ public class SubsystemManager {
 
     public void init()
     {
-        subsystems.add(Intake.getInstance());
+        //subsystems.add(Intake.getInstance());
         subsystems.add(Drive.getInstance());
         //subsystems.add(Climber.getInstance());
     }

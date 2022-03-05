@@ -31,7 +31,7 @@ public class Pigeon extends GyroBase
         // constructors
         public Pigeon() 
         {
-                pigeon = new PigeonIMU(Constants.kPigeonID);
+                pigeon = new PigeonIMU(1);
         }
 
         /**

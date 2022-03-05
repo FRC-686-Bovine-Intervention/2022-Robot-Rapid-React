@@ -37,7 +37,9 @@ public class DriverInteraction {
     public void run()
     {
         driving = !controls.getButton(Controls.ButtonControlEnum.CLIMBERNEXTSTAGE);
-        if (driving) 
+        if (driving) Drive.getInstance().setOpenLoop(controls.getDriveCommand());
+        else Climber.getInstance().setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*+1.0);
+        if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
         {
             drive.setOpenLoop(controls.getDriveCommand());
             //Climber.getInstance().setTargetPos(0);
