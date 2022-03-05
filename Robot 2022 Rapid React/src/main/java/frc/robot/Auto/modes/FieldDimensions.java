@@ -17,14 +17,16 @@ public class FieldDimensions
     
     // Fender (left/right as viewed from the driver station)
     public static final double originToFenderCenterInches = 37.0;
-    public static final double rFenderApproachAngle = Units.degreesToRadians(-101);
-    public static final double lFenderApproachAngle = Units.degreesToRadians(+159);
-    public static final Vector2d rFenderCenter = Vector2d.magnitudeAngle(originToFenderCenterInches, -rFenderApproachAngle);
-    public static final Vector2d lFenderCenter = Vector2d.magnitudeAngle(originToFenderCenterInches, -lFenderApproachAngle);
+    public static final double rFenderNormalAngle = Units.degreesToRadians(69);
+    public static final double lFenderNormalAngle = rFenderNormalAngle - Units.degreesToRadians(90);
+    public static final double rFenderApproachAngle = rFenderNormalAngle + Units.degreesToRadians(180);
+    public static final double lFenderApproachAngle = lFenderNormalAngle + Units.degreesToRadians(180);
+    public static final Vector2d rFenderCenter = Vector2d.magnitudeAngle(originToFenderCenterInches, rFenderNormalAngle);
+    public static final Vector2d lFenderCenter = Vector2d.magnitudeAngle(originToFenderCenterInches, lFenderNormalAngle);
 
     // Fender Shot Positions
-    public static final Pose rFenderShotPose = new Pose(rFenderCenter.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, rFenderApproachAngle)), rFenderApproachAngle);
-    public static final Pose lFenderShotPose = new Pose(lFenderCenter.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, lFenderApproachAngle)), lFenderApproachAngle);
+    public static final Pose rFenderShotPose = new Pose(rFenderCenter.add(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, rFenderNormalAngle)), rFenderApproachAngle);
+    public static final Pose lFenderShotPose = new Pose(lFenderCenter.add(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, lFenderNormalAngle)), lFenderApproachAngle);
 
     // Ball Positions
     public static final double ballStartRingRadius = 153.0;

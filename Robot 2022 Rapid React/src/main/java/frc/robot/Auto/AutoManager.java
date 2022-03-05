@@ -7,8 +7,11 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.auto.modes.ActionTestingAuto;
 import frc.robot.auto.modes.AutoMode;
-import frc.robot.auto.modes.EpicAwesomeAuto;
+import frc.robot.auto.modes.FieldDimensions;
 import frc.robot.auto.modes.OneBallAuto;
+import frc.robot.auto.modes.ThreeBallAuto;
+import frc.robot.auto.modes.TurnAroundAuto;
+import frc.robot.auto.modes.WheelPositionAuto;
 import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.Pose;
 
@@ -29,10 +32,12 @@ public class AutoManager {
     public void InitChoices()
     {
         AutoModeChooser.addOption("OneBallAuto", new OneBallAuto());
-        AutoModeChooser.addOption("BasicAuto", new BasicAuto());
-        AutoModeChooser.setDefaultOption("TurnAround", new TurnAroundAuto());
-        AutoModeChooser.setDefaultOption("WheelPosition", new WheelPositionAuto());
-        InitialPoseChooser.setDefaultOption("new Pose()", new Pose());
+        AutoModeChooser.addOption("Action Testing", new ActionTestingAuto());
+        AutoModeChooser.addOption("TurnAround", new TurnAroundAuto());
+        AutoModeChooser.addOption("WheelPosition", new WheelPositionAuto());
+        AutoModeChooser.setDefaultOption("3 Ball Auto", new ThreeBallAuto());
+        InitialPoseChooser.addOption("new Pose()", new Pose());
+        InitialPoseChooser.setDefaultOption("Right Fender", FieldDimensions.rFenderStartPose);
     }
 
     public void init()

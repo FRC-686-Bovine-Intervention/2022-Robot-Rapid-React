@@ -48,6 +48,12 @@ public class Path
             position = _position;
             options  = _options;
         }
+        /**Just gets the position from the pose, does not apply angle*/
+        public Waypoint(Pose pose, Options options)
+        {
+            this.position = pose.getPosition();
+            this.options = options;
+        }
     }
 
     // constructor for empty path
