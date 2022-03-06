@@ -17,16 +17,16 @@ public class FieldDimensions
     
     // Fender (left/right as viewed from the driver station)
     public static final double originToFenderCenterInches = 37.0;
-    public static final double rFenderNormalAngle = Units.degreesToRadians(69);
-    public static final double lFenderNormalAngle = rFenderNormalAngle - Units.degreesToRadians(90);
-    public static final double rFenderApproachAngle = rFenderNormalAngle + Units.degreesToRadians(180);
-    public static final double lFenderApproachAngle = lFenderNormalAngle + Units.degreesToRadians(180);
-    public static final Vector2d rFenderCenter = Vector2d.magnitudeAngle(originToFenderCenterInches, rFenderNormalAngle);
-    public static final Vector2d lFenderCenter = Vector2d.magnitudeAngle(originToFenderCenterInches, lFenderNormalAngle);
+    public static final double rFenderNormalAngleRad = Units.degreesToRadians(69);
+    public static final double lFenderNormalAngleRad = rFenderNormalAngleRad - Units.degreesToRadians(90);
+    public static final double rFenderApproachAngleRad = rFenderNormalAngleRad + Units.degreesToRadians(180);
+    public static final double lFenderApproachAngleRad = lFenderNormalAngleRad + Units.degreesToRadians(180);
+    public static final Vector2d rFenderCenter = Vector2d.magnitudeAngle(originToFenderCenterInches, rFenderNormalAngleRad);
+    public static final Vector2d lFenderCenter = Vector2d.magnitudeAngle(originToFenderCenterInches, lFenderNormalAngleRad);
 
     // Fender Shot Positions
-    public static final Pose rFenderShotPose = new Pose(rFenderCenter.add(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, rFenderNormalAngle)), rFenderApproachAngle);
-    public static final Pose lFenderShotPose = new Pose(lFenderCenter.add(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, lFenderNormalAngle)), lFenderApproachAngle);
+    public static final Pose rFenderShotPose = new Pose(rFenderCenter.add(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, rFenderNormalAngleRad)), rFenderApproachAngleRad);
+    public static final Pose lFenderShotPose = new Pose(lFenderCenter.add(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, lFenderNormalAngleRad)), lFenderApproachAngleRad);
 
     // Ball Positions
     public static final double ballStartRingRadius = 153.0;

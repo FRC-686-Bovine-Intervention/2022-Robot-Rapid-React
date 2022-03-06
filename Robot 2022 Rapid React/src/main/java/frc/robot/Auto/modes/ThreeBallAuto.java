@@ -26,7 +26,7 @@ public class ThreeBallAuto extends AutoMode{
         Path path5 = new Path();
         System.out.println(FieldDimensions.rFenderStartPose);
         Vector2d initPos = FieldDimensions.rFenderStartPose.getPosition();
-        Vector2d axisOfEvil = Vector2d.magnitudeAngle(72+37, FieldDimensions.rFenderNormalAngle);
+        Vector2d axisOfEvil = Vector2d.magnitudeAngle(72+37, FieldDimensions.rFenderNormalAngleRad);
         Vector2d bBall1 = axisOfEvil.add(new Vector2d(-48,-24));
         Vector2d lBall1 = FieldDimensions.ourBall1.add(new Vector2d(-48,0));
         Vector2d dBall1 = FieldDimensions.ourBall1.add(new Vector2d(0,-18));
