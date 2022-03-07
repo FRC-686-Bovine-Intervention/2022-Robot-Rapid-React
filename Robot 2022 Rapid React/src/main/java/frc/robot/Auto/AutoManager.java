@@ -5,13 +5,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.auto.modes.ActionTestingAuto;
-import frc.robot.auto.modes.AutoMode;
-import frc.robot.auto.modes.FieldDimensions;
-import frc.robot.auto.modes.OneBallAuto;
-import frc.robot.auto.modes.ThreeBallAuto;
-import frc.robot.auto.modes.TurnAroundAuto;
-import frc.robot.auto.modes.WheelPositionAuto;
+import frc.robot.auto.modes.*;
+
 import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.Pose;
 
@@ -35,7 +30,8 @@ public class AutoManager {
         AutoModeChooser.addOption("Action Testing", new ActionTestingAuto());
         AutoModeChooser.addOption("TurnAround", new TurnAroundAuto());
         AutoModeChooser.addOption("WheelPosition", new WheelPositionAuto());
-        AutoModeChooser.setDefaultOption("3 Ball Auto", new ThreeBallAuto());
+        AutoModeChooser.addOption("3 Ball Auto", new ThreeBallAuto());
+        AutoModeChooser.setDefaultOption("2 Ball Auto", new TwoBallAuto());
         InitialPoseChooser.addOption("new Pose()", new Pose());
         InitialPoseChooser.setDefaultOption("Right Fender", FieldDimensions.rFenderStartPose);
     }

@@ -18,13 +18,15 @@ import frc.robot.lib.util.Vector2d;
 import frc.robot.subsystems.Intake.IntakeState;
 
 public class TwoBallAuto extends AutoMode{
-    public TwoBallAuto(){}
+    public TwoBallAuto(){
+        System.out.println("ourBall4StartPose: " + FieldDimensions.ourBall4StartPose);
+    }
 
     @Override
     protected void routine() throws AutoModeEndedException {
 
-        double maxSpeed = 36;
-        double accel = 36;
+        double maxSpeed = 24;//36;
+        double accel = 24;//36;
         double lookaheadDist = 24;
         boolean visionEnabled = false;
         Options driveOptions = new Options(maxSpeed, accel, lookaheadDist, visionEnabled);
@@ -58,14 +60,14 @@ public class TwoBallAuto extends AutoMode{
 
         // path4: after backing up and turning towards theirBall3, intake theirBall3, and shoot it into the hangar
         Vector2d theirBall3IntakePos = FieldDimensions.theirBall3.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, Units.degreesToRadians(-35.35)));
-        Vector2d outtakePos = theirBall3IntakePos.add(new Vector2d(24.0, 0.0));
+        Vector2d outtakePos = theirBall3IntakePos.add(new Vector2d(12.0, 0.0));
         Path path4 = new Path();
         path4.add(new Waypoint(lFenderBackupPos, driveOptions));
         path4.add(new Waypoint(theirBall3IntakePos, driveOptions));
         path4.add(new Waypoint(outtakePos, driveOptions));
 
         // path5: after turning around, get close to ourBall5 on the other side of the field
-        Vector2d ourBall5EndPos = FieldDimensions.theirBall3.add(new Vector2d(-20, -12));
+        Vector2d ourBall5EndPos = FieldDimensions.theirBall3.add(new Vector2d(0, -12));
         Path path5 = new Path();
         path5.add(new Waypoint(outtakePos, driveOptions));
         path5.add(new Waypoint(ourBall5EndPos, driveOptions));
@@ -81,7 +83,9 @@ public class TwoBallAuto extends AutoMode{
         runAction(new WaitAction(0.0));     // TODO: use programmable delay from Shuffleboard
 
         // drive forward, intake ball
-        runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.INTAKE), new PathFollowerAction(path1))));
+        // runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.INTAKE), new PathFollowerAction(path1))));
+        runAction(new SetIntakeAction(IntakeState.INTAKE));
+        runAction(new PathFollowerAction(path1));
 
         // turn around towards fender, then drive to fender and shoot
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.DEFENSE), new TurnToAngleAction(180 - 35.25))));
@@ -91,7 +95,7 @@ public class TwoBallAuto extends AutoMode{
 
         // back up a short distance, turn towards theirBall3
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.DEFENSE), new PathFollowerAction(path3))));
-        runAction(new TurnToAngleAction(-54.75));
+        runAction(new TurnToAngleAction(-75));
         // drive to theirBall3, intake, drive a little longer then outtake into hangar
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.INTAKE), new PathFollowerAction(path4))));
         runAction(new SetIntakeAction(IntakeState.OUTTAKE_GROUND));
@@ -100,7 +104,7 @@ public class TwoBallAuto extends AutoMode{
         // TODO?  Could hide ball behind truss structure if we have enough time
 
         // turn around, head towards ourBall5
-        runAction(new TurnToAngleAction(180.0));
-        runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.INTAKE), new PathFollowerAction(path5))));
+        runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.INTAKE), new TurnToAngleAction(180.0))));
+        // runAction(new PathFollowerAction(path5));
     }
 }

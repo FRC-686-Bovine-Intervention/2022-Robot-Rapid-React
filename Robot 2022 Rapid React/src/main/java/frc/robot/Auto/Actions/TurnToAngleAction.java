@@ -30,7 +30,12 @@ public class TurnToAngleAction implements Action{
 
     @Override
     public boolean isFinished() {
-        return Drive.getInstance().isTurnToHeadingFinished(distanceThresholdInches);
+        boolean finished = Drive.getInstance().isTurnToHeadingFinished(distanceThresholdInches);
+        if (finished) {
+            //DEBUG
+            System.out.println("Done with TurnToAngleAction");         
+        }
+        return finished;
     }
 
     @Override

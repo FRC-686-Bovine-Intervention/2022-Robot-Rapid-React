@@ -4,6 +4,7 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.lib.util.Pose;
 import frc.robot.lib.util.Vector2d;
+import frc.robot.subsystems.Drive.VelocityHeadingSetpoint;
 
 /**
  * Interface that holds all the field measurements 
@@ -41,12 +42,21 @@ public class FieldDimensions
     public static final Vector2d theirBall2 = Vector2d.magnitudeAngle(ballStartRingRadius, Units.degreesToRadians( 12.75)); // center
     public static final Vector2d theirBall3 = Vector2d.magnitudeAngle(ballStartRingRadius, Units.degreesToRadians(-54.75)); // left wall
 
+    // Tarmac apex
+    public static final Vector2d lTarmacApex = new Vector2d(108.75, -41.75);   // from field CAD
+    public static final double lTarmacTapeAngle = Units.degreesToRadians(46.8); // from field CAD
+    public static final double ourBall4InitialHeadingRad = lTarmacTapeAngle - Math.PI/2;
+    public static final Vector2d ourBall4FrontCenterOfRobot = lTarmacApex.sub(Vector2d.magnitudeAngle(Constants.kCenterToSideBumper, lTarmacTapeAngle));
+    public static final Vector2d ourBall4CenterOfRotation = ourBall4FrontCenterOfRobot.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, ourBall4InitialHeadingRad));
+
     // Starting Positions
     public static final Pose rFenderStartPose = rFenderShotPose;    // centered on fender
     public static final Pose lFenderStartPose = lFenderShotPose;    // centered on fender
     // the following 2 start poses assume the robot is at the tarmac tape, with the corner of the bumper at the apex of the tarmac
     public static final Pose ourBall1StartPose = new Pose(new Vector2d(25.9, 106.0).sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, Units.degreesToRadians(90.0))), Units.degreesToRadians(90.0));
-    public static final Pose ourBall4StartPose = new Pose(new Vector2d(96.5, -53.0).sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, Units.degreesToRadians(-46.5))), Units.degreesToRadians(-46.5));
+    // public static final Pose ourBall4StartPose = new Pose(ourBall4CenterOfRotation, ourBall4InitialHeadingRad);
+    // measured from CAD
+    public static final Pose ourBall4StartPose = new Pose(new Vector2d(86, -40), Units.degreesToRadians(-43.5));
 
     // Their Ball Dumping Positions
     public static final double dumpingDistanceInches = 12;

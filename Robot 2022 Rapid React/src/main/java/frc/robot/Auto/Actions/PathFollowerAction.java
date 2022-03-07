@@ -36,17 +36,19 @@ public class PathFollowerAction implements Action{
     public boolean isFinished() 
     {
     	boolean finished = driveCtrl.isFinished();
-    	
-//		if (finished)
-//			System.out.println("InterruptableAction Finished");
-	
-    	return finished;
+      if (finished) {
+        //DEBUG
+        System.out.println("Done with PathFollowerAction");         
+      }
+      return finished;    	
     }
 
     @Override
     public void done() 
     {
-		// cleanup code, if any
-		driveCtrl.done();
+//DEBUG
+System.out.println("Done with PathFollowerAction");      
+      // cleanup code, if any
+      driveCtrl.done();
     }
 }

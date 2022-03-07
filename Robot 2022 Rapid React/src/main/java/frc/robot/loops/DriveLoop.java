@@ -133,8 +133,8 @@ public class DriveLoop implements Loop
     public static double kPointTurnMaxOutput = 0.7; 
     
     // Path following constants
-    public static double kPathFollowingMaxVel    = 12.0; // inches/sec  		
-    public static double kPathFollowingAccelTime = 2;		// sec to reach max velocity
+    public static double kPathFollowingMaxVel    = 36.0; 	// inches/sec  		
+    public static double kPathFollowingAccelTime = 0.25;	// sec to reach max velocity
     public static double kPathFollowingMaxAccel  = kPathFollowingMaxVel / kPathFollowingAccelTime; // inches/sec^2
     public static double kPathFollowingLookahead = 24.0; // inches
     public static double kPathFollowingCompletionTolerance = 4.0; 

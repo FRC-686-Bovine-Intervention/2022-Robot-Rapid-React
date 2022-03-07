@@ -23,11 +23,17 @@ public class SetIntakeAction implements Action{
 
     @Override
     public boolean isFinished() {
-        return Intake.getInstance().calibrated && Intake.getInstance().isAtPos(state.armPos);
+        boolean finished = Intake.getInstance().calibrated && Intake.getInstance().isAtPos(state.armPos);
+        if (finished) {
+            //DEBUG
+            System.out.println("Done with IntakeAction");         
+        }
+        return finished;        
     }
 
     @Override
     public void done() {
-        
+//DEBUG
+System.out.println("Done with SetIntakeAction");        
     }
 }
