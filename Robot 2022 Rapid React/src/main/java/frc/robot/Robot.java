@@ -70,8 +70,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    subsystemManager.run();
     driverInteraction.run();
+    subsystemManager.run();
   }
 
   @Override

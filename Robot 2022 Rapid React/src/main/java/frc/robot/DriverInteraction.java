@@ -1,7 +1,9 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
 import frc.robot.controls.Controls;
-import frc.robot.controls.Controls.ButtonControlEnum;
 import frc.robot.controls.Controls.JoystickEnum;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drive;
@@ -18,6 +20,7 @@ public class DriverInteraction {
     Controls controls;
     Climber climber;
     Intake intake;
+    TalonFX ArmMotor;
 
     private DriverInteraction()
     {
@@ -30,16 +33,18 @@ public class DriverInteraction {
             if (s instanceof Climber)       {climber =      (Climber)s;}
             if (s instanceof Intake)        {intake =       (Intake)s;}
         }*/
+//DEBUG
+ArmMotor = new TalonFX(Constants.kArmMotorID);
     }
 
     private boolean driving = true;
 
     public void run()
     {
-        // driving = !controls.getButton(Controls.ButtonControlEnum.CLIMBERNEXTSTAGE);
-        // if (driving) Drive.getInstance().setOpenLoop(controls.getDriveCommand());
-        // else Climber.getInstance().setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*+1.0);
-        if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
+        driving = !controls.getButton(Controls.ButtonControlEnum.CLIMBERNEXTSTAGE);
+        if (driving) Drive.getInstance().setOpenLoop(controls.getDriveCommand());
+        else Climber.getInstance().setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*+1.0);
+        if (controls.getButton(Controls.ButtonControlEnum.CLIMBERPREVSTAGE))
         {
             drive.setOpenLoop(controls.getDriveCommand());
             //Climber.getInstance().setTargetPos(0);
@@ -53,13 +58,21 @@ public class DriverInteraction {
         {
             intake.changeState(IntakeState.INTAKE);
         }
-        else if (controls.getButton(Controls.ButtonControlEnum.OUTTAKE))
-        {
-            intake.changeState(IntakeState.OUTTAKE);
-        }
         else
         {
-            intake.changeState(IntakeState.DEFENSE);
+            ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
         }
+        // if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
+        // {
+        //     intake.changeState(IntakeState.INTAKE);
+        // }
+        // else if (controls.getButton(Controls.ButtonControlEnum.OUTTAKE))
+        // {
+        //     intake.changeState(IntakeState.OUTTAKE);
+        // }
+        // else
+        // {
+        //     intake.changeState(IntakeState.DEFENSE);
+        // }
     }
 }
