@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -65,6 +66,11 @@ public class Intake extends Subsystem {
         TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(kMaxVelocityDegPerSecond, kMaxAccelerationDegPerSecSquared);
         pid = new ProfiledPIDController(kP, kI, kD, constraints);
         pid.reset(calState);
+
+        for (IntakeState s : IntakeState.values())
+        {
+            stateChooser.addOption(s.name(), s);
+        }
     
         calibrated = false;
     }
@@ -132,6 +138,7 @@ public class Intake extends Subsystem {
                     calibrated = true;
                     break;
                 }
+                calibrated = false;
                 ArmMotor.set(TalonFXControlMode.PercentOutput, kCalibrationPercentOutput);
                 break;
             }
@@ -141,9 +148,10 @@ public class Intake extends Subsystem {
     @Override
     public void runTestMode()
     {
-        //intakeStatus = stateChooser.getSelected();
-        if (stateChooser.getSelected() == IntakeState.CALIBRATING)
+        if (stateChooser.getSelected() != null) intakeStatus = stateChooser.getSelected();
+        if (calibrateButton.getBoolean(false))
         {
+            calibrateButton.setBoolean(false);
             runCalibration();
         }
         autoCalibrate = false;
@@ -231,7 +239,8 @@ public class Intake extends Subsystem {
     }
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Intake");
-    private NetworkTableEntry calibrateEntry = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kBooleanBox).getEntry();
+    private NetworkTableEntry calibratedEntry = tab.add("Calibrated", false).withWidget(BuiltInWidgets.kBooleanBox).getEntry();
+    private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();
     private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
     private NetworkTableEntry statusEntry = tab.add("Status", "not updating what").withWidget(BuiltInWidgets.kTextView).getEntry();
     private NetworkTableEntry armposEntry = tab.add("Arm position", "not updating what").withWidget(BuiltInWidgets.kTextView).getEntry();
@@ -240,6 +249,7 @@ public class Intake extends Subsystem {
     private NetworkTableEntry armCurrentPosEntry = tab.add("Arm Current Pos", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
     private NetworkTableEntry armGoalEntry = tab.add("Arm PID Goal", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
     private SendableChooser<IntakeState> stateChooser = new SendableChooser<>();
+    private ComplexWidget wig = tab.add("State Chooser", stateChooser);
 
     @Override
     public void updateShuffleboard()
@@ -252,6 +262,6 @@ public class Intake extends Subsystem {
         enableEntry.setBoolean(Enabled);
         statusEntry.setString(intakeStatus.name());
         armposEntry.setString(targetPos.name());
-        calibrateEntry.setBoolean(calibrated);
+        calibratedEntry.setBoolean(calibrated);
     }
 }

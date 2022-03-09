@@ -88,6 +88,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void testPeriodic() {
-    subsystemManager.run();
+    subsystemManager.runTestMode();
   }
 }
