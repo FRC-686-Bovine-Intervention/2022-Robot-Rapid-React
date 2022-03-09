@@ -16,7 +16,9 @@ import frc.robot.lib.util.Vector2d;
 import frc.robot.subsystems.Intake.IntakeState;
 
 public class OneBallAuto extends AutoMode{
-    public OneBallAuto(){}
+    public OneBallAuto(){
+        initialPose = new Pose();
+    }
 
     @Override
     protected void routine() throws AutoModeEndedException {
@@ -29,11 +31,11 @@ public class OneBallAuto extends AutoMode{
 
         double shotTime = 0.3;
 
-        Path reversePath = new Path();
-        Vector2d initialPose = new Vector2d(0,0);
-        Vector2d outsideTarmac = new Vector2d(-120,0);
+        Vector2d initialPos = initialPose.getPosition();
+        Vector2d outsideTarmac = initialPos.add(new Vector2d(-120,0));
         
-        reversePath.add(new Waypoint(initialPose, driveOptions));
+        Path reversePath = new Path();
+        reversePath.add(new Waypoint(initialPos, driveOptions));
         reversePath.add(new Waypoint(outsideTarmac, driveOptions));
         reversePath.setReverseDirection();
 
@@ -42,8 +44,7 @@ public class OneBallAuto extends AutoMode{
         //================================================================
         // ONE BALL AUTO
         //================================================================
-        RobotState.getInstance().reset(new Pose());
-
+        RobotState.getInstance().reset(initialPose);
         runAction(new SetIntakeAction(IntakeState.OUTTAKE));
         runAction(new WaitAction(shotTime));
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.DEFENSE), new PathFollowerAction(reversePath))));

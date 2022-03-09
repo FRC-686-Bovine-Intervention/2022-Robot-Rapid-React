@@ -19,7 +19,9 @@ import frc.robot.lib.util.Vector2d;
 import frc.robot.subsystems.Intake.IntakeState;
 
 public class ThreeBallAuto extends AutoMode{
-    public ThreeBallAuto(){}
+    public ThreeBallAuto(){
+        initialPose = FieldDimensions.threeBallAutoStartingPose;
+    }
 
     @Override
     protected void routine() throws AutoModeEndedException {
@@ -33,29 +35,30 @@ public class ThreeBallAuto extends AutoMode{
         double shotTime = 0.3;
 
        // path1: after initial shot, backup so we can turn around
+        Vector2d initialPos = initialPose.getPosition();
         Path path1 = new Path();
-        path1.add(new Waypoint(FieldDimensions.fenderShotPos, driveOptions));
+        path1.add(new Waypoint(initialPos, driveOptions));
         path1.add(new Waypoint(FieldDimensions.fenderBackupPos, driveOptions));
         path1.setReverseDirection();
         
         // path2: drive to ball 1
-        double ball1ApproachHeadingRad = FieldDimensions.ourBall1.sub(FieldDimensions.fenderShotPos).angle();
-        Vector2d ourBall1IntakePos = FieldDimensions.ourBall1.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, ball1ApproachHeadingRad)); 
+        double ball2of3ApproachHeadingRad = FieldDimensions.ball2of3.sub(FieldDimensions.fenderBackupPos).angle();
+        Vector2d ourBall2of3IntakePos = FieldDimensions.ball2of3.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, ball2of3ApproachHeadingRad)); 
         Path path2 = new Path();
         path2.add(new Waypoint(FieldDimensions.fenderBackupPos, driveOptions));
-        path2.add(new Waypoint(ourBall1IntakePos, driveOptions));
+        path2.add(new Waypoint(ourBall2of3IntakePos, driveOptions));
 
         // path3: drive to ball 2
-        double ball2ApproachHeadingRad = FieldDimensions.ourBall2.sub(ourBall1IntakePos).angle();
-        Vector2d ourBall2IntakePos = FieldDimensions.ourBall2.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, ball2ApproachHeadingRad)); 
+        double ball3of3ApproachHeadingRad = FieldDimensions.ball3of3.sub(ourBall2of3IntakePos).angle();
+        Vector2d ourBall3of3IntakePos = FieldDimensions.ball3of3.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, ball3of3ApproachHeadingRad)); 
         Path path3 = new Path();
-        path3.add(new Waypoint(ourBall1IntakePos, driveOptions));
-        path3.add(new Waypoint(ourBall2IntakePos, driveOptions));
+        path3.add(new Waypoint(ourBall2of3IntakePos, driveOptions));
+        path3.add(new Waypoint(ourBall3of3IntakePos, driveOptions));
 
         // path4: go back to the fender and shoot
-        double returnAngleRad = FieldDimensions.fenderApproachPos.sub(ourBall2IntakePos).angle();
+        double returnAngleRad = FieldDimensions.fenderApproachPos.sub(ourBall3of3IntakePos).angle();
         Path path4 = new Path();
-        path4.add(new Waypoint(ourBall2IntakePos, driveOptions));
+        path4.add(new Waypoint(ourBall3of3IntakePos, driveOptions));
         path4.add(new Waypoint(FieldDimensions.fenderApproachPos, driveOptions));
         path4.add(new Waypoint(FieldDimensions.fenderShotPos, driveOptions));
 
@@ -65,8 +68,10 @@ public class ThreeBallAuto extends AutoMode{
         path5.add(new Waypoint(FieldDimensions.fenderBackupPos, driveOptions));
         path5.setReverseDirection();
         
-        // path6: head towards ourBall6
-        Vector2d finalPos = FieldDimensions.fenderBackupPos.add(new Vector2d(24,0));
+        // path6: head towards final ball
+        double finalHeadingRad = FieldDimensions.threeBallAutoFinalTarget.sub(FieldDimensions.fenderBackupPos).angle();
+        double finalTravelDist = 24;
+        Vector2d finalPos = Vector2d.magnitudeAngle(finalTravelDist, finalHeadingRad);
         Path path6 = new Path();
         path6.add(new Waypoint(FieldDimensions.fenderBackupPos, driveOptions));
         path6.add(new Waypoint(finalPos, driveOptions));
@@ -77,21 +82,21 @@ public class ThreeBallAuto extends AutoMode{
         //================================================================
         
         // set initial pose
-        RobotState.getInstance().reset(FieldDimensions.threeBallAutoStartingPose);
+        RobotState.getInstance().reset(initialPose);
 
         runAction(new WaitAction(0.0));     // TODO: use programmable delay from Shuffleboard
 
-        // shoot preloaded shot at right fender
+        // shoot preloaded shot
         runAction(new SetIntakeAction(IntakeState.OUTTAKE));
         runAction(new WaitAction(shotTime));
         
-        // backup and intake OurBall1
+        // backup and intake ball 2 of 3
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.DEFENSE), new PathFollowerAction(path1))));
-        runAction(new TurnToAngleAction(Units.radiansToDegrees(ball1ApproachHeadingRad)));
+        runAction(new TurnToAngleAction(Units.radiansToDegrees(ball2of3ApproachHeadingRad)));
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.INTAKE), new PathFollowerAction(path2))));
         
         // turn and intake OurBall2
-        runAction(new TurnToAngleAction(Units.radiansToDegrees(ball2ApproachHeadingRad)));
+        runAction(new TurnToAngleAction(Units.radiansToDegrees(ball3of3ApproachHeadingRad)));
         runAction(new PathFollowerAction(path3));
         
         // return to fender and shoot
