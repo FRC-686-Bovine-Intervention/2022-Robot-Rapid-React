@@ -2,13 +2,10 @@ package frc.robot;
 
 import frc.robot.controls.Controls;
 import frc.robot.controls.Controls.ButtonControlEnum;
-import frc.robot.controls.Controls.JoystickEnum;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
-import frc.robot.subsystems.Subsystem;
-import frc.robot.subsystems.SubsystemManager;
 
 public class DriverInteraction {
     private static DriverInteraction instance;

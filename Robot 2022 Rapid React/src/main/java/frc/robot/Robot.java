@@ -4,21 +4,17 @@
 
 package frc.robot;
 
-import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.cscore.HttpCamera;
-import edu.wpi.first.cscore.HttpCamera.HttpCameraKind;
-import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.auto.AutoManager;
-import frc.robot.subsystems.Drive;
-import frc.robot.subsystems.SubsystemManager;
 import frc.robot.command_status.DriveState;
 import frc.robot.command_status.RobotState;
 import frc.robot.loops.DriveLoop;
 import frc.robot.loops.LoopController;
 import frc.robot.loops.RobotStateLoop;
+import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.SubsystemManager;
 
 public class Robot extends TimedRobot {
 

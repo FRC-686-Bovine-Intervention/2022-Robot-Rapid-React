@@ -1,6 +1,5 @@
 package frc.robot.auto.actions;
 
-import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.Path;
 import frc.robot.lib.util.PathFollower;
 import frc.robot.lib.util.PathFollower.PathVisionState;

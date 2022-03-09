@@ -3,8 +3,6 @@ package frc.robot.auto.actions;
 import java.util.ArrayList;
 import java.util.List;
 
-import frc.robot.lib.util.DataLogger;
-
 /**
  * Composite action, running all sub-actions at the same time All actions are
  * started then updated until all actions report being done.

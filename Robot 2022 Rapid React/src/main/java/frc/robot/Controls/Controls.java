@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.drive.Vector2d;
 import frc.robot.Constants;
 import frc.robot.command_status.DriveCommand;
-import frc.robot.lib.util.Util;
 
 public class Controls {
     private static Controls instance;

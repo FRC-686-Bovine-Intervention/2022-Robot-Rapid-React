@@ -37,7 +37,6 @@ public class Drive extends Subsystem
 	}
 
 	private NetworkTableEntry enableEntry = Shuffleboard.getTab("Drivetrain").add("Enabled", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-	private NetworkTableEntry deltaDistanceInchesEntry = Shuffleboard.getTab("Drivetrain").add("deltaDistanceInchesEntry", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();
 
 	// drive commands
 	private DriveCommand driveCmd;

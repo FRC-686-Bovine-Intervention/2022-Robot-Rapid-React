@@ -1,7 +1,6 @@
 package frc.robot.auto.modes;
 
 import java.util.Arrays;
-import java.util.concurrent.RejectedExecutionHandler;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;

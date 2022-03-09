@@ -4,8 +4,6 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 import frc.robot.lib.util.Pose;
 import frc.robot.lib.util.Vector2d;
-import frc.robot.subsystems.Drive.VelocityHeadingSetpoint;
-import frc.robot.subsystems.UnitNumber.Unit;
 
 /**
  * Interface that holds all the field measurements 
