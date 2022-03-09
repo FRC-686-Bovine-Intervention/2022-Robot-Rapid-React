@@ -66,6 +66,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     LoopController.getInstance().start();
+    driverInteraction.init();
   }
 
   @Override

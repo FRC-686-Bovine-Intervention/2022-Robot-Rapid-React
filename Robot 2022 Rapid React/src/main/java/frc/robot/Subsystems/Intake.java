@@ -98,38 +98,44 @@ public class Intake extends Subsystem {
     public void run()
     {
         disabledInit = true;
-        if(autoCalibrate && !calibrated) {changeState(IntakeState.CALIBRATING);}
+        if(autoCalibrate && !calibrated) {setState(IntakeState.CALIBRATING);}
         switch (intakeStatus)
         {
             case DEFENSE: default:
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 setTargetPos(ArmPosEnum.RAISED);
+                setPos(targetPos);
             break;
             case INTAKE:
                 if(isAtPos(ArmPosEnum.LOWERED, 30)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kIntakePercentOutput);}
                 else {setTargetPos(ArmPosEnum.LOWERED);}
+                setPos(targetPos);
             break;
             case OUTTAKE:
                 if(isAtPos(ArmPosEnum.RAISED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kOuttakePercentOutput);}
                 else {setTargetPos(ArmPosEnum.RAISED);}
+                setPos(targetPos);
             break;
             case OUTTAKE_GROUND:
                 if(isAtPos(ArmPosEnum.LOWERED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kOuttakePercentOutput);}
                 else {setTargetPos(ArmPosEnum.LOWERED);}
+                setPos(targetPos);
             break;
-            case CLIMBING: break;
+            case CLIMBING:
+                ArmMotor.set(TalonFXControlMode.PercentOutput, climbingPower);
+            break;
             case CALIBRATING:
                 if (checkFwdLimitSwitch())
                 {
                     ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
-                    changeState(IntakeState.DEFENSE);
+                    setState(IntakeState.DEFENSE);
                     calibrated = true;
                     break;
                 }
                 ArmMotor.set(TalonFXControlMode.PercentOutput, kCalibrationPercentOutput);
-            break;
-        }
-        if (intakeStatus != IntakeState.CALIBRATING) setPos(targetPos);
+                break;
+            }
+        climbingPower = 0;
     }
 
     @Override
@@ -148,7 +154,7 @@ public class Intake extends Subsystem {
     public void runCalibration()
     {
         calibrated = false;
-        changeState(IntakeState.CALIBRATING);
+        setState(IntakeState.CALIBRATING);
     }
     private boolean disabledInit = true;
     private double disabledTime;
@@ -177,6 +183,12 @@ public class Intake extends Subsystem {
     public boolean isAtPos(ArmPosEnum pos) {return isAtPos(pos,kAtTargetThresholdDegrees);}
 
     public void setTargetPos(ArmPosEnum pos) {targetPos = pos;}
+
+    private double climbingPower;
+    public void setClimbingPower(double armPower)
+    {
+        climbingPower = armPower;
+    }
 
     double pidOutput = 0.0;
     private void setPos(ArmPosEnum pos)
@@ -213,7 +225,7 @@ public class Intake extends Subsystem {
         return fwdLimitSwitchClosed;
     }
 
-    public void changeState(IntakeState newState)
+    public void setState(IntakeState newState)
     {
         intakeStatus = newState;
     }

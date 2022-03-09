@@ -13,12 +13,12 @@ public class SetIntake implements Action{
     
     @Override
     public void start() {
-        Intake.getInstance().changeState(state);
+        Intake.getInstance().setState(state);
     }
     
     @Override
     public void run() {
-        Intake.getInstance().changeState(state);
+        Intake.getInstance().setState(state);
     }
 
     @Override

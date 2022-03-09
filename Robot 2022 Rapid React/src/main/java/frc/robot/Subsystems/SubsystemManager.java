@@ -12,9 +12,9 @@ public class SubsystemManager {
 
     public void init()
     {
-        //subsystems.add(Intake.getInstance());
+        subsystems.add(Intake.getInstance());
         subsystems.add(Drive.getInstance());
-        //subsystems.add(Climber.getInstance());
+        subsystems.add(Climber.getInstance());
     }
 
     public void run()                   {for (Subsystem s : subsystems) {if (s.Enabled) s.run();            else s.disable();}}

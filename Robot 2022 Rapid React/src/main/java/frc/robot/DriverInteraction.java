@@ -1,78 +1,109 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import frc.robot.command_status.DriveCommand;
+import frc.robot.command_status.DriveCommand.DriveControlMode;
 import frc.robot.controls.Controls;
+import frc.robot.controls.Controls.ButtonControlEnum;
 import frc.robot.controls.Controls.JoystickEnum;
+import frc.robot.lib.util.RisingEdgeDetector;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
-import frc.robot.subsystems.Subsystem;
-import frc.robot.subsystems.SubsystemManager;
 
 public class DriverInteraction {
     private static DriverInteraction instance;
     public static DriverInteraction getInstance() {if(instance == null){instance = new DriverInteraction();}return instance;}
 
+    private static final double kClimberMaxPercent = 1;
+    private static final double kClimbingDriveSlowdown = 0.3;
+    private static final double kIntakeMaxPercent = 0.3;
+
     Drive drive;
     Controls controls;
     Climber climber;
     Intake intake;
-    TalonFX ArmMotor;
 
     private DriverInteraction()
     {
         controls = Controls.getInstance();
         drive = Drive.getInstance();
         intake = Intake.getInstance();
+        climber = Climber.getInstance();
         /*for (Subsystem s : SubsystemManager.getInstance().subsystems)
         {
             if (s instanceof Drive)         {drive =        (Drive)s;}
             if (s instanceof Climber)       {climber =      (Climber)s;}
             if (s instanceof Intake)        {intake =       (Intake)s;}
         }*/
-//DEBUG
-ArmMotor = new TalonFX(Constants.kArmMotorID);
     }
 
-    private boolean driving = true;
+    private enum SubsystemControl
+    {
+        DRIVETOCLIMB,
+        CLIMBTODRIVE,
+        DRIVETOINTAKE,
+        CLIMBTOINTAKE,
+        INTAKE
+    }
+
+    private RisingEdgeDetector climbEdgeDetector = new RisingEdgeDetector();
+    private SubsystemControl subsystemControl = SubsystemControl.DRIVETOCLIMB;
+    
+    public void init()
+    {
+        subsystemControl = SubsystemControl.DRIVETOCLIMB;
+    }
 
     public void run()
     {
-        driving = !controls.getButton(Controls.ButtonControlEnum.CLIMBERNEXTSTAGE);
-        if (driving) Drive.getInstance().setOpenLoop(controls.getDriveCommand());
-        else Climber.getInstance().setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*+1.0);
-        if (controls.getButton(Controls.ButtonControlEnum.CLIMBERPREVSTAGE))
+        if (controls.getButton(ButtonControlEnum.INTAKE) && controls.getButton(ButtonControlEnum.OUTTAKE))
         {
-            drive.setOpenLoop(controls.getDriveCommand());
-            //Climber.getInstance().setTargetPos(0);
+            intake.setState(IntakeState.OUTTAKE_GROUND);
         }
-        //else Climber.getInstance().setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*-1);
-        if (controls.getButton(Controls.ButtonControlEnum.INTAKE) && controls.getButton(ButtonControlEnum.OUTTAKE))
+        else if (controls.getButton(ButtonControlEnum.INTAKE))
         {
-            intake.changeState(IntakeState.OUTTAKE_GROUND);
+            intake.setState(IntakeState.INTAKE);
         }
-        else if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
+        else if (controls.getButton(ButtonControlEnum.OUTTAKE))
         {
-            intake.changeState(IntakeState.INTAKE);
+            intake.setState(IntakeState.OUTTAKE);
         }
         else
         {
-            ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
+            intake.setState(IntakeState.DEFENSE);
         }
-        // if (controls.getButton(Controls.ButtonControlEnum.INTAKE))
-        // {
-        //     intake.changeState(IntakeState.INTAKE);
-        // }
-        // else if (controls.getButton(Controls.ButtonControlEnum.OUTTAKE))
-        // {
-        //     intake.changeState(IntakeState.OUTTAKE);
-        // }
-        // else
-        // {
-        //     intake.changeState(IntakeState.DEFENSE);
-        // }
+        climbEdgeDetector.update(controls.getButton(ButtonControlEnum.CLIMBERNEXTSTAGE));
+        if (climbEdgeDetector.get())
+        {
+            switch(subsystemControl)
+            {
+                case DRIVETOCLIMB:  subsystemControl = SubsystemControl.CLIMBTODRIVE;   break;
+                case CLIMBTODRIVE:  subsystemControl = SubsystemControl.DRIVETOINTAKE;  break;
+                case DRIVETOINTAKE: subsystemControl = SubsystemControl.CLIMBTOINTAKE;  break;
+                case CLIMBTOINTAKE: subsystemControl = SubsystemControl.INTAKE;         break;
+                case INTAKE:        subsystemControl = SubsystemControl.CLIMBTOINTAKE;  break;
+            }
+        }
+        switch(subsystemControl)
+        {
+            case DRIVETOCLIMB:
+                drive.setOpenLoop(controls.getDriveCommand());
+            break;
+            case DRIVETOINTAKE:
+                drive.setOpenLoop(new DriveCommand(DriveControlMode.OPEN_LOOP, controls.getDriveCommand().getLeftMotor()*kClimbingDriveSlowdown, controls.getDriveCommand().getRightMotor()*kClimbingDriveSlowdown, NeutralMode.Coast));
+            break;
+            case CLIMBTOINTAKE:
+                intake.setState(IntakeState.CLIMBING);
+            case CLIMBTODRIVE:
+                climber.setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*kClimberMaxPercent);
+            break;
+            case INTAKE:
+                intake.setState(IntakeState.CLIMBING);
+                intake.setClimbingPower(controls.getAxis(JoystickEnum.THRUSTMASTER).y*kIntakeMaxPercent);
+            break;
+        }
     }
 }

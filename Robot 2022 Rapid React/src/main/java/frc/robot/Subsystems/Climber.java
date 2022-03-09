@@ -21,6 +21,9 @@ public class Climber extends Subsystem {
 
     private Intake intake;
 
+    private static final double kCalibratingPercent = -0.15; 
+    private static final double kCalibratingThreshold = 20; 
+
     private Climber()
     {
         LeftMotor = new TalonFX(Constants.kLeftClimberID);
@@ -31,7 +34,7 @@ public class Climber extends Subsystem {
 
         RightMotor.follow(LeftMotor);
 
-        changeState(ClimberState.DEFENSE);
+        setState(ClimberState.DEFENSE);
         intake = Intake.getInstance();
     }
 
@@ -42,12 +45,31 @@ public class Climber extends Subsystem {
         EXTEND_BAR,
         CALIBRATING
     }
+    public ClimberState climberStatus = ClimberState.DEFENSE; 
     public ArrayList<ClimberState> ClimberStatusHistory = new ArrayList<>();
     public boolean readyForNextState;
 
     @Override
     public void run()
     {
+        if(autoCalibrate && !calibrated) setState(ClimberState.CALIBRATING); 
+        switch (climberStatus) 
+        { 
+            case CALIBRATING: 
+                calibrated = false; 
+                LeftMotor.set(TalonFXControlMode.PercentOutput, kCalibratingPercent); 
+                if (LeftMotor.getStatorCurrent() > kCalibratingThreshold) 
+                { 
+                    calibrated = true; 
+                    prevState(); 
+                    LeftMotor.set(TalonFXControlMode.PercentOutput, 0); 
+                } 
+            break; 
+            default: 
+                LeftMotor.set(TalonFXControlMode.PercentOutput, power); 
+            break; 
+        } 
+        power = 0; 
         // if(autoCalibrate && !calibrated) {changeState(ClimberState.CALIBRATING);}
         // switch (getClimberStatus())
         // {
@@ -109,11 +131,12 @@ public class Climber extends Subsystem {
         EXTENDED,
         RETRACTED
     }
-
-    public void setTargetPos(double power)
-    {
-        LeftMotor.set(TalonFXControlMode.PercentOutput, power);
-    }
+//DEBUG 
+private double power; 
+    public void setTargetPos(double power) 
+    { 
+        this.power = power; 
+    } 
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Climber");
     private NetworkTableEntry currentEntry = tab.add("Current", -9999).getEntry();
@@ -138,13 +161,32 @@ public class Climber extends Subsystem {
     {
         switch(getClimberStatus())
         {
-            case DEFENSE:       changeState(ClimberState.EXTEND_FLOOR); break;
-            case EXTEND_FLOOR:  changeState(ClimberState.RETRACT);      break;
-            case RETRACT:       changeState(ClimberState.EXTEND_BAR);   break;
-            case EXTEND_BAR:    changeState(ClimberState.RETRACT);      break;
+            case DEFENSE:       setState(ClimberState.EXTEND_FLOOR); break;
+            case EXTEND_FLOOR:  setState(ClimberState.RETRACT);      break;
+            case RETRACT:       setState(ClimberState.EXTEND_BAR);   break;
+            case EXTEND_BAR:    setState(ClimberState.RETRACT);      break;
             case CALIBRATING:   break;
         }
     }
-    public void prevState() {ClimberStatusHistory.remove(ClimberStatusHistory.size()-1);}
-    public void changeState(ClimberState newState) {if(getClimberStatus() != newState) ClimberStatusHistory.add(newState);}
+    public void prevState() 
+    { 
+        try 
+        { 
+            climberStatus = ClimberStatusHistory.get(ClimberStatusHistory.size()-1); 
+            ClimberStatusHistory.remove(ClimberStatusHistory.size()-1); 
+        } 
+        catch (IndexOutOfBoundsException exception) 
+        { 
+            climberStatus = ClimberState.DEFENSE; 
+        } 
+    } 
+     
+    public void setState(ClimberState newState) 
+    { 
+        if (climberStatus != newState) 
+        { 
+            ClimberStatusHistory.add(newState); 
+            climberStatus = newState; 
+        } 
+    } 
 }
