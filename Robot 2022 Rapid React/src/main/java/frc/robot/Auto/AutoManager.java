@@ -18,9 +18,7 @@ public class AutoManager {
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Autonomous");
     private SendableChooser<AutoMode> AutoModeChooser = new SendableChooser<>();
-    private SendableChooser<Pose> InitialPoseChooser = new SendableChooser<>();
     private ComplexWidget wig = tab.add("mode", AutoModeChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
-    private ComplexWidget a = tab.add("pose", InitialPoseChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
 
     private AutoManager(){}
 
@@ -32,8 +30,6 @@ public class AutoManager {
         AutoModeChooser.addOption("WheelPosition", new WheelPositionAuto());
         AutoModeChooser.addOption("3 Ball Auto", new ThreeBallAuto());
         AutoModeChooser.setDefaultOption("2 Ball Auto", new TwoBallAuto());
-        InitialPoseChooser.addOption("new Pose()", new Pose());
-        InitialPoseChooser.setDefaultOption("Right Fender", FieldDimensions.rFenderStartPose);
     }
 
     public void init()
@@ -46,7 +42,6 @@ public class AutoManager {
 
         autoModeExecuter = new AutoModeExecuter();
         autoModeExecuter.setAutoMode(AutoModeChooser.getSelected());
-        RobotState.getInstance().reset(InitialPoseChooser.getSelected());
 
         autoModeExecuter.start();
     }
