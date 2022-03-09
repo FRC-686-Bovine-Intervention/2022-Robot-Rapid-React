@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -43,10 +44,12 @@ public class Intake extends Subsystem {
     private static final double kP = 0.06;
     private static final double kI = 0.0;
     private static final double kD = 0.0;
-    private static final double kMaxVelocityDegPerSecond = 120;
-    private static final double kMaxAccelerationDegPerSecSquared = 270;
+    private static final double kMaxVelocityDegPerSecond = 240;
+    private static final double kMaxAccelerationDegPerSecSquared = 390;
 
-    private static final double kAtTargetThresholdDegrees = 1.0;
+    private static final double kAtTargetThresholdDegrees = 5.0;
+
+    private static final double kDisableRecalTimeThreshold = 5;
 
     private ProfiledPIDController pid;
 
@@ -94,6 +97,7 @@ public class Intake extends Subsystem {
     @Override
     public void run()
     {
+        disabledInit = true;
         if(autoCalibrate && !calibrated) {changeState(IntakeState.CALIBRATING);}
         switch (intakeStatus)
         {
@@ -102,7 +106,7 @@ public class Intake extends Subsystem {
                 setTargetPos(ArmPosEnum.RAISED);
             break;
             case INTAKE:
-                if(isAtPos(ArmPosEnum.LOWERED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kIntakePercentOutput);}
+                if(isAtPos(ArmPosEnum.LOWERED, 30)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kIntakePercentOutput);}
                 else {setTargetPos(ArmPosEnum.LOWERED);}
             break;
             case OUTTAKE:
@@ -146,11 +150,15 @@ public class Intake extends Subsystem {
         calibrated = false;
         changeState(IntakeState.CALIBRATING);
     }
+    private boolean disabledInit = true;
+    private double disabledTime;
     @Override
     public void disable() {
         ArmMotor.set(TalonFXControlMode.PercentOutput, 0.0);
-        RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
-        calibrated = false;
+        RollerMotor.set(VictorSPXControlMode.PercentOutput, 0.0);
+        if(disabledInit) disabledTime = Timer.getFPGATimestamp();
+        if(Timer.getFPGATimestamp() - disabledTime > kDisableRecalTimeThreshold) calibrated = false;
+        disabledInit = false;
     }
 
     /**
@@ -158,13 +166,15 @@ public class Intake extends Subsystem {
      * @param error is the radius of error
      * @return if the arm is within the radius of error from the desired pos
      */
-    public boolean isAtPos(ArmPosEnum pos)
+    public boolean isAtPos(ArmPosEnum pos, double threshold)
     {
         double currentAngleDegrees = encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition());
         double targetDegrees = pos.angleDeg;
 
-        return (Math.abs(currentAngleDegrees - targetDegrees) < kAtTargetThresholdDegrees);
+        return (Math.abs(currentAngleDegrees - targetDegrees) < threshold);
     }
+
+    public boolean isAtPos(ArmPosEnum pos) {return isAtPos(pos,kAtTargetThresholdDegrees);}
 
     public void setTargetPos(ArmPosEnum pos) {targetPos = pos;}
 
