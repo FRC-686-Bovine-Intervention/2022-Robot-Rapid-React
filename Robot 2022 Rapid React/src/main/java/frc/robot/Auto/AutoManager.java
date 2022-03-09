@@ -7,13 +7,12 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.auto.modes.ActionTestingAuto;
 import frc.robot.auto.modes.AutoMode;
-import frc.robot.auto.modes.FieldDimensions;
 import frc.robot.auto.modes.OneBallAuto;
 import frc.robot.auto.modes.ThreeBallAuto;
 import frc.robot.auto.modes.TurnAroundAuto;
+import frc.robot.auto.modes.TwoBallAuto;
 import frc.robot.auto.modes.WheelPositionAuto;
 import frc.robot.command_status.RobotState;
-import frc.robot.lib.util.Pose;
 
 public class AutoManager {
     private static AutoManager instance;
@@ -23,21 +22,18 @@ public class AutoManager {
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Autonomous");
     private SendableChooser<AutoMode> AutoModeChooser = new SendableChooser<>();
-    private SendableChooser<Pose> InitialPoseChooser = new SendableChooser<>();
-    private ComplexWidget wig = tab.add("mode", AutoModeChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
-    private ComplexWidget a = tab.add("pose", InitialPoseChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
+    private ComplexWidget wig = tab.add("AutoMode", AutoModeChooser).withWidget(BuiltInWidgets.kComboBoxChooser);
 
     private AutoManager(){}
 
     public void InitChoices()
     {
-        AutoModeChooser.addOption("OneBallAuto", new OneBallAuto());
-        AutoModeChooser.addOption("Action Testing", new ActionTestingAuto());
-        AutoModeChooser.addOption("TurnAround", new TurnAroundAuto());
-        AutoModeChooser.addOption("WheelPosition", new WheelPositionAuto());
+        AutoModeChooser.addOption("1 Ball Auto", new OneBallAuto());
+        AutoModeChooser.addOption("2 Ball Auto", new TwoBallAuto());
         AutoModeChooser.setDefaultOption("3 Ball Auto", new ThreeBallAuto());
-        InitialPoseChooser.addOption("new Pose()", new Pose());
-        InitialPoseChooser.setDefaultOption("Right Fender", FieldDimensions.rFenderStartPose);
+        AutoModeChooser.addOption("Action Testing Auto", new ActionTestingAuto());
+        AutoModeChooser.addOption("Turn Around Auto", new TurnAroundAuto());
+        AutoModeChooser.addOption("Wheel Position Auto", new WheelPositionAuto());
     }
 
     public void init()
@@ -49,9 +45,10 @@ public class AutoManager {
         autoModeExecuter = null;
 
         autoModeExecuter = new AutoModeExecuter();
+        AutoMode autoMode = AutoModeChooser.getSelected();
+        RobotState.getInstance().reset(autoMode.getInitialPose());
+        
         autoModeExecuter.setAutoMode(AutoModeChooser.getSelected());
-        RobotState.getInstance().reset(InitialPoseChooser.getSelected());
-
         autoModeExecuter.start();
     }
 

@@ -164,7 +164,6 @@ public class Drive extends Subsystem
 		rTargetDistanceInches = DriveState.getInstance().getRightDistanceInches()  + deltaDistanceInches.right;
 
 		// update Position Motion Magic Setpoint
-		// DriveLoop.getInstance().configMotionMagicSpeed(kTurnToAngleCruiseVelocity, kTurnToAngleAccel);
 		driveCmd.setDriveMode(DriveControlMode.TURN_TO_HEADING);
 		driveCmd.setMotors(lTargetDistanceInches, rTargetDistanceInches);
 	}	
