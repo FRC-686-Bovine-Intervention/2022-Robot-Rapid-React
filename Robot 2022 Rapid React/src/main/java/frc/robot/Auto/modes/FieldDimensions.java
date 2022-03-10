@@ -23,7 +23,7 @@ public class FieldDimensions
     // Fender Shot Positions
     public static final Vector2d fenderShotPos     = new Vector2d(Constants.kCenterToFrontBumper, 0);
     public static final Vector2d fenderApproachPos = new Vector2d(48.0, 0);     // some distance in front of fender
-    public static final Vector2d fenderBackupPos   = new Vector2d(30.0, 0);     // some distance in front of fender
+    public static final Vector2d fenderBackupPos   = new Vector2d(48.0, 0);     // some distance in front of fender
 
     //====================================================================================================
     // 2 Ball Auto 

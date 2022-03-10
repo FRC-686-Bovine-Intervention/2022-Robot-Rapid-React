@@ -33,7 +33,7 @@ public class ThreeBallAuto extends AutoMode{
 
         double shotTime = 0.3;
 
-       // path1: after initial shot, backup so we can turn around
+        // path1: after initial shot, backup so we can turn around
         Vector2d initialPos = initialPose.getPosition();
         Path path1 = new Path();
         path1.add(new Waypoint(initialPos, driveOptions));
