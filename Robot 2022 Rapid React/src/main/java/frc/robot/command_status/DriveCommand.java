@@ -39,7 +39,7 @@ import edu.wpi.first.wpilibj.Timer;
 public class DriveCommand
 {    
 	// The robot drivetrain's various states
-	public enum DriveControlMode { OPEN_LOOP, BASE_LOCKED, VELOCITY_SETPOINT, VELOCITY_HEADING, TURN_TO_HEADING }
+	public enum DriveControlMode { OPEN_LOOP, BASE_LOCKED, POSITION_SETPOINT, VELOCITY_SETPOINT, VELOCITY_HEADING, TURN_TO_HEADING }
 
 	// all member variables should be private to force other object to use the set/get access methods
 	// which are synchronized to allow multi-thread synchronization	
@@ -92,8 +92,12 @@ public class DriveCommand
     		break;
     		
     	case BASE_LOCKED:
+            talonMode = ControlMode.Position;
+        
+        case POSITION_SETPOINT:
         case TURN_TO_HEADING:
-    		talonMode = ControlMode.Position;
+            talonMode = ControlMode.MotionMagic;
+            break;
     		
     	case VELOCITY_SETPOINT:
     	case VELOCITY_HEADING:

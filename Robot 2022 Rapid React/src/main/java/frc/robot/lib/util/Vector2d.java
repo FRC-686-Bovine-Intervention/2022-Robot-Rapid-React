@@ -1,6 +1,5 @@
 package frc.robot.lib.util;
 
-
 public class Vector2d implements Interpolable<Vector2d>
 {
 	protected double x;
@@ -198,6 +197,11 @@ public class Vector2d implements Interpolable<Vector2d>
         double y = this.y + u*(that.y - this.y);
 		return new Vector2d(x,y);
     }
+
+	public Vector2d scale(double scale)
+	{
+		return new Vector2d(this.getX()*scale,this.getY()*scale);
+	}
     
 	
 	@Override
