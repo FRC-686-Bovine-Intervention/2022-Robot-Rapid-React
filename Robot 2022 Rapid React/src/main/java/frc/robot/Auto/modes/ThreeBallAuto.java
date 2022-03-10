@@ -15,6 +15,7 @@ import frc.robot.lib.util.Path;
 import frc.robot.lib.util.Path.Waypoint;
 import frc.robot.lib.util.PathSegment.Options;
 import frc.robot.lib.util.Vector2d;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 
 public class ThreeBallAuto extends AutoMode{
@@ -48,8 +49,8 @@ public class ThreeBallAuto extends AutoMode{
         path2.add(new Waypoint(ourBall2of3IntakePos, driveOptions));
 
         // path3: drive to ball 2
-        double ball3of3ApproachHeadingRad = FieldDimensions.ball3of3.sub(ourBall2of3IntakePos).angle();
-        Vector2d ourBall3of3IntakePos = FieldDimensions.ball3of3.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, ball3of3ApproachHeadingRad)); 
+        double ball3of3ApproachHeadingRad = FieldDimensions.ball3of3.sub(ourBall2of3IntakePos).angle();                   //chocolate fudge
+        Vector2d ourBall3of3IntakePos = FieldDimensions.ball3of3.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper - 12, ball3of3ApproachHeadingRad)); 
         Path path3 = new Path();
         path3.add(new Waypoint(ourBall2of3IntakePos, driveOptions));
         path3.add(new Waypoint(ourBall3of3IntakePos, driveOptions));
@@ -70,7 +71,7 @@ public class ThreeBallAuto extends AutoMode{
         // path6: head towards final ball
         double finalHeadingRad = FieldDimensions.threeBallAutoFinalTarget.sub(FieldDimensions.fenderBackupPos).angle();
         double finalTravelDist = 24;
-        Vector2d finalPos = Vector2d.magnitudeAngle(finalTravelDist, finalHeadingRad);
+        Vector2d finalPos = FieldDimensions.fenderBackupPos.add(Vector2d.magnitudeAngle(finalTravelDist, finalHeadingRad));
         Path path6 = new Path();
         path6.add(new Waypoint(FieldDimensions.fenderBackupPos, driveOptions));
         path6.add(new Waypoint(finalPos, driveOptions));
@@ -86,6 +87,7 @@ public class ThreeBallAuto extends AutoMode{
         runAction(new WaitAction(0.0));     // TODO: use programmable delay from Shuffleboard
 
         // shoot preloaded shot
+        runAction(new SetIntakeAction(IntakeState.DEFENSE));
         runAction(new SetIntakeAction(IntakeState.OUTTAKE));
         runAction(new WaitAction(shotTime));
         
@@ -106,6 +108,7 @@ public class ThreeBallAuto extends AutoMode{
         
         // head towards OurBall6
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.DEFENSE), new PathFollowerAction(path5))));
+        runAction(new TurnToAngleAction(Units.radiansToDegrees(finalHeadingRad)));
         runAction(new PathFollowerAction(path6));
 
     }

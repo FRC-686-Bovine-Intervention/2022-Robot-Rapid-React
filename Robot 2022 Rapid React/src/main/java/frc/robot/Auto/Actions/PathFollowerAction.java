@@ -35,18 +35,12 @@ public class PathFollowerAction implements Action{
     public boolean isFinished() 
     {
     	boolean finished = driveCtrl.isFinished();
-      if (finished) {
-        //DEBUG
-        System.out.println("Done with PathFollowerAction");         
-      }
       return finished;    	
     }
 
     @Override
     public void done() 
     {
-//DEBUG
-System.out.println("Done with PathFollowerAction");      
       // cleanup code, if any
       driveCtrl.done();
     }

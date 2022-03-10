@@ -29,7 +29,6 @@ public class SetIntakeAction implements Action{
 
     @Override
     public void done() {
-//DEBUG
-System.out.println("Done with SetIntakeAction");        
+        System.out.println("SetIntake.done()");
     }
 }
