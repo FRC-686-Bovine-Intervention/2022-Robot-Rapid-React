@@ -33,7 +33,7 @@ public class TwoBallAuto extends AutoMode{
         boolean visionEnabled = false;
         Options driveOptions = new Options(maxSpeed, accel, lookaheadDist, visionEnabled);
 
-        double shotTime = 0.3;
+        double shotTime = 0.5;
 
         // Robot starts with front bumper aligned with tarmac tape, with bumper corner at apex corner of tarmax
         
