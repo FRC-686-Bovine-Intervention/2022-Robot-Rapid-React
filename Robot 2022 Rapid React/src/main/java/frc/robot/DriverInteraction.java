@@ -97,6 +97,7 @@ public class DriverInteraction {
             break;
             case CLIMBTOINTAKE:
                 intake.setState(IntakeState.CLIMBING);
+                intake.setClimbingPower(Intake.kClimbingHoldPercent);
             case CLIMBTODRIVE:
                 climber.setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*kClimberMaxPercent);
             break;
