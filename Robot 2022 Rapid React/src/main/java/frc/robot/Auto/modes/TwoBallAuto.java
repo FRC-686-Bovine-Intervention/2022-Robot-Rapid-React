@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.auto.AutoManager;
 import frc.robot.auto.AutoModeEndedException;
 import frc.robot.auto.actions.ParallelAction;
 import frc.robot.auto.actions.PathFollowerAction;
@@ -72,7 +73,7 @@ public class TwoBallAuto extends AutoMode{
         //================================================================
         RobotState.getInstance().reset(initialPose);
 
-        runAction(new WaitAction(0.0));     // TODO: use programmable delay from Shuffleboard
+        runAction(new WaitAction(AutoManager.autoInitialDelaySec)); 
 
         // drive forward, intake ball
         runAction(new SetIntakeAction(IntakeState.INTAKE));

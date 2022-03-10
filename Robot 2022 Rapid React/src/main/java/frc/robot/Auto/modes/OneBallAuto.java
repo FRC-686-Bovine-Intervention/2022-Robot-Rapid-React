@@ -2,6 +2,7 @@ package frc.robot.auto.modes;
 
 import java.util.Arrays;
 
+import frc.robot.auto.AutoManager;
 import frc.robot.auto.AutoModeEndedException;
 import frc.robot.auto.actions.ParallelAction;
 import frc.robot.auto.actions.PathFollowerAction;
@@ -29,7 +30,7 @@ public class OneBallAuto extends AutoMode{
         boolean visionEnabled = false;
         Options driveOptions = new Options(maxSpeed, accel, lookaheadDist, visionEnabled);
 
-        double shotTime = 0.3;
+        double shotTime = 0.5;
 
         Vector2d initialPos = initialPose.getPosition();
         Vector2d outsideTarmac = initialPos.add(new Vector2d(-120,0));
@@ -45,6 +46,8 @@ public class OneBallAuto extends AutoMode{
         // ONE BALL AUTO
         //================================================================
         RobotState.getInstance().reset(initialPose);
+        runAction(new WaitAction(AutoManager.autoInitialDelaySec)); 
+
         runAction(new SetIntakeAction(IntakeState.OUTTAKE));
         runAction(new WaitAction(shotTime));
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.DEFENSE), new PathFollowerAction(reversePath))));

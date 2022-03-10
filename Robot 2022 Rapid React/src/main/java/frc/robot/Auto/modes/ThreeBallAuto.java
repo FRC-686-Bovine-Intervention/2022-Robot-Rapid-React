@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
+import frc.robot.auto.AutoManager;
 import frc.robot.auto.AutoModeEndedException;
 import frc.robot.auto.actions.ParallelAction;
 import frc.robot.auto.actions.PathFollowerAction;
@@ -15,7 +16,6 @@ import frc.robot.lib.util.Path;
 import frc.robot.lib.util.Path.Waypoint;
 import frc.robot.lib.util.PathSegment.Options;
 import frc.robot.lib.util.Vector2d;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeState;
 
 public class ThreeBallAuto extends AutoMode{
@@ -84,7 +84,7 @@ public class ThreeBallAuto extends AutoMode{
         // set initial pose
         RobotState.getInstance().reset(initialPose);
 
-        runAction(new WaitAction(0.0));     // TODO: use programmable delay from Shuffleboard
+        runAction(new WaitAction(AutoManager.autoInitialDelaySec)); 
 
         // shoot preloaded shot
         runAction(new SetIntakeAction(IntakeState.DEFENSE));
