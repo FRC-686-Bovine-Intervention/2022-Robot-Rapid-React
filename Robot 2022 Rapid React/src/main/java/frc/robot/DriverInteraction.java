@@ -11,6 +11,7 @@ import frc.robot.lib.util.RisingEdgeDetector;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Climber.ClimberState;
 import frc.robot.subsystems.Intake.IntakeState; 
  
 public class DriverInteraction { 
@@ -74,7 +75,7 @@ public class DriverInteraction {
         else 
         { 
             intake.setState(IntakeState.DEFENSE); 
-        } 
+        }
         climbEdgeDetector.update(controls.getButton(ButtonControlEnum.CLIMBERNEXTSTAGE)); 
         if (climbEdgeDetector.get()) 
         { 
@@ -86,18 +87,28 @@ public class DriverInteraction {
                 case CLIMBTOINTAKE: subsystemControl = SubsystemControl.INTAKE;         break; 
                 case INTAKE:        subsystemControl = SubsystemControl.CLIMBTOINTAKE;  break; 
             } 
-        } 
+        }
+        if (controls.getButton(ButtonControlEnum.CLIMBERPREVSTAGE))
+        {
+            subsystemControl = SubsystemControl.DRIVETOCLIMB;
+        }
         switch(subsystemControl) 
         { 
             case DRIVETOCLIMB: 
-                drive.setOpenLoop(controls.getDriveCommand()); 
+                drive.setOpenLoop(controls.getDriveCommand());
+                climber.setState(ClimberState.DEFENSE);
+                if (intake.intakeStatus == IntakeState.CLIMBING)
+                {
+                    intake.setState(IntakeState.DEFENSE);
+                }
             break; 
             case DRIVETOINTAKE: 
                 drive.setOpenLoop(new DriveCommand(DriveControlMode.OPEN_LOOP, controls.getDriveCommand().getLeftMotor()*kClimbingDriveSlowdown, controls.getDriveCommand().getRightMotor()*kClimbingDriveSlowdown, NeutralMode.Coast)); 
             break; 
             case CLIMBTOINTAKE: 
-                intake.setState(IntakeState.CLIMBING); 
+                intake.setState(IntakeState.CLIMBING);
             case CLIMBTODRIVE: 
+                climber.setState(ClimberState.EXTEND_FLOOR);
                 climber.setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*kClimberMaxPercent); 
             break; 
             case INTAKE: 

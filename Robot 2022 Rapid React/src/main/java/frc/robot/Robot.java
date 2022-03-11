@@ -38,10 +38,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    // HttpCamera httpCamera = new HttpCamera("Limelight", "http://gloworm.local:1182/stream.mjpg"); //10.6.86.11:1182/stream.mjpg
-    // httpCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-    // CameraServer.addCamera(httpCamera);
-
     subsystemManager.init();
     autoManager.InitChoices();
     LoopController.getInstance().register(Drive.getInstance().getVelocityPIDLoop());
@@ -77,6 +73,7 @@ public class Robot extends TimedRobot {
     startingLeftDistance = DriveState.getInstance().getLeftDistanceInches();
     startingRightDistance = DriveState.getInstance().getRightDistanceInches();
     LoopController.getInstance().start();
+    driverInteraction.init();
   }
 
   @Override

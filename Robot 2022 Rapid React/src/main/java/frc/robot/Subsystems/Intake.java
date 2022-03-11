@@ -63,6 +63,7 @@ public class Intake extends Subsystem {
         ArmMotor.configFactoryDefault();
         ArmMotor.setInverted(TalonFXInvertType.CounterClockwise);
         ArmMotor.setNeutralMode(NeutralMode.Brake);
+        ArmMotor.configForwardSoftLimitThreshold(degreesToEncoderUnits(IntakeState.DEFENSE.armPos.angleDeg));
 
         TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(kMaxVelocityDegPerSecond, kMaxAccelerationDegPerSecSquared);
         pid = new ProfiledPIDController(kP, kI, kD, constraints);
@@ -106,6 +107,7 @@ public class Intake extends Subsystem {
     {
         disabledInit = true;
         if(autoCalibrate && !calibrated) {setState(IntakeState.CALIBRATING);}
+        ArmMotor.configForwardSoftLimitEnable(true);
         switch (intakeStatus)
         {
             case DEFENSE: default:
@@ -131,7 +133,8 @@ public class Intake extends Subsystem {
             case CLIMBING:
                 ArmMotor.set(TalonFXControlMode.PercentOutput, climbingPower);
             break;
-            case CALIBRATING:
+                case CALIBRATING:
+                ArmMotor.configForwardSoftLimitEnable(false);
                 if (checkFwdLimitSwitch())
                 {
                     ArmMotor.set(TalonFXControlMode.PercentOutput, 0);

@@ -64,9 +64,6 @@ public class Controls {
         a.x = 0.8*a.x*a.x*a.x - 0.8*a.x + a.x;
         a.y = 0.7*a.y*a.y*a.y - 0.7*a.y + a.y;
 
-        //DEBUG
-        a.y = 0;
-
         double leftPower = a.y-a.x;
         double rightPower = a.y+a.x;
         return new DriveCommand(leftPower, rightPower);
