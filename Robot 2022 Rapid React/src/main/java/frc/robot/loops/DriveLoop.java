@@ -69,7 +69,7 @@ public class DriveLoop implements Loop
 	public static double kDriveWatchdogTimerThreshold = 0.500;
 
 	// Wheels
-	public static double kDriveWheelCircumInches    = 6*Math.PI;
+	public static double kDriveWheelCircumInches    = 6*Math.PI*190.5/188.2;
 	public static double kTrackWidthInches          = 22.000;
 	public static double kTrackEffectiveDiameter    = 22.5; //Went 707in in 10 rotations       (kTrackWidthInches * kTrackWidthInches + kTrackLengthInches * kTrackLengthInches) / kTrackWidthInches;
 	public static double kTrackScrubFactor          = 1.0;

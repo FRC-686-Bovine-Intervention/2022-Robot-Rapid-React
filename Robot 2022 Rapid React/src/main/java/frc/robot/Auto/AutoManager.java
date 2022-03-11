@@ -12,6 +12,7 @@ import frc.robot.auto.modes.OneBallAuto;
 import frc.robot.auto.modes.ThreeBallAuto;
 import frc.robot.auto.modes.TurnAroundAuto;
 import frc.robot.auto.modes.TwoBallAuto;
+import frc.robot.auto.modes.WheelDiameterCalibrationAuto;
 import frc.robot.auto.modes.WheelPositionAuto;
 import frc.robot.command_status.RobotState;
 
@@ -36,7 +37,7 @@ public class AutoManager {
         AutoModeChooser.setDefaultOption("3 Ball Auto", new ThreeBallAuto());
         AutoModeChooser.addOption("Action Testing Auto", new ActionTestingAuto());
         AutoModeChooser.addOption("Turn Around Auto", new TurnAroundAuto());
-        AutoModeChooser.addOption("Wheel Position Auto", new WheelPositionAuto());
+        AutoModeChooser.addOption("Wheel Calibration Auto", new WheelDiameterCalibrationAuto());
     }
 
     public void init()
