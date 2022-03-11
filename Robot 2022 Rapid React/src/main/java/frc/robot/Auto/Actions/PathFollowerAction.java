@@ -1,6 +1,5 @@
 package frc.robot.auto.actions;
 
-import frc.robot.command_status.RobotState;
 import frc.robot.lib.util.Path;
 import frc.robot.lib.util.PathFollower;
 import frc.robot.lib.util.PathFollower.PathVisionState;
@@ -21,7 +20,6 @@ public class PathFollowerAction implements Action{
     @Override
     public void start() 
     {
-      System.out.println("PathFollowerAction.start(), pose = " + RobotState.getInstance().getLatestFieldToVehicle().toString());
       driveCtrl.start();
     }
 
@@ -37,18 +35,13 @@ public class PathFollowerAction implements Action{
     public boolean isFinished() 
     {
     	boolean finished = driveCtrl.isFinished();
-    	
-//		if (finished)
-//			System.out.println("InterruptableAction Finished");
-	
-    	return finished;
+      return finished;    	
     }
 
     @Override
     public void done() 
     {
-		System.out.println("PathFollowerAction.done(),  pose = " + RobotState.getInstance().getLatestFieldToVehicle().toString());
-		// cleanup code, if any
-		driveCtrl.done();
+      // cleanup code, if any
+      driveCtrl.done();
     }
 }

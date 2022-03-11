@@ -12,6 +12,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -32,7 +33,7 @@ public class Intake extends Subsystem {
     TrapezoidProfile.State scoringState = new TrapezoidProfile.State(ArmPosEnum.RAISED.angleDeg, 0);
     TrapezoidProfile.State groundState = new TrapezoidProfile.State(ArmPosEnum.LOWERED.angleDeg, 0);
 
-    private static final double kCalibrationPercentOutput = 0.15;
+    private static final double kCalibrationPercentOutput = 0.2;
 
     private static final double kGroundHoldingThresholdDegrees = 2.0;
     private static final double kGroundHoldingPercentOutput = -0.10;
@@ -48,6 +49,7 @@ public class Intake extends Subsystem {
     private static final double kMaxAccelerationDegPerSecSquared = 390;
 
     private static final double kAtTargetThresholdDegrees = 5.0;
+    public static final double kClimbingHoldPercent = 0.2;
 
     private static final double kDisableRecalTimeThreshold = 5;
 
@@ -61,10 +63,16 @@ public class Intake extends Subsystem {
         ArmMotor.configFactoryDefault();
         ArmMotor.setInverted(TalonFXInvertType.CounterClockwise);
         ArmMotor.setNeutralMode(NeutralMode.Brake);
+        ArmMotor.configForwardSoftLimitThreshold(degreesToEncoderUnits(IntakeState.DEFENSE.armPos.angleDeg));
 
         TrapezoidProfile.Constraints constraints = new TrapezoidProfile.Constraints(kMaxVelocityDegPerSecond, kMaxAccelerationDegPerSecSquared);
         pid = new ProfiledPIDController(kP, kI, kD, constraints);
         pid.reset(calState);
+
+        for (IntakeState s : IntakeState.values())
+        {
+            stateChooser.addOption(s.name(), s);
+        }
     
         calibrated = false;
     }
@@ -98,46 +106,55 @@ public class Intake extends Subsystem {
     public void run()
     {
         disabledInit = true;
-        if(autoCalibrate && !calibrated) {changeState(IntakeState.CALIBRATING);}
+        if(autoCalibrate && !calibrated) {setState(IntakeState.CALIBRATING);}
+        ArmMotor.configForwardSoftLimitEnable(true);
         switch (intakeStatus)
         {
             case DEFENSE: default:
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 setTargetPos(ArmPosEnum.RAISED);
+                setPos(targetPos);
             break;
             case INTAKE:
                 if(isAtPos(ArmPosEnum.LOWERED, 30)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kIntakePercentOutput);}
                 else {setTargetPos(ArmPosEnum.LOWERED);}
+                setPos(targetPos);
             break;
             case OUTTAKE:
                 if(isAtPos(ArmPosEnum.RAISED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kOuttakePercentOutput);}
                 else {setTargetPos(ArmPosEnum.RAISED);}
+                setPos(targetPos);
             break;
             case OUTTAKE_GROUND:
                 if(isAtPos(ArmPosEnum.LOWERED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kOuttakePercentOutput);}
                 else {setTargetPos(ArmPosEnum.LOWERED);}
+                setPos(targetPos);
             break;
-            case CLIMBING: break;
-            case CALIBRATING:
+            case CLIMBING:
+                ArmMotor.set(TalonFXControlMode.PercentOutput, climbingPower);
+            break;
+                case CALIBRATING:
+                ArmMotor.configForwardSoftLimitEnable(false);
                 if (checkFwdLimitSwitch())
                 {
                     ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
-                    changeState(IntakeState.DEFENSE);
+                    setState(IntakeState.DEFENSE);
                     calibrated = true;
                     break;
                 }
+                calibrated = false;
                 ArmMotor.set(TalonFXControlMode.PercentOutput, kCalibrationPercentOutput);
-            break;
-        }
-        if (intakeStatus != IntakeState.CALIBRATING) setPos(targetPos);
+                break;
+            }
     }
 
     @Override
     public void runTestMode()
     {
-        //intakeStatus = stateChooser.getSelected();
-        if (stateChooser.getSelected() == IntakeState.CALIBRATING)
+        if (stateChooser.getSelected() != null) intakeStatus = stateChooser.getSelected();
+        if (calibrateButton.getBoolean(false))
         {
+            calibrateButton.setBoolean(false);
             runCalibration();
         }
         autoCalibrate = false;
@@ -148,7 +165,7 @@ public class Intake extends Subsystem {
     public void runCalibration()
     {
         calibrated = false;
-        changeState(IntakeState.CALIBRATING);
+        setState(IntakeState.CALIBRATING);
     }
     private boolean disabledInit = true;
     private double disabledTime;
@@ -177,6 +194,12 @@ public class Intake extends Subsystem {
     public boolean isAtPos(ArmPosEnum pos) {return isAtPos(pos,kAtTargetThresholdDegrees);}
 
     public void setTargetPos(ArmPosEnum pos) {targetPos = pos;}
+
+    private double climbingPower;
+    public void setClimbingPower(double armPower)
+    {
+        climbingPower = armPower;
+    }
 
     double pidOutput = 0.0;
     private void setPos(ArmPosEnum pos)
@@ -213,21 +236,23 @@ public class Intake extends Subsystem {
         return fwdLimitSwitchClosed;
     }
 
-    public void changeState(IntakeState newState)
+    public void setState(IntakeState newState)
     {
         intakeStatus = newState;
     }
 
     private ShuffleboardTab tab = Shuffleboard.getTab("Intake");
-    private NetworkTableEntry calibrateEntry = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kBooleanBox).getEntry();
-    private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry();
-    private NetworkTableEntry statusEntry = tab.add("Status", "not updating what").withWidget(BuiltInWidgets.kTextView).getEntry();
-    private NetworkTableEntry armposEntry = tab.add("Arm position", "not updating what").withWidget(BuiltInWidgets.kTextView).getEntry();
-    private NetworkTableEntry armCurrentEntry = tab.add("Arm Current", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
-    private NetworkTableEntry armPIDOutputEntry = tab.add("Arm PID Output", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
-    private NetworkTableEntry armCurrentPosEntry = tab.add("Arm Current Pos", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
-    private NetworkTableEntry armGoalEntry = tab.add("Arm PID Goal", -9999).withWidget(BuiltInWidgets.kTextView).getEntry();
+    private NetworkTableEntry statusEntry = tab.add("Status", "not updating what").withWidget(BuiltInWidgets.kTextView)         .withPosition(0,0).withSize(2,1).getEntry();
+    private NetworkTableEntry armposEntry = tab.add("Arm position", "not updating what").withWidget(BuiltInWidgets.kTextView)   .withPosition(0,1).getEntry();
+    private NetworkTableEntry calibratedEntry = tab.add("Calibrated", false).withWidget(BuiltInWidgets.kBooleanBox)             .withPosition(1,1).getEntry();
+    private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton)            .withPosition(1,3).getEntry();
+    private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch)                    .withPosition(0,3).getEntry();
     private SendableChooser<IntakeState> stateChooser = new SendableChooser<>();
+    private ComplexWidget wig = tab.add("State Chooser", stateChooser)                                                          .withPosition(0,4).withSize(2,1);
+    private NetworkTableEntry armCurrentEntry = tab.add("Arm Current", -9999).withWidget(BuiltInWidgets.kTextView)              .withPosition(8,0).getEntry();
+    private NetworkTableEntry armCurrentPosEntry = tab.add("Arm Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry();
+    private NetworkTableEntry armPIDOutputEntry = tab.add("Arm PID Output", -9999).withWidget(BuiltInWidgets.kTextView)         .withPosition(8,1).getEntry();
+    private NetworkTableEntry armGoalEntry = tab.add("Arm PID Goal", -9999).withWidget(BuiltInWidgets.kTextView)                .withPosition(9,1).getEntry();
 
     @Override
     public void updateShuffleboard()
@@ -240,6 +265,6 @@ public class Intake extends Subsystem {
         enableEntry.setBoolean(Enabled);
         statusEntry.setString(intakeStatus.name());
         armposEntry.setString(targetPos.name());
-        calibrateEntry.setBoolean(calibrated);
+        calibratedEntry.setBoolean(calibrated);
     }
 }

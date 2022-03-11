@@ -26,7 +26,8 @@ public class Constants {
 
 
     // Robot Dimensions
-    public static double kCenterToFrontBumper = 20.0;       // TODO: measure and update!
-    public static double kCenterToIntake = 30.0;            // TODO: measure and update!
+    public static double kCenterToSideBumper = 15.0;
+    public static double kCenterToFrontBumper = 19.5;
+    public static double kCenterToIntake = 32.0;
 }
 
