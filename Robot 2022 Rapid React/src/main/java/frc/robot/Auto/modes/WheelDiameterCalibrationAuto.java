@@ -20,7 +20,7 @@ public class WheelDiameterCalibrationAuto extends AutoMode{
         boolean visionEnabled = false;
         Options driveOptions = new Options(maxSpeed, accel, lookaheadDist, visionEnabled);
 
-        double distanceToDriveFeet = 20.0;
+        double distanceToDriveFeet = 16.0;
         Vector2d initialPos = initialPose.getPosition();
         Vector2d finalPos = initialPos.add(new Vector2d(distanceToDriveFeet*12,0));
         Path path = new Path();
