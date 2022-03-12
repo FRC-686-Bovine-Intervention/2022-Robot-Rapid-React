@@ -22,9 +22,11 @@ public class Vision {
         new Thread(
             () -> {
               // Get the UsbCamera from CameraServer
-              UsbCamera camera = CameraServer.startAutomaticCapture();
+              UsbCamera limelight = CameraServer.startAutomaticCapture();
+              UsbCamera driverCamera = CameraServer.startAutomaticCapture();
               // Set the resolution
-              camera.setResolution(640, 480);
+              limelight.setResolution(320, 240);
+              driverCamera.setResolution(320, 240);
 
               // Get a CvSink. This will capture Mats from the camera
               CvSink cvSink = CameraServer.getVideo();
