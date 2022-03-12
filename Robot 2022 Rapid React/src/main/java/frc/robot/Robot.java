@@ -15,6 +15,7 @@ import frc.robot.loops.LoopController;
 import frc.robot.loops.RobotStateLoop;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.SubsystemManager;
+import frc.robot.subsystems.Vision;
 
 public class Robot extends TimedRobot {
 
@@ -38,9 +39,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    // HttpCamera httpCamera = new HttpCamera("Limelight", "http://gloworm.local:1182/stream.mjpg"); //10.6.86.11:1182/stream.mjpg
-    // httpCamera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
-    // CameraServer.addCamera(httpCamera);
+    Vision.getInstance().init();
 
     subsystemManager.init();
     autoManager.InitChoices();
