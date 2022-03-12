@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
-    Vision.getInstance().init();
+    //Vision.getInstance().init();
 
     subsystemManager.init();
     autoManager.InitChoices();
