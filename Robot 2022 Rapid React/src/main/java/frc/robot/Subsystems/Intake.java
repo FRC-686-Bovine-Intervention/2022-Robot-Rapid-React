@@ -131,6 +131,7 @@ public class Intake extends Subsystem {
                 setPos(targetPos);
             break;
             case CLIMBING:
+                RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 ArmMotor.set(TalonFXControlMode.PercentOutput, climbingPower);
             break;
                 case CALIBRATING:
@@ -173,6 +174,7 @@ public class Intake extends Subsystem {
     public void disable() {
         ArmMotor.set(TalonFXControlMode.PercentOutput, 0.0);
         RollerMotor.set(VictorSPXControlMode.PercentOutput, 0.0);
+        climbingPower = 0;
         if(disabledInit) disabledTime = Timer.getFPGATimestamp();
         if(Timer.getFPGATimestamp() - disabledTime > kDisableRecalTimeThreshold) calibrated = false;
         disabledInit = false;
