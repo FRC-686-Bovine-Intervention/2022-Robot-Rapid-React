@@ -44,7 +44,7 @@ public class ThreeBallAuto extends AutoMode{
         
         // path2: drive to ball 1
         double ball2of3ApproachHeadingRad = FieldDimensions.ball2of3[DriverStation.getAlliance().ordinal()].sub(FieldDimensions.fenderBackupPos).angle();
-        Vector2d ourBall2of3IntakePos = FieldDimensions.ball2of3[DriverStation.getAlliance().ordinal()].sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, ball2of3ApproachHeadingRad)); 
+        Vector2d ourBall2of3IntakePos = FieldDimensions.ball2of3[DriverStation.getAlliance().ordinal()].sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper+6, ball2of3ApproachHeadingRad)); 
         Path path2 = new Path();
         path2.add(new Waypoint(FieldDimensions.fenderBackupPos, driveOptions));
         path2.add(new Waypoint(ourBall2of3IntakePos, driveOptions));

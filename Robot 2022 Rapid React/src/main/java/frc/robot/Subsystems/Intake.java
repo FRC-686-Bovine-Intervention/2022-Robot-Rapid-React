@@ -26,7 +26,7 @@ public class Intake extends Subsystem {
     private TalonFX ArmMotor;
     private VictorSPX RollerMotor;
     
-    private static final double kOuttakePercentOutput = -0.9;
+    private static final double kOuttakePercentOutput = -1.0;
     private static final double kIntakePercentOutput = 0.7;
 
     TrapezoidProfile.State calState = new TrapezoidProfile.State(ArmPosEnum.CALIBRATION.angleDeg, 0);
@@ -35,8 +35,8 @@ public class Intake extends Subsystem {
 
     private static final double kCalibrationPercentOutput = 0.2;
 
-    private static final double kGroundHoldingThresholdDegrees = 2.0;
-    private static final double kGroundHoldingPercentOutput = -0.10;
+    private static final double kGroundHoldingThresholdDegrees = 4.0;
+    private static final double kGroundHoldingPercentOutput = -0.2;
 
     private static final double kGearRatio = 16.0 * 48.0/12.0;  // 16 in gearbox, 48t:12t sprockets
     private static final double kEncoderUnitsPerRev = 2048 * kGearRatio;
