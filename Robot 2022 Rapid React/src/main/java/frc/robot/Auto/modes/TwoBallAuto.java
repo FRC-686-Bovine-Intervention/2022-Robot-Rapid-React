@@ -3,6 +3,7 @@ package frc.robot.auto.modes;
 import java.util.Arrays;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.auto.AutoManager;
 import frc.robot.auto.AutoModeEndedException;
@@ -40,7 +41,7 @@ public class TwoBallAuto extends AutoMode{
         
         // path1: drive forward to collect one more ball
         Vector2d initialPos = initialPose.getPosition();
-        Vector2d ball2of2IntakePos = FieldDimensions.ball2of2.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, Units.degreesToRadians(-20.0))); 
+        Vector2d ball2of2IntakePos = FieldDimensions.ball2of2[DriverStation.getAlliance().ordinal()].sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, Units.degreesToRadians(-20.0))); 
         Path path1 = new Path();
         path1.add(new Waypoint(initialPos, driveOptions));    // start at tarmac tape
         path1.add(new Waypoint(ball2of2IntakePos, driveOptions));   // stop when front bumpers reach center of ball position
@@ -59,8 +60,8 @@ public class TwoBallAuto extends AutoMode{
         path3.setReverseDirection();
 
         // path4: after backing up and turning towards theirBall, intake theirBall, and shoot it into the hangar
-        double theirBallHeadingRad = FieldDimensions.theirBall.sub(FieldDimensions.fenderBackupPos).angle();
-        Vector2d theirBallIntakePos = FieldDimensions.theirBall.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, theirBallHeadingRad));
+        double theirBallHeadingRad = FieldDimensions.theirBall[DriverStation.getAlliance().ordinal()].sub(FieldDimensions.fenderBackupPos).angle();
+        Vector2d theirBallIntakePos = FieldDimensions.theirBall[DriverStation.getAlliance().ordinal()].sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, theirBallHeadingRad));
         Path path4 = new Path();
         path4.add(new Waypoint(FieldDimensions.fenderBackupPos, driveOptions));
         path4.add(new Waypoint(theirBallIntakePos, driveOptions));
@@ -90,7 +91,7 @@ public class TwoBallAuto extends AutoMode{
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.DEFENSE), new PathFollowerAction(path3))));
         
         // turn and drive  to theirBall, intake
-        double theirBallHeadingDeg = Units.radiansToDegrees(FieldDimensions.theirBall.sub(FieldDimensions.fenderBackupPos).angle());
+        double theirBallHeadingDeg = Units.radiansToDegrees(FieldDimensions.theirBall[DriverStation.getAlliance().ordinal()].sub(FieldDimensions.fenderBackupPos).angle());
         runAction(new TurnToAngleAction(theirBallHeadingDeg));
         runAction(new ParallelAction(Arrays.asList(new SetIntakeAction(IntakeState.INTAKE), new PathFollowerAction(path4))));
 

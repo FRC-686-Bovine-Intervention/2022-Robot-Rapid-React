@@ -3,6 +3,7 @@ package frc.robot.auto.modes;
 import java.util.Arrays;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 import frc.robot.auto.AutoManager;
 import frc.robot.auto.AutoModeEndedException;
@@ -42,15 +43,15 @@ public class ThreeBallAuto extends AutoMode{
         path1.setReverseDirection();
         
         // path2: drive to ball 1
-        double ball2of3ApproachHeadingRad = FieldDimensions.ball2of3.sub(FieldDimensions.fenderBackupPos).angle();
-        Vector2d ourBall2of3IntakePos = FieldDimensions.ball2of3.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper, ball2of3ApproachHeadingRad)); 
+        double ball2of3ApproachHeadingRad = FieldDimensions.ball2of3[DriverStation.getAlliance().ordinal()].sub(FieldDimensions.fenderBackupPos).angle();
+        Vector2d ourBall2of3IntakePos = FieldDimensions.ball2of3[DriverStation.getAlliance().ordinal()].sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper+6, ball2of3ApproachHeadingRad)); 
         Path path2 = new Path();
         path2.add(new Waypoint(FieldDimensions.fenderBackupPos, driveOptions));
         path2.add(new Waypoint(ourBall2of3IntakePos, driveOptions));
 
         // path3: drive to ball 2
-        double ball3of3ApproachHeadingRad = FieldDimensions.ball3of3.sub(ourBall2of3IntakePos).angle();                   //chocolate fudge
-        Vector2d ourBall3of3IntakePos = FieldDimensions.ball3of3.sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper - 12, ball3of3ApproachHeadingRad)); 
+        double ball3of3ApproachHeadingRad = FieldDimensions.ball3of3[DriverStation.getAlliance().ordinal()].sub(ourBall2of3IntakePos).angle();                   //chocolate fudge
+        Vector2d ourBall3of3IntakePos = FieldDimensions.ball3of3[DriverStation.getAlliance().ordinal()].sub(Vector2d.magnitudeAngle(Constants.kCenterToFrontBumper - 12, ball3of3ApproachHeadingRad)); 
         Path path3 = new Path();
         path3.add(new Waypoint(ourBall2of3IntakePos, driveOptions));
         path3.add(new Waypoint(ourBall3of3IntakePos, driveOptions));

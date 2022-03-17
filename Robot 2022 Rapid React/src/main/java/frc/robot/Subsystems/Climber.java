@@ -35,13 +35,17 @@ public class Climber extends Subsystem {
         LeftMotor = new TalonFX(Constants.kLeftClimberID); 
         RightMotor = new TalonFX(Constants.kRightClimberID); 
  
+        LeftMotor.configFactoryDefault();
         LeftMotor.setInverted(TalonFXInvertType.Clockwise); 
         RightMotor.setInverted(TalonFXInvertType.CounterClockwise); 
         
+        RightMotor.configFactoryDefault();
         RightMotor.follow(LeftMotor); 
         
         LeftMotor.configForwardSoftLimitThreshold(degreesToEncoderUnits(26800));
+        LeftMotor.configReverseSoftLimitThreshold(degreesToEncoderUnits(-5000));
         LeftMotor.configForwardSoftLimitEnable(true);
+        LeftMotor.configReverseSoftLimitEnable(true);
 
         calibrated = false; 
         setState(ClimberState.DEFENSE); 
