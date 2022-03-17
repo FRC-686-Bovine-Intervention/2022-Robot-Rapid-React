@@ -69,10 +69,7 @@ public class Intake extends Subsystem {
         pid = new ProfiledPIDController(kP, kI, kD, constraints);
         pid.reset(calState);
 
-        for (IntakeState s : IntakeState.values())
-        {
-            stateChooser.addOption(s.name(), s);
-        }
+        for (IntakeState s : IntakeState.values()) {stateChooser.addOption(s.name(), s);}
     
         calibrated = false;
     }
@@ -80,6 +77,7 @@ public class Intake extends Subsystem {
     public enum ArmPosEnum {
         LOWERED(0),
         RAISED(105),
+        HARD_STOPS(60),
         CALIBRATION(112);
 
         public final double angleDeg;
@@ -95,6 +93,7 @@ public class Intake extends Subsystem {
         OUTTAKE(ArmPosEnum.RAISED),
         OUTTAKE_GROUND(ArmPosEnum.LOWERED),
         CLIMBING(null),
+        HARD_STOPS(ArmPosEnum.HARD_STOPS),
         CALIBRATING(null);
 
         public final ArmPosEnum armPos;
@@ -106,47 +105,49 @@ public class Intake extends Subsystem {
     public void run()
     {
         disabledInit = true;
-        if(autoCalibrate && !calibrated) {setState(IntakeState.CALIBRATING);}
         ArmMotor.configForwardSoftLimitEnable(true);
+        if(autoCalibrate && !calibrated) {setState(IntakeState.CALIBRATING);}
         switch (intakeStatus)
         {
             case DEFENSE: default:
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 setTargetPos(ArmPosEnum.RAISED);
-                setPos(targetPos);
             break;
             case INTAKE:
                 if(isAtPos(ArmPosEnum.LOWERED, 30)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kIntakePercentOutput);}
-                else {setTargetPos(ArmPosEnum.LOWERED);}
-                setPos(targetPos);
+                setTargetPos(ArmPosEnum.LOWERED);
             break;
             case OUTTAKE:
                 if(isAtPos(ArmPosEnum.RAISED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kOuttakePercentOutput);}
-                else {setTargetPos(ArmPosEnum.RAISED);}
-                setPos(targetPos);
+                setTargetPos(ArmPosEnum.RAISED);
             break;
             case OUTTAKE_GROUND:
                 if(isAtPos(ArmPosEnum.LOWERED)) {RollerMotor.set(VictorSPXControlMode.PercentOutput, kOuttakePercentOutput);}
-                else {setTargetPos(ArmPosEnum.LOWERED);}
-                setPos(targetPos);
+                setTargetPos(ArmPosEnum.LOWERED);
             break;
             case CLIMBING:
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 ArmMotor.set(TalonFXControlMode.PercentOutput, climbingPower);
+                pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
+                climbingPower = 0;
+            case HARD_STOPS:
+                RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
+                setTargetPos(ArmPosEnum.HARD_STOPS);
             break;
-                case CALIBRATING:
-                ArmMotor.configForwardSoftLimitEnable(false);
-                if (checkFwdLimitSwitch())
-                {
-                    ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
-                    setState(IntakeState.DEFENSE);
-                    calibrated = true;
-                    break;
-                }
-                calibrated = false;
-                ArmMotor.set(TalonFXControlMode.PercentOutput, kCalibrationPercentOutput);
-                break;
+            case CALIBRATING:
+            ArmMotor.configForwardSoftLimitEnable(false);
+            pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
+            calibrated = false;
+            ArmMotor.set(TalonFXControlMode.PercentOutput, kCalibrationPercentOutput);
+            if (checkFwdLimitSwitch())
+            {
+                ArmMotor.setSelectedSensorPosition(degreesToEncoderUnits(ArmPosEnum.CALIBRATION.angleDeg));
+                calibrated = true;
+                ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
+                setState(IntakeState.DEFENSE);
             }
+            break;
+        }
     }
 
     @Override
@@ -195,7 +196,11 @@ public class Intake extends Subsystem {
 
     public boolean isAtPos(ArmPosEnum pos) {return isAtPos(pos,kAtTargetThresholdDegrees);}
 
-    public void setTargetPos(ArmPosEnum pos) {targetPos = pos;}
+    public void setTargetPos(ArmPosEnum pos)
+    {
+        targetPos = pos;
+        setPos(targetPos);
+    }
 
     private double climbingPower;
     public void setClimbingPower(double armPower)
