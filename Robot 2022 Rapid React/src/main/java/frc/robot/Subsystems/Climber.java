@@ -85,6 +85,7 @@ public class Climber extends Subsystem {
     public ClimberPos targetPos = ClimberPos.RETRACTED; 
     public boolean readyForNextState; 
  
+    private boolean moveToClimbingMode = false;
     @Override 
     public void run() 
     { 
@@ -125,20 +126,23 @@ public class Climber extends Subsystem {
             case SLOW_DRIVE:
                 intake.setState(IntakeState.HARD_STOPS);
                 LeftMotor.set(TalonFXControlMode.PercentOutput,0);
+                moveToClimbingMode = false;
             break;
             case RETRACT_EXTEND:
-                if (isAtPos(ClimberPos.EXTENDED,6))
+                if (!isAtPos(ClimberPos.RETRACTED,12) && moveToClimbingMode)
                 {
                     intake.setState(IntakeState.CLIMBING);
                 }
                 else
                 {
+                    moveToClimbingMode = false;
                     intake.setClimbingPower(0);
                     intake.setState(IntakeState.HARD_STOPS);
                 }
                 LeftMotor.set(TalonFXControlMode.PercentOutput, power);
             break;
             case INTAKE:
+                moveToClimbingMode = true;
                 intake.setState(IntakeState.CLIMBING);
                 intake.setClimbingPower(power * kIntakeMaxPercent);
                 LeftMotor.set(TalonFXControlMode.PercentOutput,0);
