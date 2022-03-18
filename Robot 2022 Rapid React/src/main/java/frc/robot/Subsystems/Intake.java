@@ -77,7 +77,7 @@ public class Intake extends Subsystem {
     public enum ArmPosEnum {
         LOWERED(0),
         RAISED(105),
-        HARD_STOPS(60),
+        HARD_STOPS(55),
         CALIBRATION(112);
 
         public final double angleDeg;
@@ -94,7 +94,7 @@ public class Intake extends Subsystem {
         OUTTAKE_GROUND(ArmPosEnum.LOWERED),
         CLIMBING(null),
         HARD_STOPS(ArmPosEnum.HARD_STOPS),
-        CALIBRATING(null);
+        CALIBRATING(ArmPosEnum.CALIBRATION);
 
         public final ArmPosEnum armPos;
         IntakeState(ArmPosEnum armPos) {this.armPos = armPos;}
@@ -129,23 +129,25 @@ public class Intake extends Subsystem {
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 ArmMotor.set(TalonFXControlMode.PercentOutput, climbingPower);
                 pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
-                climbingPower = 0;
+//DEBUG
+                //climbingPower = 0;
+            break;
             case HARD_STOPS:
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 setTargetPos(ArmPosEnum.HARD_STOPS);
             break;
             case CALIBRATING:
-            ArmMotor.configForwardSoftLimitEnable(false);
-            pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
-            calibrated = false;
-            ArmMotor.set(TalonFXControlMode.PercentOutput, kCalibrationPercentOutput);
-            if (checkFwdLimitSwitch())
-            {
-                ArmMotor.setSelectedSensorPosition(degreesToEncoderUnits(ArmPosEnum.CALIBRATION.angleDeg));
-                calibrated = true;
-                ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
-                setState(IntakeState.DEFENSE);
-            }
+                ArmMotor.configForwardSoftLimitEnable(false);
+                pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
+                calibrated = false;
+                ArmMotor.set(TalonFXControlMode.PercentOutput, kCalibrationPercentOutput);
+                if (checkFwdLimitSwitch())
+                {
+                    ArmMotor.setSelectedSensorPosition(degreesToEncoderUnits(ArmPosEnum.CALIBRATION.angleDeg));
+                    calibrated = true;
+                    ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
+                    setState(IntakeState.DEFENSE);
+                }
             break;
         }
     }
