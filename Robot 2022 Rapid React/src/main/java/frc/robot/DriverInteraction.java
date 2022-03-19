@@ -44,7 +44,7 @@ public class DriverInteraction {
     private RisingEdgeDetector climbEdgeDetector = new RisingEdgeDetector(); 
      
     public void init() {
-        climber.setState(ClimberState.DEFENSE);
+        climber.resetState();
     }
  
     public void run() 

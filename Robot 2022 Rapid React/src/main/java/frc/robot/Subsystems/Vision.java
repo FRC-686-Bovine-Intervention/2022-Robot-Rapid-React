@@ -9,11 +9,6 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.CvSink;
 import edu.wpi.first.cscore.CvSource;
 import edu.wpi.first.cscore.UsbCamera;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class Vision {
     private static Vision instance; 
@@ -31,11 +26,6 @@ public class Vision {
               // Set the resolution
               limelight.setResolution(320, 240);
               driverCamera.setResolution(320, 240);
-
-              Map<String,Object> cameraProperties = new HashMap<String,Object>();
-              cameraProperties.put("Show controls", false);
-
-              Shuffleboard.getTab("Intake").add("camera", driverCamera).withPosition(2,0).withSize(6,5).withWidget(BuiltInWidgets.kCameraStream).withProperties(cameraProperties);
 
               // Get a CvSink. This will capture Mats from the camera
               CvSink cvSink = CameraServer.getVideo();
