@@ -154,8 +154,8 @@ public class Climber extends Subsystem {
                 if (LeftMotor.getStatorCurrent() > kCalibratingThreshold)  
                 {
                     LeftMotor.setSelectedSensorPosition(inchesToEncoderUnits(ClimberPos.CALIBRATION.distIn));
-                    calibrated = true;  
-                    prevState();  
+                    resetState();
+                    calibrated = true;
                     LeftMotor.set(TalonFXControlMode.PercentOutput, 0);  
                 }  
             break;
@@ -287,7 +287,14 @@ private double power;
         {  
             climberStatus = ClimberState.DEFENSE;  
         }  
-    }  
+    } 
+
+    public void resetState()
+    {
+        ClimberStatusHistory.clear();
+        ClimberStatusHistory.add(ClimberState.DEFENSE);  
+        climberStatus = ClimberState.DEFENSE;  
+    }
       
     public void setState(ClimberState newState)  
     {  
