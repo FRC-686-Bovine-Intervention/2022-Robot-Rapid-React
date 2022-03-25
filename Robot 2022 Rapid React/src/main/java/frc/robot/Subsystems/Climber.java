@@ -43,11 +43,12 @@ public class Climber extends Subsystem {
         RightMotor = new TalonFX(Constants.kRightClimberID); 
  
         
-        LeftMotor.configFactoryDefault(); 
+        LeftMotor.configFactoryDefault();
+        LeftMotor.configOpenloopRamp(0.75);
         LeftMotor.setInverted(TalonFXInvertType.Clockwise);  
         LeftMotor.configForwardSoftLimitThreshold(inchesToEncoderUnits(ClimberPos.EXTENDED.distIn)); 
         LeftMotor.configForwardSoftLimitEnable(true); 
-        LeftMotor.configReverseSoftLimitThreshold(inchesToEncoderUnits(-6));
+        LeftMotor.configReverseSoftLimitThreshold(inchesToEncoderUnits(-3));
         LeftMotor.configReverseSoftLimitEnable(true);
         
         RightMotor.configFactoryDefault();
@@ -91,6 +92,7 @@ public class Climber extends Subsystem {
     { 
         disabledInit = true; 
         if(autoCalibrate && !calibrated) setState(ClimberState.CALIBRATING);
+        LeftMotor.configForwardSoftLimitEnable(true);
         LeftMotor.configReverseSoftLimitEnable(true);
         // switch (climberStatus)  
         // {  
@@ -215,6 +217,7 @@ private double power;
     private NetworkTableEntry calibratedEntry = tab.add("Calibrated", false).withWidget(BuiltInWidgets.kBooleanBox).getEntry();  
     private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();  
     private NetworkTableEntry statusEntry = tab.add("Status", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();  
+    private NetworkTableEntry historyEntry = tab.add("Status History", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();  
     private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry(); 
     private NetworkTableEntry climberCurrentPosEntry = tab.add("Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry(); 
 
@@ -226,11 +229,13 @@ private double power;
       
     @Override  
     public void updateShuffleboard()  
-    {  
+    {
         statusEntry.setString(climberStatus.name()); 
         climberCurrentPosEntry.setNumber(encoderUnitsToInches(LeftMotor.getSelectedSensorPosition())); 
         calibratedEntry.setBoolean(calibrated);  
         Enabled = enableEntry.getBoolean(true);  
+
+        historyEntry.setString(ClimberStatusHistory.toString());
         
         lowbarEntry.setBoolean(false);
         extendGroundEntry.setBoolean(false);
@@ -280,12 +285,12 @@ private double power;
     {  
         try  
         {  
-            climberStatus = ClimberStatusHistory.get(ClimberStatusHistory.size()-1);  
             ClimberStatusHistory.remove(ClimberStatusHistory.size()-1);  
+            climberStatus = ClimberStatusHistory.get(ClimberStatusHistory.size()-1);  
         }  
         catch (IndexOutOfBoundsException exception)  
         {  
-            climberStatus = ClimberState.DEFENSE;  
+            resetState();
         }  
     } 
 

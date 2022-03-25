@@ -177,6 +177,7 @@ public class Intake extends Subsystem {
     public void disable() {
         ArmMotor.set(TalonFXControlMode.PercentOutput, 0.0);
         RollerMotor.set(VictorSPXControlMode.PercentOutput, 0.0);
+        pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
         climbingPower = 0;
         if(disabledInit) disabledTime = Timer.getFPGATimestamp();
         if(Timer.getFPGATimestamp() - disabledTime > kDisableRecalTimeThreshold) calibrated = false;

@@ -39,7 +39,7 @@ public class FieldDimensions
                                     twoBallAutoInitialHeadingRad);
     
     // Ball Positions
-    public static final Vector2d redBall2of2  = new Vector2d(114, -34);   // near hangar
+    public static final Vector2d redBall2of2  = new Vector2d(115.5, -34);   // near hangar
     public static final Vector2d blueBall2of2  = new Vector2d(116, -29);   // near hangar
     public static Vector2d[] ball2of2  = new Vector2d[]{redBall2of2, blueBall2of2};
     public static final Vector2d redTheirBall = new Vector2d(91, -87);    // left wall

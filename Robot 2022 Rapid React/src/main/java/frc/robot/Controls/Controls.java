@@ -40,9 +40,9 @@ public class Controls {
     public enum ButtonControlEnum {
         INTAKE,
         OUTTAKE,
-        CLIMBERNEXTSTAGE,
-        CLIMBERPREVSTAGE,
-        CLIMBERFORCESTATE
+        CLIMBER_NEXT_STATE,
+        CLIMBER_PREV_STATE,
+        CLIMBER_RESET_STATE
     }
     
     public boolean getButton(ButtonControlEnum button)
@@ -51,9 +51,9 @@ public class Controls {
         {
             case INTAKE:                    return thrustmaster.getRawButton(Thrustmaster.kTriggerButton);
             case OUTTAKE:                   return thrustmaster.getRawButton(Thrustmaster.kBottomThumbButton);
-            case CLIMBERNEXTSTAGE:          return thrustmaster.getRawButton(Thrustmaster.kTopButton3);
-            case CLIMBERPREVSTAGE:          return thrustmaster.getRawButton(Thrustmaster.kTopButton2);
-            case CLIMBERFORCESTATE:         return thrustmaster.getRawButton(Thrustmaster.kBottomButton1) && thrustmaster.getRawButton(Thrustmaster.kBottomButton2) && thrustmaster.getRawButton(Thrustmaster.kBottomButton3);
+            case CLIMBER_NEXT_STATE:          return thrustmaster.getRawButton(Thrustmaster.kTopButton3);
+            case CLIMBER_PREV_STATE:          return thrustmaster.getRawButton(Thrustmaster.kTopButton2);
+            case CLIMBER_RESET_STATE:         return thrustmaster.getRawButton(Thrustmaster.kBottomButton1) && thrustmaster.getRawButton(Thrustmaster.kBottomButton2) && thrustmaster.getRawButton(Thrustmaster.kBottomButton3);
             default:                        return false;
         }
     }

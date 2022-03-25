@@ -12,7 +12,6 @@ import frc.robot.lib.util.RisingEdgeDetector;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Climber.ClimberState;
 import frc.robot.subsystems.Intake.IntakeState; 
  
 public class DriverInteraction { 
@@ -41,7 +40,8 @@ public class DriverInteraction {
         }*/ 
     } 
  
-    private RisingEdgeDetector climbEdgeDetector = new RisingEdgeDetector(); 
+    private RisingEdgeDetector climberNextEdgeDetector = new RisingEdgeDetector(); 
+    private RisingEdgeDetector climberPrevEdgeDetector = new RisingEdgeDetector(); 
      
     public void init() {
         climber.resetState();
@@ -49,14 +49,19 @@ public class DriverInteraction {
  
     public void run() 
     { 
-        climbEdgeDetector.update(controls.getButton(ButtonControlEnum.CLIMBERNEXTSTAGE)); 
-        if(climbEdgeDetector.get())
+        climberNextEdgeDetector.update(controls.getButton(ButtonControlEnum.CLIMBER_NEXT_STATE)); 
+        climberPrevEdgeDetector.update(controls.getButton(ButtonControlEnum.CLIMBER_PREV_STATE)); 
+        if(climberNextEdgeDetector.get())
         {
             climber.nextState();
         }
-        if (controls.getButton(ButtonControlEnum.CLIMBERPREVSTAGE))
+        if (climberPrevEdgeDetector.get())
         {
-            climber.setState(ClimberState.DEFENSE);
+            climber.prevState();
+        }
+        if (controls.getButton(ButtonControlEnum.CLIMBER_RESET_STATE))
+        {
+            climber.resetState();
         }
         switch(climber.climberStatus)
         {
