@@ -217,6 +217,7 @@ private double power;
     private NetworkTableEntry calibratedEntry = tab.add("Calibrated", false).withWidget(BuiltInWidgets.kBooleanBox).getEntry();  
     private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();  
     private NetworkTableEntry statusEntry = tab.add("Status", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();  
+    private NetworkTableEntry historyEntry = tab.add("Status History", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();  
     private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry(); 
     private NetworkTableEntry climberCurrentPosEntry = tab.add("Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry(); 
 
@@ -228,11 +229,13 @@ private double power;
       
     @Override  
     public void updateShuffleboard()  
-    {  
+    {
         statusEntry.setString(climberStatus.name()); 
         climberCurrentPosEntry.setNumber(encoderUnitsToInches(LeftMotor.getSelectedSensorPosition())); 
         calibratedEntry.setBoolean(calibrated);  
         Enabled = enableEntry.getBoolean(true);  
+
+        historyEntry.setString(ClimberStatusHistory.toString());
         
         lowbarEntry.setBoolean(false);
         extendGroundEntry.setBoolean(false);
@@ -282,12 +285,12 @@ private double power;
     {  
         try  
         {  
-            climberStatus = ClimberStatusHistory.get(ClimberStatusHistory.size()-1);  
             ClimberStatusHistory.remove(ClimberStatusHistory.size()-1);  
+            climberStatus = ClimberStatusHistory.get(ClimberStatusHistory.size()-1);  
         }  
         catch (IndexOutOfBoundsException exception)  
         {  
-            climberStatus = ClimberState.DEFENSE;  
+            resetState();
         }  
     } 
 
