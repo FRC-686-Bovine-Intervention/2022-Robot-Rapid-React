@@ -126,7 +126,7 @@ public class Climber extends Subsystem {
                 LeftMotor.set(TalonFXControlMode.PercentOutput, power);
             break;
             case SLOW_DRIVE:
-                intake.setState(IntakeState.HARD_STOPS);
+                intake.setState(IntakeState.MID_BAR);
                 LeftMotor.set(TalonFXControlMode.PercentOutput,0);
                 moveToClimbingMode = false;
             break;
@@ -139,7 +139,14 @@ public class Climber extends Subsystem {
                 {
                     moveToClimbingMode = false;
                     intake.setClimbingPower(0);
-                    intake.setState(IntakeState.HARD_STOPS);
+                    if (intake.intakeStatus == IntakeState.MID_BAR && !isAtPos(ClimberPos.RETRACTED,12))
+                    {
+                        intake.setState(IntakeState.MID_BAR);
+                    }
+                    else
+                    {
+                        intake.setState(IntakeState.HARD_STOPS);
+                    }
                 }
                 LeftMotor.set(TalonFXControlMode.PercentOutput, power);
             break;
