@@ -25,7 +25,7 @@ public class Climber extends Subsystem {
     private Intake intake; 
  
     private static final double kDefensePower = -0.07;
-    private static final double kCalibratingPercent = -0.15;
+    private static final double kCalibratingPercent = -0.2;
     private static final double kCalibratingThreshold = 20; 
     private static final double kDisableRecalTimeThreshold = 5;
 
@@ -48,7 +48,7 @@ public class Climber extends Subsystem {
         LeftMotor.setInverted(TalonFXInvertType.Clockwise);  
         LeftMotor.configForwardSoftLimitThreshold(inchesToEncoderUnits(ClimberPos.EXTENDED.distIn)); 
         LeftMotor.configForwardSoftLimitEnable(true); 
-        LeftMotor.configReverseSoftLimitThreshold(inchesToEncoderUnits(-3));
+        LeftMotor.configReverseSoftLimitThreshold(inchesToEncoderUnits(-1.5));
         LeftMotor.configReverseSoftLimitEnable(true);
         
         RightMotor.configFactoryDefault();
