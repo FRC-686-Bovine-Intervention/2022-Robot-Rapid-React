@@ -78,7 +78,6 @@ public class Intake extends Subsystem {
         LOWERED(0),
         RAISED(105),
         HARD_STOPS(55),
-        MID_BAR(70),
         CALIBRATION(112);
 
         public final double angleDeg;
@@ -95,7 +94,6 @@ public class Intake extends Subsystem {
         OUTTAKE_GROUND(ArmPosEnum.LOWERED),
         CLIMBING(null),
         HARD_STOPS(ArmPosEnum.HARD_STOPS),
-        MID_BAR(ArmPosEnum.MID_BAR),
         CALIBRATING(ArmPosEnum.CALIBRATION);
 
         public final ArmPosEnum armPos;
@@ -131,16 +129,10 @@ public class Intake extends Subsystem {
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 ArmMotor.set(TalonFXControlMode.PercentOutput, climbingPower);
                 pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
-//DEBUG
-                //climbingPower = 0;
             break;
             case HARD_STOPS:
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 setTargetPos(ArmPosEnum.HARD_STOPS);
-            break;
-            case MID_BAR:
-                RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
-                setTargetPos(ArmPosEnum.MID_BAR);
             break;
             case CALIBRATING:
                 ArmMotor.configForwardSoftLimitEnable(false);

@@ -48,7 +48,7 @@ public class Climber extends Subsystem {
         LeftMotor.setInverted(TalonFXInvertType.Clockwise);  
         LeftMotor.configForwardSoftLimitThreshold(inchesToEncoderUnits(ClimberPos.EXTENDED.distIn)); 
         LeftMotor.configForwardSoftLimitEnable(true); 
-        LeftMotor.configReverseSoftLimitThreshold(inchesToEncoderUnits(-1.5));
+        LeftMotor.configReverseSoftLimitThreshold(inchesToEncoderUnits(-3));
         LeftMotor.configReverseSoftLimitEnable(true);
         
         RightMotor.configFactoryDefault();
@@ -65,7 +65,7 @@ public class Climber extends Subsystem {
         LOW_BAR(ClimberPos.RETRACTED),
         EXTEND_GROUND(ClimberPos.EXTENDED),
         SLOW_DRIVE(ClimberPos.EXTENDED),
-        RETRACT_EXTEND(null),
+        RETRACT_EXTEND(ClimberPos.EXTENDED),
         INTAKE(ClimberPos.EXTENDED),
         CALIBRATING(ClimberPos.CALIBRATION);
  
@@ -126,7 +126,7 @@ public class Climber extends Subsystem {
                 LeftMotor.set(TalonFXControlMode.PercentOutput, power);
             break;
             case SLOW_DRIVE:
-                intake.setState(IntakeState.MID_BAR);
+                intake.setState(IntakeState.HARD_STOPS);
                 LeftMotor.set(TalonFXControlMode.PercentOutput,0);
                 moveToClimbingMode = false;
             break;
@@ -139,14 +139,7 @@ public class Climber extends Subsystem {
                 {
                     moveToClimbingMode = false;
                     intake.setClimbingPower(0);
-                    if (intake.intakeStatus == IntakeState.MID_BAR && !isAtPos(ClimberPos.RETRACTED,12))
-                    {
-                        intake.setState(IntakeState.MID_BAR);
-                    }
-                    else
-                    {
-                        intake.setState(IntakeState.HARD_STOPS);
-                    }
+                    intake.setState(IntakeState.HARD_STOPS);
                 }
                 LeftMotor.set(TalonFXControlMode.PercentOutput, power);
             break;
@@ -221,28 +214,39 @@ private double power;
     private static double encoderUnitsToInches(double _encoderUnits) {return (double)(_encoderUnits / kEncoderUnitsPerIn);} 
   
     private ShuffleboardTab tab = Shuffleboard.getTab("Climber");  
-    private NetworkTableEntry calibratedEntry = tab.add("Calibrated", false).withWidget(BuiltInWidgets.kBooleanBox).getEntry();  
-    private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();  
-    private NetworkTableEntry statusEntry = tab.add("Status", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();  
-    private NetworkTableEntry historyEntry = tab.add("Status History", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();  
-    private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry(); 
-    private NetworkTableEntry climberCurrentPosEntry = tab.add("Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry(); 
+    private NetworkTableEntry statusEntry = tab.add("Status", "not updating").withWidget(BuiltInWidgets.kTextView)              .withPosition(0,0).withSize(2,1).getEntry();  
+    private NetworkTableEntry historyEntry = tab.add("Status History", "not updating").withWidget(BuiltInWidgets.kTextView)     .withPosition(3,1).withSize(4,1).getEntry();  
+    private NetworkTableEntry targetPosEntry = tab.add("Target Pos", "not updating").withWidget(BuiltInWidgets.kTextView)       .withPosition(0,1).getEntry();  
+    private NetworkTableEntry calibratedEntry = tab.add("Calibrated", false).withWidget(BuiltInWidgets.kBooleanBox)             .withPosition(1,1).getEntry();
 
-    private NetworkTableEntry lowbarEntry           = tab.add("Low Bar", false)         .withWidget(BuiltInWidgets.kBooleanBox).withPosition(0, 3).getEntry();
-    private NetworkTableEntry extendGroundEntry     = tab.add("Extend Ground", false)   .withWidget(BuiltInWidgets.kBooleanBox).withPosition(1, 3).getEntry();
-    private NetworkTableEntry slowDriveEntry        = tab.add("Slow Drive", false)      .withWidget(BuiltInWidgets.kBooleanBox).withPosition(2, 3).getEntry();
-    private NetworkTableEntry retractExtendEntry    = tab.add("Retract|Extend", false)  .withWidget(BuiltInWidgets.kBooleanBox).withPosition(3, 3).getEntry();
-    private NetworkTableEntry intakeEntry           = tab.add("Intake", false)          .withWidget(BuiltInWidgets.kBooleanBox).withPosition(4, 3).getEntry();
+    private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch)                    .withPosition(0,3).getEntry(); 
+    private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton)            .withPosition(1,3).getEntry();
+
+    private NetworkTableEntry climberCurrentPosEntry = tab.add("Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry(); 
+    private NetworkTableEntry climberCurrentEntry = tab.add("Current", -9999).withWidget(BuiltInWidgets.kTextView)              .withPosition(8,0).getEntry(); 
+    private NetworkTableEntry climbingPowerInput = tab.add("Power Input", -9999).withWidget(BuiltInWidgets.kTextView)           .withPosition(8,1).getEntry(); 
+    private NetworkTableEntry climberRawEncoder = tab.add("Raw Encoder Units", -9999).withWidget(BuiltInWidgets.kTextView)      .withPosition(9,1).getEntry(); 
+
+    private NetworkTableEntry lowbarEntry           = tab.add("Low Bar", false)         .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(3,2).getEntry();
+    private NetworkTableEntry extendGroundEntry     = tab.add("Extend Ground", false)   .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(4,2).getEntry();
+    private NetworkTableEntry slowDriveEntry        = tab.add("Slow Drive", false)      .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(5,2).getEntry();
+    private NetworkTableEntry retractExtendEntry    = tab.add("Retract|Extend", false)  .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(6,2).getEntry();
+    private NetworkTableEntry intakeEntry           = tab.add("Intake", false)          .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(3,3).withSize(4,1).getEntry();
       
     @Override  
     public void updateShuffleboard()  
     {
         statusEntry.setString(climberStatus.name()); 
-        climberCurrentPosEntry.setNumber(encoderUnitsToInches(LeftMotor.getSelectedSensorPosition())); 
-        calibratedEntry.setBoolean(calibrated);  
-        Enabled = enableEntry.getBoolean(true);  
-
         historyEntry.setString(ClimberStatusHistory.toString());
+        calibratedEntry.setBoolean(calibrated);
+        targetPosEntry.setString(climberStatus.pos.name());
+
+        Enabled = enableEntry.getBoolean(true);
+        
+        climberCurrentPosEntry.setNumber(encoderUnitsToInches(LeftMotor.getSelectedSensorPosition()));
+        climberCurrentEntry.setNumber(LeftMotor.getStatorCurrent());
+        climbingPowerInput.setNumber(power);
+        climberRawEncoder.setNumber(LeftMotor.getSelectedSensorPosition());
         
         lowbarEntry.setBoolean(false);
         extendGroundEntry.setBoolean(false);
