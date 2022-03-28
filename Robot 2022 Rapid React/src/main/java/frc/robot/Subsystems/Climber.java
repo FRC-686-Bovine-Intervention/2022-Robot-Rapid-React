@@ -223,9 +223,9 @@ private double power;
     private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton)            .withPosition(1,3).getEntry();
 
     private NetworkTableEntry climberCurrentPosEntry = tab.add("Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry(); 
-    private NetworkTableEntry climberCurrentEntry = tab.add("Current", -9999).withWidget(BuiltInWidgets.kTextView)              .withPosition(8,0).getEntry(); 
-    private NetworkTableEntry climbingPowerInput = tab.add("Power Input", -9999).withWidget(BuiltInWidgets.kTextView)           .withPosition(8,1).getEntry(); 
-    private NetworkTableEntry climberRawEncoder = tab.add("Raw Encoder Units", -9999).withWidget(BuiltInWidgets.kTextView)      .withPosition(9,1).getEntry(); 
+    private NetworkTableEntry climberStatorEntry = tab.add("Stator Current", -9999).withWidget(BuiltInWidgets.kTextView)              .withPosition(8,0).getEntry(); 
+    private NetworkTableEntry climberSupplyEntry = tab.add("Supply Current", -9999).withWidget(BuiltInWidgets.kTextView)      .withPosition(8,1).getEntry(); 
+    private NetworkTableEntry climbingPowerInput = tab.add("Power Input", -9999).withWidget(BuiltInWidgets.kTextView)           .withPosition(9,1).getEntry(); 
 
     private NetworkTableEntry lowbarEntry           = tab.add("Low Bar", false)         .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(3,2).getEntry();
     private NetworkTableEntry extendGroundEntry     = tab.add("Extend Ground", false)   .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(4,2).getEntry();
@@ -244,9 +244,9 @@ private double power;
         Enabled = enableEntry.getBoolean(true);
         
         climberCurrentPosEntry.setNumber(encoderUnitsToInches(LeftMotor.getSelectedSensorPosition()));
-        climberCurrentEntry.setNumber(LeftMotor.getStatorCurrent());
+        climberStatorEntry.setNumber(LeftMotor.getStatorCurrent());
         climbingPowerInput.setNumber(power);
-        climberRawEncoder.setNumber(LeftMotor.getSelectedSensorPosition());
+        climberSupplyEntry.setNumber(LeftMotor.getSupplyCurrent());
         
         lowbarEntry.setBoolean(false);
         extendGroundEntry.setBoolean(false);
