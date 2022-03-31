@@ -49,7 +49,7 @@ public class Climber extends Subsystem {
         
         LeftMotor.configFactoryDefault();
         LeftMotor.configOpenloopRamp(0.75);
-        LeftMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 50, 60, 0.25));
+        //LeftMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 50, 60, 0.25));
         LeftMotor.setInverted(TalonFXInvertType.Clockwise);
         LeftMotor.configForwardSoftLimitThreshold(inchesToEncoderUnits(ClimberPos.EXTENDED.distIn));
         LeftMotor.configForwardSoftLimitEnable(true);
