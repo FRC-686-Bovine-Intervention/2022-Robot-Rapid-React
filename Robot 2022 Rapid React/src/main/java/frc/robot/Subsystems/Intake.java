@@ -106,6 +106,7 @@ public class Intake extends Subsystem {
     {
         disabledInit = true;
         ArmMotor.configForwardSoftLimitEnable(true);
+        ArmMotor.setNeutralMode(NeutralMode.Brake);
         if(autoCalibrate && !calibrated) {setState(IntakeState.CALIBRATING);}
         switch (intakeStatus)
         {
@@ -178,7 +179,11 @@ public class Intake extends Subsystem {
         pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
         climbingPower = 0;
         if(disabledInit) disabledTime = Timer.getFPGATimestamp();
-        if(Timer.getFPGATimestamp() - disabledTime > kDisableRecalTimeThreshold) calibrated = false;
+        if(Timer.getFPGATimestamp() - disabledTime > kDisableRecalTimeThreshold)
+        {
+            calibrated = false;
+            ArmMotor.setNeutralMode(NeutralMode.Coast);
+        }
         disabledInit = false;
     }
 

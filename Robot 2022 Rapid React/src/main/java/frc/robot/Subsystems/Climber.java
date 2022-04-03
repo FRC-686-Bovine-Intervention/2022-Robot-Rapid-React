@@ -217,12 +217,12 @@ private double power;
     private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch)                    .withPosition(0,3).getEntry(); 
     private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton)            .withPosition(1,3).getEntry();
 
-    private NetworkTableEntry climberStatorEntry = tab.add("Stator Current", -9999).withWidget(BuiltInWidgets.kTextView)        .withPosition(8,0).getEntry(); 
-    private NetworkTableEntry climberOutputVoltageEntry = tab.add("Output Voltage", -9999).withWidget(BuiltInWidgets.kTextView) .withPosition(8,2).getEntry(); 
-    private NetworkTableEntry climberBusVoltageEntry = tab.add("Bus Voltage", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(8,3).getEntry(); 
-    private NetworkTableEntry climberSupplyEntry = tab.add("Supply Current", -9999).withWidget(BuiltInWidgets.kTextView)        .withPosition(8,1).getEntry(); 
+    private NetworkTableEntry climbingPowerInput = tab.add("Power Input", -9999).withWidget(BuiltInWidgets.kTextView)           .withPosition(8,0).getEntry(); 
     private NetworkTableEntry climberCurrentPosEntry = tab.add("Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry(); 
-    private NetworkTableEntry climbingPowerInput = tab.add("Power Input", -9999).withWidget(BuiltInWidgets.kTextView)           .withPosition(9,1).getEntry(); 
+    private NetworkTableEntry climberSupplyEntry = tab.add("Supply Current", -9999).withWidget(BuiltInWidgets.kTextView)        .withPosition(8,1).getEntry(); 
+    private NetworkTableEntry climberStatorEntry = tab.add("Stator Current", -9999).withWidget(BuiltInWidgets.kTextView)        .withPosition(9,1).getEntry(); 
+    private NetworkTableEntry climberBusVoltageEntry = tab.add("Bus Voltage", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(8,2).getEntry(); 
+    private NetworkTableEntry climberOutputVoltageEntry = tab.add("Output Voltage", -9999).withWidget(BuiltInWidgets.kTextView) .withPosition(9,2).getEntry(); 
 
     private NetworkTableEntry lowbarEntry           = tab.add("Low Bar", false)         .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(3,2).getEntry();
     private NetworkTableEntry extendGroundEntry     = tab.add("Extend Ground", false)   .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(4,2).getEntry();
@@ -280,6 +280,7 @@ private double power;
     } 
     public void nextState() 
     { 
+        calibrationPaused = false;
         switch(climberStatus) 
         { 
             case DEFENSE:           setState(ClimberState.LOW_BAR);         break;
