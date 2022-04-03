@@ -36,7 +36,7 @@ public class Intake extends Subsystem {
     private static final double kCalibrationPercentOutput = 0.2;
 
     private static final double kGroundHoldingThresholdDegrees = 4.0;
-    private static final double kGroundHoldingPercentOutput = -0.2;
+    private static final double kGroundHoldingPercentOutput = -0.25;
 
     private static final double kGearRatio = 16.0 * 48.0/12.0;  // 16 in gearbox, 48t:12t sprockets
     private static final double kEncoderUnitsPerRev = 2048 * kGearRatio;
