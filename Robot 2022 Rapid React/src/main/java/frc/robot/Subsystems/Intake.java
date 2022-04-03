@@ -17,6 +17,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.Constants;
+import frc.robot.command_status.GoalStates;
+import frc.robot.command_status.GoalStates.GoalState;
+import frc.robot.vision.VisionLoop;
+import frc.robot.vision.VisionTargetList;
 
 /**<h4>Contains all code for the Intake subsystem</h4>*/
 public class Intake extends Subsystem {
@@ -255,26 +259,61 @@ public class Intake extends Subsystem {
     private NetworkTableEntry statusEntry = tab.add("Status", "not updating what").withWidget(BuiltInWidgets.kTextView)         .withPosition(0,0).withSize(2,1).getEntry();
     private NetworkTableEntry armposEntry = tab.add("Arm position", "not updating what").withWidget(BuiltInWidgets.kTextView)   .withPosition(0,1).getEntry();
     private NetworkTableEntry calibratedEntry = tab.add("Calibrated", false).withWidget(BuiltInWidgets.kBooleanBox)             .withPosition(1,1).getEntry();
+
     private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton)            .withPosition(1,3).getEntry();
     private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch)                    .withPosition(0,3).getEntry();
     private SendableChooser<IntakeState> stateChooser = new SendableChooser<>();
     private ComplexWidget wig = tab.add("State Chooser", stateChooser)                                                          .withPosition(0,4).withSize(2,1);
+
     private NetworkTableEntry armCurrentEntry = tab.add("Arm Current", -9999).withWidget(BuiltInWidgets.kTextView)              .withPosition(8,0).getEntry();
     private NetworkTableEntry armCurrentPosEntry = tab.add("Arm Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry();
     private NetworkTableEntry armPIDOutputEntry = tab.add("Arm PID Output", -9999).withWidget(BuiltInWidgets.kTextView)         .withPosition(8,1).getEntry();
     private NetworkTableEntry armGoalEntry = tab.add("Arm PID Goal", -9999).withWidget(BuiltInWidgets.kTextView)                .withPosition(9,1).getEntry();
 
+    private NetworkTableEntry cameraTargetYaw = tab.add("Target Yaw", -9999).withWidget(BuiltInWidgets.kTextView)               .withPosition(8,3).getEntry();
+    private NetworkTableEntry cameraTargetPitch = tab.add("Target Pitch", -9999).withWidget(BuiltInWidgets.kTextView)           .withPosition(9,3).getEntry();
+    private NetworkTableEntry goalDistance = tab.add("Goal Distance", -9999).withWidget(BuiltInWidgets.kTextView)               .withPosition(8,4).getEntry();
+    private NetworkTableEntry goalBearing = tab.add("Goal Relative Bearing", -9999).withWidget(BuiltInWidgets.kTextView)        .withPosition(9,4).getEntry();
+    private NetworkTableEntry goalTime = tab.add("Goal Time", -9999).withWidget(BuiltInWidgets.kTextView)                       .withPosition(8,2).getEntry();
+    
     @Override
     public void updateShuffleboard()
     {
+        statusEntry.setString(intakeStatus.name());
+        armposEntry.setString(targetPos.name());
+        calibratedEntry.setBoolean(calibrated);
+
+        Enabled = enableEntry.getBoolean(true);
+        enableEntry.setBoolean(Enabled);
+
         armCurrentEntry.setDouble(ArmMotor.getStatorCurrent());
         armPIDOutputEntry.setDouble(pidOutput);
         armCurrentPosEntry.setDouble(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
         armGoalEntry.setDouble(pid.getGoal().position);
-        Enabled = enableEntry.getBoolean(true);
-        enableEntry.setBoolean(Enabled);
-        statusEntry.setString(intakeStatus.name());
-        armposEntry.setString(targetPos.name());
-        calibratedEntry.setBoolean(calibrated);
+
+        if (!VisionTargetList.getInstance().getTargets().isEmpty())
+        {
+            // cameraTargetYaw.setDouble(VisionTargetList.getInstance().getTargets().get(0).getHorizontalAngle());
+            // cameraTargetPitch.setDouble(VisionTargetList.getInstance().getTargets().get(0).getVerticalAngle());
+            cameraTargetYaw.setDouble(VisionLoop.getInstance().ballCamera.getLatestResult().getBestTarget().getYaw());
+            cameraTargetPitch.setDouble(VisionLoop.getInstance().ballCamera.getLatestResult().getBestTarget().getPitch());
+        }
+        else
+        {
+            cameraTargetYaw.setDouble(-8888);
+            cameraTargetPitch.setDouble(-8888);
+        }
+        if (!GoalStates.getInstance().getBestVisionTarget().isEmpty())
+        {
+            goalDistance.setDouble(GoalStates.getInstance().getBestVisionTarget().get().getHorizontalDistance());
+            goalBearing.setDouble(GoalStates.getInstance().getBestVisionTarget().get().getRelativeBearing());
+            goalTime.setDouble(GoalStates.getInstance().getBestVisionTarget().get().getTrackTime());
+        }
+        else
+        {
+            goalDistance.setDouble(-8888);
+            goalBearing.setDouble(-8888);
+            goalTime.setDouble(-8888);
+        }
     }
 }

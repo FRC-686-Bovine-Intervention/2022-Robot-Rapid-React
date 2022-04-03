@@ -12,7 +12,8 @@ import frc.robot.lib.util.RisingEdgeDetector;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Intake.IntakeState; 
+import frc.robot.subsystems.Intake.IntakeState;
+import frc.robot.vision.VisionDriveAssistant; 
  
 public class DriverInteraction { 
     private static DriverInteraction instance; 
@@ -49,6 +50,7 @@ public class DriverInteraction {
  
     public void run() 
     { 
+        DriveCommand driveCommand = DriveCommand.COAST();
         climberNextEdgeDetector.update(controls.getButton(ButtonControlEnum.CLIMBER_NEXT_STATE)); 
         climberPrevEdgeDetector.update(controls.getButton(ButtonControlEnum.CLIMBER_PREV_STATE)); 
         if(climberNextEdgeDetector.get())
@@ -84,14 +86,14 @@ public class DriverInteraction {
                 { 
                     intake.setState(IntakeState.DEFENSE); 
                 }
-                drive.setOpenLoop(controls.getDriveCommand());
+                driveCommand = VisionDriveAssistant.getInstance().assist(controls.getDriveCommand(), controls.getButton(ButtonControlEnum.VISION_ASSIST) && intake.intakeStatus == IntakeState.INTAKE);
             break;
             case LOW_BAR:
-                drive.setOpenLoop(controls.getDriveCommand());
+                driveCommand = controls.getDriveCommand();
                 Shuffleboard.selectTab("Climber");
             break;
             case SLOW_DRIVE:
-                drive.setOpenLoop(new DriveCommand(DriveControlMode.OPEN_LOOP, controls.getDriveCommand().getLeftMotor()*kClimbingDriveSlowdown, controls.getDriveCommand().getRightMotor()*kClimbingDriveSlowdown, NeutralMode.Coast));
+                driveCommand = new DriveCommand(DriveControlMode.OPEN_LOOP, controls.getDriveCommand().getLeftMotor()*kClimbingDriveSlowdown, controls.getDriveCommand().getRightMotor()*kClimbingDriveSlowdown, NeutralMode.Coast);
                 Shuffleboard.selectTab("Climber");
             break;
             default:
@@ -99,5 +101,6 @@ public class DriverInteraction {
                 climber.setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*kClimberMaxPercent);
             break;
         }
+        drive.setOpenLoop(driveCommand);
     } 
 } 

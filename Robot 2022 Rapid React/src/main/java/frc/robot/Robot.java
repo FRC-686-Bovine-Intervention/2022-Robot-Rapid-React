@@ -11,11 +11,13 @@ import frc.robot.auto.AutoManager;
 import frc.robot.command_status.DriveState;
 import frc.robot.command_status.RobotState;
 import frc.robot.loops.DriveLoop;
+import frc.robot.loops.GoalStateLoop;
 import frc.robot.loops.LoopController;
 import frc.robot.loops.RobotStateLoop;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.SubsystemManager;
 import frc.robot.subsystems.Vision;
+import frc.robot.vision.VisionLoop;
 
 public class Robot extends TimedRobot {
 
@@ -46,6 +48,8 @@ public class Robot extends TimedRobot {
     LoopController.getInstance().register(Drive.getInstance().getVelocityPIDLoop());
     LoopController.getInstance().register(DriveLoop.getInstance());
     LoopController.getInstance().register(RobotStateLoop.getInstance());
+    LoopController.getInstance().register(GoalStateLoop.getInstance());
+    LoopController.getInstance().register(VisionLoop.getInstance());
   }
 
   @Override

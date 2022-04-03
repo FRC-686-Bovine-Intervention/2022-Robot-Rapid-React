@@ -6,28 +6,37 @@ public class Constants {
 
     // Hardware Port Definitions
     // Drivetrain Hardware
-    public static int kPigeonID =           1;
-    public static int kLeftMasterID =       2;
-    public static int kLeftSlaveID =        3;
-    public static int kRightMasterID =      4;
-    public static int kRightSlaveID =       5;
+    public static final int kPigeonID =           1;
+    public static final int kLeftMasterID =       2;
+    public static final int kLeftSlaveID =        3;
+    public static final int kRightMasterID =      4;
+    public static final int kRightSlaveID =       5;
     // Intake Hardware
-    public static int kArmMotorID =         6;
-    public static int kRollerMotorID =      7;
+    public static final int kArmMotorID =         6;
+    public static final int kRollerMotorID =      7;
     // Climber Hardware
-    public static int kLeftClimberID =      8;
-    public static int kRightClimberID =     9;
+    public static final int kLeftClimberID =      8;
+    public static final int kRightClimberID =     9;
     // Control Hardware
-    public static int kThrustmasterPort =   0;
-    public static int kButtonboardPort =    1;
+    public static final int kThrustmasterPort =   0;
+    public static final int kButtonboardPort =    1;
 
-    public static double kLoopDt = 0.01;
-    public static int kTalonTimeoutMs = 5;
+    public static final double kLoopDt = 0.01;
+    public static final int kTalonTimeoutMs = 5;
 
+    public static final double kCameraFrameRate = 90;
 
     // Robot Dimensions
-    public static double kCenterToSideBumper = 15.0;
-    public static double kCenterToFrontBumper = 19.5;
-    public static double kCenterToIntake = 32.0;
+    public static final double kCenterToSideBumper = 15.0;
+    public static final double kCenterToFrontBumper = 19.5;
+    public static final double kCenterToIntake = 32.0;
+
+    public static final double kCameraPoseX = -7;
+    public static final double kCameraPoseY = 0;
+    public static final double kCameraPoseZ = 36;
+    public static final double kCameraPosePitchRad = Math.toRadians(-15);
+
+
+    public static final double kBallDiameter = 9.25;
 }
 

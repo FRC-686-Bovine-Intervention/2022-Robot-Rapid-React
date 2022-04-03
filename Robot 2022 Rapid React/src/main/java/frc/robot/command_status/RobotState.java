@@ -2,6 +2,7 @@ package frc.robot.command_status;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants;
 import frc.robot.lib.util.InterpolatingDouble;
 import frc.robot.lib.util.InterpolatingTreeMap;
 import frc.robot.lib.util.Kinematics;
@@ -178,6 +179,28 @@ public class RobotState
             SmartDashboard.putNumber("RobotState/positionY", odometry.getY());
             SmartDashboard.putNumber("RobotState/headingDeg", odometry.getHeadingDeg());
         }
-    };
+    }
+
+    public synchronized Pose getFieldToCamera(double timestamp) {
+		Pose robotToCamera = new Pose(Constants.kCameraPoseX, Constants.kCameraPoseY, Constants.kCameraPosePitchRad);
+		Pose fieldToRobot = getFieldToVehicle(timestamp);
+		Pose fieldToCamera = robotToCamera.changeCoordinateSystem(fieldToRobot);
+		return fieldToCamera;
+	}
+
+    public synchronized Pose getFieldToShooter(double timestamp) {
+		Pose robotToShooter = new Pose(0, 0, 0);
+		Pose fieldToRobot = getFieldToVehicle(timestamp);
+		Pose fieldToShooter = robotToShooter.changeCoordinateSystem(fieldToRobot);
+		return fieldToShooter;
+	}
+
+
+    public synchronized Pose getPredictedFieldToShooter(double _lookaheadTime) {
+		Pose robotToShooter = new Pose(0, 0, 0);
+		Pose fieldToRobot = getPredictedFieldToVehicle(_lookaheadTime);
+		Pose fieldToShooter = robotToShooter.changeCoordinateSystem(fieldToRobot);
+		return fieldToShooter;
+	}
 
 }
