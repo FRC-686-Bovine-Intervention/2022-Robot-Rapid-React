@@ -3,10 +3,12 @@ package frc.robot.vision;
 import java.util.ArrayList;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.loops.Loop;
 
 /**
@@ -22,7 +24,7 @@ public class VisionLoop implements Loop {
 
 	private VisionLoop()
 	{
-		ballCamera = new PhotonCamera("photonvision/BallCamera");//mmal_service_16.1
+		ballCamera = new PhotonCamera("BallCamera");//mmal_service_16.1
 	}
 
 	// camera selection
@@ -37,6 +39,7 @@ public class VisionLoop implements Loop {
 
 	@Override
 	public void onLoop() {
+		System.out.println(ballCamera.getPipelineIndex());
 		double currentTime = Timer.getFPGATimestamp();
 
 		// get target info from Limelight
@@ -56,10 +59,11 @@ public class VisionLoop implements Loop {
 
 		ArrayList<VisionTargetList.Target> targets = new ArrayList<>();	// initially empty
 
-		if (ballCamera.getLatestResult().hasTargets()) 
+		PhotonPipelineResult latest = ballCamera.getLatestResult();
+		if (latest.hasTargets()) 
 		{
-			double hAngle = ballCamera.getLatestResult().getBestTarget().getYaw();
-			double vAngle = ballCamera.getLatestResult().getBestTarget().getPitch();
+			double hAngle = latest.getBestTarget().getYaw();
+			double vAngle = latest.getBestTarget().getPitch();
 			VisionTargetList.Target target = new VisionTargetList.Target(hAngle, vAngle);
 			targets.add(target);
 		}

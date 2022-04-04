@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
@@ -291,23 +293,27 @@ public class Intake extends Subsystem {
         armCurrentPosEntry.setDouble(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
         armGoalEntry.setDouble(pid.getGoal().position);
 
+        // if (VisionLoop.getInstance().ballCamera.getLatestResult().hasTargets())
+        // {
+        //     cameraTargetYaw.setDouble(VisionLoop.getInstance().ballCamera.getLatestResult().getBestTarget().getYaw());
+        //     cameraTargetPitch.setDouble(VisionLoop.getInstance().ballCamera.getLatestResult().getBestTarget().getPitch());
+        // }
         if (!VisionTargetList.getInstance().getTargets().isEmpty())
         {
-            // cameraTargetYaw.setDouble(VisionTargetList.getInstance().getTargets().get(0).getHorizontalAngle());
-            // cameraTargetPitch.setDouble(VisionTargetList.getInstance().getTargets().get(0).getVerticalAngle());
-            cameraTargetYaw.setDouble(VisionLoop.getInstance().ballCamera.getLatestResult().getBestTarget().getYaw());
-            cameraTargetPitch.setDouble(VisionLoop.getInstance().ballCamera.getLatestResult().getBestTarget().getPitch());
+            cameraTargetYaw.setDouble(VisionTargetList.getInstance().getTargets().get(0).getHorizontalAngle());
+            cameraTargetPitch.setDouble(VisionTargetList.getInstance().getTargets().get(0).getVerticalAngle());
         }
         else
         {
             cameraTargetYaw.setDouble(-8888);
             cameraTargetPitch.setDouble(-8888);
         }
-        if (!GoalStates.getInstance().getBestVisionTarget().isEmpty())
+        Optional<GoalState> best = GoalStates.getInstance().getBestVisionTarget();
+        if (best.isPresent())
         {
-            goalDistance.setDouble(GoalStates.getInstance().getBestVisionTarget().get().getHorizontalDistance());
-            goalBearing.setDouble(GoalStates.getInstance().getBestVisionTarget().get().getRelativeBearing());
-            goalTime.setDouble(GoalStates.getInstance().getBestVisionTarget().get().getTrackTime());
+            goalDistance.setDouble(best.get().getHorizontalDistance());
+            goalBearing.setDouble(best.get().getRelativeBearing());
+            goalTime.setDouble(best.get().getTrackTime());
         }
         else
         {
