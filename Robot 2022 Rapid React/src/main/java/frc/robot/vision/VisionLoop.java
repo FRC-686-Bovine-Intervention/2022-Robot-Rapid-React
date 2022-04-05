@@ -1,11 +1,13 @@
 package frc.robot.vision;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
-import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
@@ -24,7 +26,7 @@ public class VisionLoop implements Loop {
 
 	private VisionLoop()
 	{
-		ballCamera = new PhotonCamera("BallCamera");//mmal_service_16.1
+		ballCamera = new PhotonCamera("BallCamera");
 	}
 
 	// camera selection
@@ -39,7 +41,6 @@ public class VisionLoop implements Loop {
 
 	@Override
 	public void onLoop() {
-		System.out.println(ballCamera.getPipelineIndex());
 		double currentTime = Timer.getFPGATimestamp();
 
 		// get target info from Limelight
@@ -62,10 +63,13 @@ public class VisionLoop implements Loop {
 		PhotonPipelineResult latest = ballCamera.getLatestResult();
 		if (latest.hasTargets()) 
 		{
-			double hAngle = latest.getBestTarget().getYaw();
-			double vAngle = latest.getBestTarget().getPitch();
-			VisionTargetList.Target target = new VisionTargetList.Target(hAngle, vAngle);
-			targets.add(target);
+			List<PhotonTrackedTarget> photonTargets = latest.getTargets();
+			for (PhotonTrackedTarget photonTarget : photonTargets) {
+				double hAngle = Units.degreesToRadians(photonTarget.getYaw());
+				double vAngle = Units.degreesToRadians(photonTarget.getPitch());
+				VisionTargetList.Target target = new VisionTargetList.Target(hAngle, vAngle);
+				targets.add(target);
+			}
 		}
 
 		visionTargetList.set(imageCaptureTimestamp, targets);

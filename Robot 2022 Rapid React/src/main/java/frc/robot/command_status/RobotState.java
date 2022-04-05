@@ -182,7 +182,7 @@ public class RobotState
     }
 
     public synchronized Pose getFieldToCamera(double timestamp) {
-		Pose robotToCamera = new Pose(Constants.kCameraPoseX, Constants.kCameraPoseY, Constants.kCameraPosePitchRad);
+		Pose robotToCamera = new Pose(Constants.kCameraPoseX, Constants.kCameraPoseY, Constants.kCameraPoseThetaRad);
 		Pose fieldToRobot = getFieldToVehicle(timestamp);
 		Pose fieldToCamera = robotToCamera.changeCoordinateSystem(fieldToRobot);
 		return fieldToCamera;

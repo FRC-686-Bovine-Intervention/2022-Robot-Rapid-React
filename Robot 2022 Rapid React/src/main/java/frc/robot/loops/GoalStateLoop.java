@@ -70,19 +70,22 @@ public class GoalStateLoop implements Loop
 		List<VisionTargetList.Target> visionTargets = visionTargetList.getTargets();
 		Pose fieldToCamera = robotState.getFieldToCamera(imageCaptureTimestamp);	// find position of camera back when image was taken (removes latency in processing)
 
-		double kCameraPoseThetaRad = 0.0;	// no variation from PI in Constants
-		double kCameraPitchRad = Constants.kCameraPosePitchRad;
+		double kCameraPoseThetaRad = Constants.kCameraPoseThetaRad;	
+		double kCameraPosePitchRad = Constants.kCameraPosePitchRad;
 		double kCameraPoseZ = Constants.kCameraPoseZ;
 		
 
 		List<Vector2d> fieldToGoals = new ArrayList<>();
 		
+		double minDist = Double.POSITIVE_INFINITY;
+		Vector2d robotToTarget = new Vector2d();
+
 		if (!(visionTargets == null || visionTargets.isEmpty()))
 		{
 			for (VisionTargetList.Target target : visionTargets)
 			{
 				hAngle = target.getHorizontalAngle() - kCameraPoseThetaRad;	// compensate for camera yaw
-				vAngle = target.getVerticalAngle()   - kCameraPitchRad;		// compensate for camera pitch
+				vAngle = target.getVerticalAngle()   - kCameraPosePitchRad;		// compensate for camera pitch
 						
 		        double differentialHeight = Constants.kBallDiameter/2 - kCameraPoseZ;	
 				horizontalDistance = 0;
@@ -96,33 +99,23 @@ public class GoalStateLoop implements Loop
 					Pose fieldToTarget = cameraToTarget.changeCoordinateSystem( fieldToCamera );
 					fieldToGoals.add( fieldToTarget.getPosition() );
 				}
+
+				if (horizontalDistance > 0 && horizontalDistance < minDist)
+				{
+					minDist = horizontalDistance;
+
+					Vector2d cameraToTarget = Vector2d.magnitudeAngle(horizontalDistance, hAngle);
+					robotToTarget = cameraToTarget;
+				}
 			}
 		}
-		else
-		{
-			boolean break_here = true; 	
-		}
-		
-	
-		
-		
-		// Step 2: Add these goals to goal tracker
-		goalTracker.update(imageCaptureTimestamp, fieldToGoals);
-		
-		
-
-		
-		// Step 3: 	Rank each goal, sort goals by rank
-		//			Store position of goals, calculate range/bearing from shooter to each goal
-        double now = Timer.getFPGATimestamp();
-        Optional<GoalState> currentTarget = goalStates.getBestVisionTarget();
-		Pose predictedFieldToShooter = robotState.getPredictedFieldToShooter(0); // set to 0 since we don't have a turret and need to point the entire robot
 
 		goalStates.clear();
-		for (GoalTracker.TrackReport report : goalTracker.getSortedTrackReports(now, currentTarget))
-		{
-			goalStates.add(report.fieldToGoal, predictedFieldToShooter, report.trackId, report.getLatestTimestamp());
-		}		
+		if (minDist < Double.POSITIVE_INFINITY) {
+			Pose fieldToRobot = new Pose(0,0,0);
+			int trackId = 0;
+			goalStates.add(robotToTarget, fieldToRobot, trackId, imageCaptureTimestamp);
+		}
 
 	}
 	

@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.Constants;
 import frc.robot.command_status.GoalStates;
 import frc.robot.command_status.GoalStates.GoalState;
-import frc.robot.vision.VisionLoop;
+import frc.robot.command_status.RobotState;
+import frc.robot.lib.util.Pose;
+import frc.robot.lib.util.Vector2d;
 import frc.robot.vision.VisionTargetList;
 
 /**<h4>Contains all code for the Intake subsystem</h4>*/
@@ -276,7 +278,6 @@ public class Intake extends Subsystem {
     private NetworkTableEntry cameraTargetPitch = tab.add("Target Pitch", -9999).withWidget(BuiltInWidgets.kTextView)           .withPosition(9,3).getEntry();
     private NetworkTableEntry goalDistance = tab.add("Goal Distance", -9999).withWidget(BuiltInWidgets.kTextView)               .withPosition(8,4).getEntry();
     private NetworkTableEntry goalBearing = tab.add("Goal Relative Bearing", -9999).withWidget(BuiltInWidgets.kTextView)        .withPosition(9,4).getEntry();
-    private NetworkTableEntry goalTime = tab.add("Goal Time", -9999).withWidget(BuiltInWidgets.kTextView)                       .withPosition(8,2).getEntry();
     
     @Override
     public void updateShuffleboard()
@@ -308,18 +309,35 @@ public class Intake extends Subsystem {
             cameraTargetYaw.setDouble(-8888);
             cameraTargetPitch.setDouble(-8888);
         }
-        Optional<GoalState> best = GoalStates.getInstance().getBestVisionTarget();
-        if (best.isPresent())
+
+        // update currentGoalState based on whether target is currently seen, and if button is being pressed
+        Optional<GoalState> visionGoalState = GoalStates.getInstance().getBestVisionTarget();
+        Optional<Vector2d> currentFieldToGoal = Optional.empty();
+        double currentTime = Timer.getFPGATimestamp();
+         
+        if (visionGoalState.isPresent())
         {
-            goalDistance.setDouble(best.get().getHorizontalDistance());
-            goalBearing.setDouble(best.get().getRelativeBearing());
-            goalTime.setDouble(best.get().getTrackTime());
+            currentFieldToGoal = Optional.of( visionGoalState.get().getPosition() );
         }
-        else
+
+        boolean haveGoal = currentFieldToGoal.isPresent();
+
+        // if we don't see a target, continue under driver control
+        if (haveGoal)
         {
+            // Get range and angle to target
+            Vector2d robotToGoal = currentFieldToGoal.get();
+	    	double distanceToGoal = robotToGoal.length();
+			double bearingToGoal = robotToGoal.angle(); 	// bearing relative to shooter's heading
+
+            double distanceToTargetInches = distanceToGoal - Constants.kCenterToIntake;   // distance from camera
+            double bearingToTarget = bearingToGoal;
+
+            goalDistance.setDouble(distanceToTargetInches);
+            goalBearing.setDouble(bearingToTarget);
+        } else {
             goalDistance.setDouble(-8888);
             goalBearing.setDouble(-8888);
-            goalTime.setDouble(-8888);
         }
     }
 }

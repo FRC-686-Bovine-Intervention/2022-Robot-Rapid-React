@@ -34,7 +34,8 @@ public class Constants {
     public static final double kCameraPoseX = -7;
     public static final double kCameraPoseY = 0;
     public static final double kCameraPoseZ = 36;
-    public static final double kCameraPosePitchRad = Math.toRadians(-15);
+    public static final double kCameraPoseThetaRad = 0;
+    public static final double kCameraPosePitchRad = Math.toRadians(15.0);
 
 
     public static final double kBallDiameter = 9.25;

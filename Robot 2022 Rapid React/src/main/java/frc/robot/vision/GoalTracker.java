@@ -29,11 +29,11 @@ public class GoalTracker
     public static double kGoalTrackAveragePeriod = 0.1;		// seconds (will average goal detections over this period)
 	public static double kMaxTargetAge = 5.0; //2.0 // 0.4;			// seconds (will not consider targets that haven't been updated in this time)
 	
-    public static double kTrackReportComparatorStablityWeight = 1.0;
-    public static double kTrackReportComparatorAgeWeight = 1.0;
+    public static double kTrackReportComparatorStablityWeight = 0.0;
+    public static double kTrackReportComparatorAgeWeight = 0.0;
     public static double kTrackReportComparatorSwitchingWeight = 0.0;
-    public static double kTrackReportComparatorDistanceWeight = 10.0;
-    public static double kTrackReportComparatorAngleWeight = 2.0; 
+    public static double kTrackReportComparatorDistanceWeight = 1.0;
+    public static double kTrackReportComparatorAngleWeight = 0.0; 
 
 
 	/**
@@ -116,7 +116,8 @@ public class GoalTracker
 			double angleScore = -Math.abs(angleWeight) * bearingToGoal;
 
 			double switchingScore = (report.trackId == currentBestTrackId ? switchingWeight : 0);
-			return (distanceScore + angleScore + stabilityScore + ageScore + switchingScore);
+			// return (distanceScore + angleScore + stabilityScore + ageScore + switchingScore);
+			return (distanceScore);
 		}
 
 		@Override

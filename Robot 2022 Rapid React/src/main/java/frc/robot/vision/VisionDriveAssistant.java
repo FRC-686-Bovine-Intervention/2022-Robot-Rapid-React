@@ -20,9 +20,9 @@ public class VisionDriveAssistant
 	public static VisionDriveAssistant getInstance() { return instance; }
 
     // configuration parameters
-    public static boolean allowSpeedControl = true;
-    public static double kLookaheadDist = 24.0;   // inches
-    public static double kFullThrottleSpeed = 72; // inches/sec
+    public static boolean allowSpeedControl = false;
+    public static double kLookaheadDist = 48.0;   // inches
+    public static double kFullThrottleSpeed = 100.0; // inches/sec
     public static double kMaxSpeed =      100.0; // inches/sec
     public static double kMaxAccel =      50.0; // inches/sec^2	
 
@@ -76,11 +76,9 @@ public class VisionDriveAssistant
         if (haveGoal)
         {
             // Get range and angle to target
-            Vector2d fieldToGoal = currentFieldToGoal.get();
-            Pose fieldToShooter = RobotState.getInstance().getFieldToShooter(currentTime);
-		    Vector2d shooterToGoal = fieldToGoal.sub(fieldToShooter.getPosition());
-	    	double distanceToGoal = shooterToGoal.length();
-			double bearingToGoal = shooterToGoal.angle() - fieldToShooter.getHeading(); 	// bearing relative to shooter's heading
+            Vector2d robotToGoal = currentFieldToGoal.get();
+	    	double distanceToGoal = robotToGoal.length();
+			double bearingToGoal = -robotToGoal.angle(); 	// bearing relative to shooter's heading
 
             distanceToTargetInches = distanceToGoal - Constants.kCenterToIntake;   // distance from camera
             bearingToTarget = bearingToGoal;
