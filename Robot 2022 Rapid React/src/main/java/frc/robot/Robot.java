@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.auto.AutoManager;
@@ -40,6 +41,8 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     Vision.getInstance().init();
+
+    DataLogManager.start();
 
     subsystemManager.init();
     autoManager.InitChoices();

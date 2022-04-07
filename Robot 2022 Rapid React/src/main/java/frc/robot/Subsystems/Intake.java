@@ -36,7 +36,7 @@ public class Intake extends Subsystem {
     private static final double kCalibrationPercentOutput = 0.2;
 
     private static final double kGroundHoldingThresholdDegrees = 4.0;
-    private static final double kGroundHoldingPercentOutput = -0.2;
+    private static final double kGroundHoldingPercentOutput = -0.25;
 
     private static final double kGearRatio = 16.0 * 48.0/12.0;  // 16 in gearbox, 48t:12t sprockets
     private static final double kEncoderUnitsPerRev = 2048 * kGearRatio;
@@ -106,6 +106,7 @@ public class Intake extends Subsystem {
     {
         disabledInit = true;
         ArmMotor.configForwardSoftLimitEnable(true);
+        ArmMotor.setNeutralMode(NeutralMode.Brake);
         if(autoCalibrate && !calibrated) {setState(IntakeState.CALIBRATING);}
         switch (intakeStatus)
         {
@@ -129,8 +130,6 @@ public class Intake extends Subsystem {
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
                 ArmMotor.set(TalonFXControlMode.PercentOutput, climbingPower);
                 pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
-//DEBUG
-                //climbingPower = 0;
             break;
             case HARD_STOPS:
                 RollerMotor.set(VictorSPXControlMode.PercentOutput, 0);
@@ -180,7 +179,11 @@ public class Intake extends Subsystem {
         pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
         climbingPower = 0;
         if(disabledInit) disabledTime = Timer.getFPGATimestamp();
-        if(Timer.getFPGATimestamp() - disabledTime > kDisableRecalTimeThreshold) calibrated = false;
+        if(Timer.getFPGATimestamp() - disabledTime > kDisableRecalTimeThreshold)
+        {
+            calibrated = false;
+            ArmMotor.setNeutralMode(NeutralMode.Coast);
+        }
         disabledInit = false;
     }
 

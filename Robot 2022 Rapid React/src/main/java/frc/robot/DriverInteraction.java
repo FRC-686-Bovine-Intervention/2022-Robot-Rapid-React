@@ -94,6 +94,8 @@ public class DriverInteraction {
                 drive.setOpenLoop(new DriveCommand(DriveControlMode.OPEN_LOOP, controls.getDriveCommand().getLeftMotor()*kClimbingDriveSlowdown, controls.getDriveCommand().getRightMotor()*kClimbingDriveSlowdown, NeutralMode.Coast));
                 Shuffleboard.selectTab("Climber");
             break;
+            case RETRACT_EXTEND:
+                drive.setOpenLoop(new DriveCommand(DriveControlMode.OPEN_LOOP, -0.1,-0.1, NeutralMode.Coast));
             default:
                 Shuffleboard.selectTab("Climber");
                 climber.setTargetPos(controls.getAxis(JoystickEnum.THRUSTMASTER).y*kClimberMaxPercent);

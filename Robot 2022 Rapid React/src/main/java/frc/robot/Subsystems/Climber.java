@@ -2,11 +2,13 @@ package frc.robot.subsystems;
  
 import java.util.ArrayList;
 
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -20,14 +22,16 @@ public class Climber extends Subsystem {
     public static Climber getInstance() {if(instance == null){instance = new Climber();}return instance;} 
  
     private TalonFX LeftMotor; 
-    private TalonFX RightMotor; 
+    private TalonFX RightMotor;
+    private DigitalInput CalibrationHallEffect;
  
     private Intake intake; 
  
     private static final double kDefensePower = -0.07;
-    private static final double kCalibratingPercent = -0.15;
+    private static final double kCalibratingPercent = -0.2;
     private static final double kCalibratingThreshold = 20; 
     private static final double kDisableRecalTimeThreshold = 5;
+    private static final double kReverseSoftLimit = -3;
 
     private static final double kShaftCircum = 0.5*Math.PI*26.75/23.58; 
     private static final double kGearRatio = 5; 
@@ -40,15 +44,16 @@ public class Climber extends Subsystem {
     private Climber() 
     { 
         LeftMotor = new TalonFX(Constants.kLeftClimberID); 
-        RightMotor = new TalonFX(Constants.kRightClimberID); 
- 
+        RightMotor = new TalonFX(Constants.kRightClimberID);
+        CalibrationHallEffect = new DigitalInput(Constants.kClimberHallEffectPort);
         
         LeftMotor.configFactoryDefault();
         LeftMotor.configOpenloopRamp(0.75);
-        LeftMotor.setInverted(TalonFXInvertType.Clockwise);  
-        LeftMotor.configForwardSoftLimitThreshold(inchesToEncoderUnits(ClimberPos.EXTENDED.distIn)); 
-        LeftMotor.configForwardSoftLimitEnable(true); 
-        LeftMotor.configReverseSoftLimitThreshold(inchesToEncoderUnits(-3));
+        //LeftMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 50, 60, 0.25));
+        LeftMotor.setInverted(TalonFXInvertType.Clockwise);
+        LeftMotor.configForwardSoftLimitThreshold(inchesToEncoderUnits(ClimberPos.EXTENDED.distIn));
+        LeftMotor.configForwardSoftLimitEnable(true);
+        LeftMotor.configReverseSoftLimitThreshold(inchesToEncoderUnits(kReverseSoftLimit));
         LeftMotor.configReverseSoftLimitEnable(true);
         
         RightMotor.configFactoryDefault();
@@ -65,7 +70,7 @@ public class Climber extends Subsystem {
         LOW_BAR(ClimberPos.RETRACTED),
         EXTEND_GROUND(ClimberPos.EXTENDED),
         SLOW_DRIVE(ClimberPos.EXTENDED),
-        RETRACT_EXTEND(null),
+        RETRACT_EXTEND(ClimberPos.EXTENDED),
         INTAKE(ClimberPos.EXTENDED),
         CALIBRATING(ClimberPos.CALIBRATION);
  
@@ -87,6 +92,7 @@ public class Climber extends Subsystem {
     public boolean readyForNextState; 
  
     private boolean moveToClimbingMode = false;
+    private boolean calibrationPaused = false;
     @Override 
     public void run() 
     { 
@@ -94,26 +100,9 @@ public class Climber extends Subsystem {
         if(autoCalibrate && !calibrated) setState(ClimberState.CALIBRATING);
         LeftMotor.configForwardSoftLimitEnable(true);
         LeftMotor.configReverseSoftLimitEnable(true);
-        // switch (climberStatus)  
-        // {  
-        //     case CALIBRATING:  
-        //         calibrated = false;  
-        //         LeftMotor.set(TalonFXControlMode.PercentOutput, kCalibratingPercent);  
-        //         if (LeftMotor.getStatorCurrent() > kCalibratingThreshold)  
-        //         {
-        //             LeftMotor.setSelectedSensorPosition(0);
-        //             calibrated = true;  
-        //             prevState();  
-        //             LeftMotor.set(TalonFXControlMode.PercentOutput, 0);  
-        //         }  
-        //     break;
-        //     case DEFENSE:
-        //         power = kDefensePower;
-        //     default:  
-        //         LeftMotor.set(TalonFXControlMode.PercentOutput, power);  
-        //     break;  
-        // } 
 
+        if(climberStatus != ClimberState.CALIBRATING) calibrationPaused = false;
+        
         switch(climberStatus)
         {
             case LOW_BAR:
@@ -149,16 +138,21 @@ public class Climber extends Subsystem {
                 intake.setClimbingPower(power * kIntakeMaxPercent);
                 LeftMotor.set(TalonFXControlMode.PercentOutput,0);
             break;
-            case CALIBRATING:  
+            case CALIBRATING:
                 calibrated = false;  
-                LeftMotor.set(TalonFXControlMode.PercentOutput, kCalibratingPercent);
                 LeftMotor.configReverseSoftLimitEnable(false);
-                if (LeftMotor.getStatorCurrent() > kCalibratingThreshold)  
+                if (LeftMotor.getStatorCurrent() > kCalibratingThreshold)
+                    calibrationPaused = true;
+                if (!calibrationPaused)
+                    LeftMotor.set(TalonFXControlMode.PercentOutput, kCalibratingPercent);
+                else
+                    LeftMotor.set(TalonFXControlMode.PercentOutput, 0);
+                if (!CalibrationHallEffect.get()) //Inverted because Hall Effect is stupid
                 {
                     LeftMotor.setSelectedSensorPosition(inchesToEncoderUnits(ClimberPos.CALIBRATION.distIn));
+                    LeftMotor.set(TalonFXControlMode.PercentOutput, 0);
                     resetState();
                     calibrated = true;
-                    LeftMotor.set(TalonFXControlMode.PercentOutput, 0);  
                 }  
             break;
         }
@@ -171,7 +165,8 @@ public class Climber extends Subsystem {
     public void disable() { 
         if(disabledInit) disabledTime = Timer.getFPGATimestamp(); 
         if(Timer.getFPGATimestamp() - disabledTime > kDisableRecalTimeThreshold) calibrated = false; 
-        disabledInit = false; 
+        disabledInit = false;
+        calibrationPaused = false;
     } 
  
     @Override 
@@ -214,28 +209,43 @@ private double power;
     private static double encoderUnitsToInches(double _encoderUnits) {return (double)(_encoderUnits / kEncoderUnitsPerIn);} 
   
     private ShuffleboardTab tab = Shuffleboard.getTab("Climber");  
-    private NetworkTableEntry calibratedEntry = tab.add("Calibrated", false).withWidget(BuiltInWidgets.kBooleanBox).getEntry();  
-    private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton).getEntry();  
-    private NetworkTableEntry statusEntry = tab.add("Status", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();  
-    private NetworkTableEntry historyEntry = tab.add("Status History", "not updating").withWidget(BuiltInWidgets.kTextView).getEntry();  
-    private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch).getEntry(); 
-    private NetworkTableEntry climberCurrentPosEntry = tab.add("Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry(); 
+    private NetworkTableEntry statusEntry = tab.add("Status", "not updating").withWidget(BuiltInWidgets.kTextView)              .withPosition(0,0).withSize(2,1).getEntry();  
+    private NetworkTableEntry historyEntry = tab.add("Status History", "not updating").withWidget(BuiltInWidgets.kTextView)     .withPosition(3,1).withSize(4,1).getEntry();  
+    private NetworkTableEntry calibratedEntry = tab.add("Calibrated", false).withWidget(BuiltInWidgets.kBooleanBox)             .withPosition(1,1).getEntry();
+    private NetworkTableEntry pauseEntry = tab.add("Calibration Paused", false).withWidget(BuiltInWidgets.kBooleanBox)          .withPosition(0,1).getEntry();  
 
-    private NetworkTableEntry lowbarEntry           = tab.add("Low Bar", false)         .withWidget(BuiltInWidgets.kBooleanBox).withPosition(0, 3).getEntry();
-    private NetworkTableEntry extendGroundEntry     = tab.add("Extend Ground", false)   .withWidget(BuiltInWidgets.kBooleanBox).withPosition(1, 3).getEntry();
-    private NetworkTableEntry slowDriveEntry        = tab.add("Slow Drive", false)      .withWidget(BuiltInWidgets.kBooleanBox).withPosition(2, 3).getEntry();
-    private NetworkTableEntry retractExtendEntry    = tab.add("Retract|Extend", false)  .withWidget(BuiltInWidgets.kBooleanBox).withPosition(3, 3).getEntry();
-    private NetworkTableEntry intakeEntry           = tab.add("Intake", false)          .withWidget(BuiltInWidgets.kBooleanBox).withPosition(4, 3).getEntry();
+    private NetworkTableEntry enableEntry = tab.add("Enable", true).withWidget(BuiltInWidgets.kToggleSwitch)                    .withPosition(0,3).getEntry(); 
+    private NetworkTableEntry calibrateButton = tab.add("Calibrate", false).withWidget(BuiltInWidgets.kToggleButton)            .withPosition(1,3).getEntry();
+
+    private NetworkTableEntry climbingPowerInput = tab.add("Power Input", -9999).withWidget(BuiltInWidgets.kTextView)           .withPosition(8,0).getEntry(); 
+    private NetworkTableEntry climberCurrentPosEntry = tab.add("Current Pos", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(9,0).getEntry(); 
+    private NetworkTableEntry climberSupplyEntry = tab.add("Supply Current", -9999).withWidget(BuiltInWidgets.kTextView)        .withPosition(8,1).getEntry(); 
+    private NetworkTableEntry climberStatorEntry = tab.add("Stator Current", -9999).withWidget(BuiltInWidgets.kTextView)        .withPosition(9,1).getEntry(); 
+    private NetworkTableEntry climberBusVoltageEntry = tab.add("Bus Voltage", -9999).withWidget(BuiltInWidgets.kTextView)       .withPosition(8,2).getEntry(); 
+    private NetworkTableEntry climberOutputVoltageEntry = tab.add("Output Voltage", -9999).withWidget(BuiltInWidgets.kTextView) .withPosition(9,2).getEntry(); 
+
+    private NetworkTableEntry lowbarEntry           = tab.add("Low Bar", false)         .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(3,2).getEntry();
+    private NetworkTableEntry extendGroundEntry     = tab.add("Extend Ground", false)   .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(4,2).getEntry();
+    private NetworkTableEntry slowDriveEntry        = tab.add("Slow Drive", false)      .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(5,2).getEntry();
+    private NetworkTableEntry retractExtendEntry    = tab.add("Retract|Extend", false)  .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(6,2).getEntry();
+    private NetworkTableEntry intakeEntry           = tab.add("Intake", false)          .withWidget(BuiltInWidgets.kBooleanBox) .withPosition(3,3).withSize(4,1).getEntry();
       
     @Override  
     public void updateShuffleboard()  
     {
         statusEntry.setString(climberStatus.name()); 
-        climberCurrentPosEntry.setNumber(encoderUnitsToInches(LeftMotor.getSelectedSensorPosition())); 
-        calibratedEntry.setBoolean(calibrated);  
-        Enabled = enableEntry.getBoolean(true);  
-
         historyEntry.setString(ClimberStatusHistory.toString());
+        calibratedEntry.setBoolean(calibrated);
+        pauseEntry.setBoolean(calibrationPaused);
+        
+        Enabled = enableEntry.getBoolean(true);
+        
+        climberStatorEntry.setNumber(LeftMotor.getStatorCurrent());
+        climberOutputVoltageEntry.setNumber(LeftMotor.getMotorOutputVoltage());
+        climberBusVoltageEntry.setNumber(LeftMotor.getBusVoltage());
+        climberSupplyEntry.setNumber(LeftMotor.getSupplyCurrent());
+        climberCurrentPosEntry.setNumber(encoderUnitsToInches(LeftMotor.getSelectedSensorPosition()));
+        climbingPowerInput.setNumber(power);
         
         lowbarEntry.setBoolean(false);
         extendGroundEntry.setBoolean(false);
@@ -270,6 +280,7 @@ private double power;
     } 
     public void nextState() 
     { 
+        calibrationPaused = false;
         switch(climberStatus) 
         { 
             case DEFENSE:           setState(ClimberState.LOW_BAR);         break;
@@ -279,7 +290,7 @@ private double power;
             case RETRACT_EXTEND:    setState(ClimberState.INTAKE);          break;
             case INTAKE:            setState(ClimberState.RETRACT_EXTEND);  break;
             case CALIBRATING:       break; 
-        } 
+        }
     } 
     public void prevState()  
     {  
