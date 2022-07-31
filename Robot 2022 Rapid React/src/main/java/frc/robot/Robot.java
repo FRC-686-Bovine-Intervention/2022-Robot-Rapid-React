@@ -79,7 +79,6 @@ public class Robot extends TimedRobot {
     startingLeftDistance = DriveState.getInstance().getLeftDistanceInches();
     startingRightDistance = DriveState.getInstance().getRightDistanceInches();
     LoopController.getInstance().start();
-    driverInteraction.init();
   }
 
   @Override

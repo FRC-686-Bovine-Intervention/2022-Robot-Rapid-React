@@ -8,13 +8,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.auto.modes.ActionTestingAuto;
 import frc.robot.auto.modes.AutoMode;
-import frc.robot.auto.modes.OneBallAuto;
-import frc.robot.auto.modes.ThreeBallAuto;
-import frc.robot.auto.modes.TrollAuto;
 import frc.robot.auto.modes.TurnAroundAuto;
-import frc.robot.auto.modes.TwoBallAuto;
 import frc.robot.auto.modes.WheelDiameterCalibrationAuto;
-import frc.robot.auto.modes.WheelPositionAuto;
 import frc.robot.command_status.RobotState;
 
 public class AutoManager {
@@ -33,10 +28,6 @@ public class AutoManager {
 
     public void InitChoices()
     {
-        AutoModeChooser.addOption("1 Ball Auto", new OneBallAuto());
-        AutoModeChooser.addOption("2 Ball Auto", new TwoBallAuto());
-        AutoModeChooser.addOption("3 Ball Auto", new ThreeBallAuto());
-        AutoModeChooser.setDefaultOption("Troll Auto :)", new TrollAuto());
         AutoModeChooser.addOption("Action Testing Auto", new ActionTestingAuto());
         AutoModeChooser.addOption("Turn Around Auto", new TurnAroundAuto());
         AutoModeChooser.addOption("Wheel Calibration Auto", new WheelDiameterCalibrationAuto());
