@@ -6,10 +6,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ComplexWidget;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import frc.robot.auto.modes.ActionTestingAuto;
 import frc.robot.auto.modes.AutoMode;
-import frc.robot.auto.modes.TurnAroundAuto;
-import frc.robot.auto.modes.WheelDiameterCalibrationAuto;
+import frc.robot.auto.modes.JankyAuto;
 import frc.robot.command_status.RobotState;
 
 public class AutoManager {
@@ -28,9 +26,7 @@ public class AutoManager {
 
     public void InitChoices()
     {
-        AutoModeChooser.addOption("Action Testing Auto", new ActionTestingAuto());
-        AutoModeChooser.addOption("Turn Around Auto", new TurnAroundAuto());
-        AutoModeChooser.addOption("Wheel Calibration Auto", new WheelDiameterCalibrationAuto());
+        AutoModeChooser.addOption("Janky Auto", new JankyAuto());
     }
 
     public void init()

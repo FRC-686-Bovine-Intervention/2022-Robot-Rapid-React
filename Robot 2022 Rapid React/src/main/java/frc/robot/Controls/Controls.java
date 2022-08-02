@@ -61,10 +61,10 @@ public class Controls {
     public DriveCommand getDriveCommand()
     {
         Vector2d a = getAxis(JoystickEnum.THRUSTMASTER);
-        a.x = 0.8*a.x*a.x*a.x - 0.8*a.x + a.x;
-        a.y = 0.7*a.y*a.y*a.y - 0.7*a.y + a.y;
+        a.x = 0.5*a.x*a.x*a.x - 0.5*a.x + a.x;
+        a.y = 0.4*a.y*a.y*a.y - 0.4*a.y + a.y;
 
-        a.x *= 0.7;
+        //a.x *= 0.7;
 
         double leftPower = a.y-a.x;
         double rightPower = a.y+a.x;

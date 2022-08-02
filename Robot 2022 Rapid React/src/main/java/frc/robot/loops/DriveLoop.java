@@ -6,17 +6,15 @@ import java.util.List;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
-import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants;
 import frc.robot.command_status.DriveCommand;
 import frc.robot.command_status.DriveState;
 import frc.robot.lib.sensors.GyroBase;
-import frc.robot.lib.sensors.Pigeon;
 import frc.robot.subsystems.Drive;
 
 /*
@@ -43,8 +41,8 @@ public class DriveLoop implements Loop
 	private static GyroBase gyro;
     private DriveState driveState;
 
-	public final TalonFX lMotorMaster;
-	public final TalonFX rMotorMaster;
+	public final VictorSPX lMotorMaster;
+	public final VictorSPX rMotorMaster;
 	public final List<BaseMotorController> lMotorSlaves;
 	public final List<BaseMotorController> rMotorSlaves;
 
@@ -54,8 +52,8 @@ public class DriveLoop implements Loop
 
 	// Motor Controller Inversions
 	
-    public static TalonFXInvertType kLeftMotorInverted = TalonFXInvertType.CounterClockwise;
-    public static TalonFXInvertType kRightMotorInverted = TalonFXInvertType.Clockwise;
+    public static InvertType kLeftMotorInverted = InvertType.None;
+    public static InvertType kRightMotorInverted = InvertType.InvertMotorOutput;
 
     public static int kDriveTrainCurrentLimit = 25;
 
@@ -139,7 +137,7 @@ public class DriveLoop implements Loop
     public static double kPathFollowingLookahead = 24.0; // inches
     public static double kPathFollowingCompletionTolerance = 4.0; 
 
-	public static double kDriveOpenLoopRampRate = 0.375;	// seconds from zero to full speed
+	public static double kDriveOpenLoopRampRate = 0;	// seconds from zero to full speed
 
 
 	private DriveLoop() 
@@ -150,15 +148,11 @@ public class DriveLoop implements Loop
 		/*****************************************************************
 		 * Configure Master Motor Controllers
 		 *****************************************************************/
-		lMotorMaster = new TalonFX(Constants.kLeftMasterID);
-		rMotorMaster = new TalonFX(Constants.kRightMasterID);
+		lMotorMaster = new VictorSPX(Constants.kLeftMasterID);
+		rMotorMaster = new VictorSPX(Constants.kRightMasterID);
         
 		lMotorMaster.configFactoryDefault();
 		rMotorMaster.configFactoryDefault();
-
-		// Get status at 100Hz (faster than default 50 Hz)
-		lMotorMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, kTalonTimeoutMs);
-		rMotorMaster.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10, kTalonTimeoutMs);
 
 		lMotorMaster.set(ControlMode.PercentOutput, 0.0);
 		rMotorMaster.set(ControlMode.PercentOutput, 0.0);
@@ -253,15 +247,6 @@ public class DriveLoop implements Loop
 		setMotors(neutralCmd);
 		setNeutralMode(neutralCmd);
 		resetEncoders(neutralCmd);        
-
-	
-		/*****************************************************************
-		 * Select which Gyro is installed
-		 *****************************************************************/
-		// select which gyro is installed
-		System.out.println("Selected gyro = Pigeon");
-		gyro = Pigeon.getInstance();
-
 	}
 
 	public void configMotionMagicSpeed(double _cruiseVelocityInchesPerSec, double _accelerationInchesPerSecSqr)
@@ -320,9 +305,7 @@ public class DriveLoop implements Loop
 			 * documentation, and standard right hand rule convention
 			 * negate it here to correct
 			 */
-			driveState.setHeadingDeg( gyro.getHeadingDeg() );
 	
-			driveState.setMotorCurrent(lMotorMaster.getStatorCurrent(), rMotorMaster.getStatorCurrent() );
 			driveState.setMotorPIDError(lMotorMaster.getClosedLoopError( kTalonPidIdx ), rMotorMaster.getClosedLoopError( kTalonPidIdx ) );
 	
 	        switch (driveState.getTalonControlMode())
