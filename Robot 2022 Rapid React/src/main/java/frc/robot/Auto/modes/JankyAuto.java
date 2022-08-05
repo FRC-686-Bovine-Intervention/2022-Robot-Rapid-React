@@ -8,8 +8,7 @@ public class JankyAuto extends AutoMode{
 
     @Override
     protected void routine() throws AutoModeEndedException {
-        runAction(new SetDriveCommandAction(new DriveCommand(-0.3, -0.3), 2));
-        runAction(new SetDriveCommandAction(new DriveCommand(0.5, -0.5), 13));
+        runAction(new SetDriveCommandAction(new DriveCommand(-0.6, -0.6), 2));
     }
     
 }
