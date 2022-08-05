@@ -140,14 +140,21 @@ public class Intake extends Subsystem {
                 pid.reset(encoderUnitsToDegrees(ArmMotor.getSelectedSensorPosition()));
                 calibrated = false;
                 ArmMotor.set(TalonFXControlMode.PercentOutput, kCalibrationPercentOutput);
-                if (checkFwdLimitSwitch())
-                {
-                    ArmMotor.setSelectedSensorPosition(degreesToEncoderUnits(ArmPosEnum.CALIBRATION.angleDeg));
-                    calibrated = true;
-                    ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
-                    setState(IntakeState.DEFENSE);
-                }
             break;
+        }
+        
+        if (checkFwdLimitSwitch())
+        {
+            ArmMotor.setSelectedSensorPosition(degreesToEncoderUnits(ArmPosEnum.CALIBRATION.angleDeg));
+            calibrated = true;
+            setState(IntakeState.DEFENSE);
+            if (!prevFwdLimitSwitchClosed)
+            {
+                ArmMotor.set(TalonFXControlMode.PercentOutput, 0);
+                pid.reset(calState);
+                pid.setGoal(calState);
+            }
+            prevFwdLimitSwitchClosed = checkFwdLimitSwitch();
         }
     }
 
@@ -233,19 +240,11 @@ public class Intake extends Subsystem {
     public static int degreesToEncoderUnits(double _degrees) {return (int)(_degrees * kEncoderUnitsPerDeg);}
     public static double encoderUnitsToDegrees(double _encoderUnits) {return (double)(_encoderUnits / kEncoderUnitsPerDeg);}
 
+
+    private boolean prevFwdLimitSwitchClosed;
     public boolean checkFwdLimitSwitch()
     {
         boolean fwdLimitSwitchClosed = (ArmMotor.isFwdLimitSwitchClosed() == 1);
-        if (fwdLimitSwitchClosed)
-        {
-            // set the calibration position here
-            ArmMotor.setSelectedSensorPosition(degreesToEncoderUnits(ArmPosEnum.CALIBRATION.angleDeg));
-            pid.reset(calState);
-            pid.setGoal(calState);
-
-            // stop future calibration
-
-        }
         return fwdLimitSwitchClosed;
     }
 
